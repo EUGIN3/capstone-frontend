@@ -1,0 +1,93 @@
+:root {
+    /* Big headers */
+    --extra-large-size: 110px;
+    --big-header-size: 46px;
+    --big-header-letter-space: 1.5px;
+
+    /* Normal Font */
+    --normal-font-size: 16px;
+    --letter-spacing: 1px;
+
+    /* Small Font */
+    --small-font-size: 12px;
+
+    /* Font Weight */
+    --semi-bold: 500;
+    --bold: 700;
+    --max-bold: 800;
+
+    /* Input box */
+    --padding: 12px;
+    --opacity: .7;
+
+    /* Border */
+    --border-radius: 2px;
+
+    /* Color */
+    --black: #0C0C0C;
+    --black-v2: #1f1f1f;
+    --white: #F5F5F5;
+    --blue: #2287E7;
+
+    /* Text Shadow */
+    --text-shadow: -1px 1px 3px var(--white);
+
+    /* Transition */
+    --transition: all .3s;
+
+
+    /* Box shadow for black button */
+    --box-shadow-black: rgba(14, 14, 14, 0.336) 0px 7px 29px 0px;
+    --box-shadow-white: rgba(255, 255, 255, 0.336) 0px 7px 29px 0px;
+}
+
+button {
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    border: 1px solid var(--black);    
+    font-weight: var(--semi-bold);
+    transition: var(--transition);
+    font-size: var(--normal-font-size);
+}
+/* Black */
+.filled-black {
+    background-color: var(--black);
+    color: var(--white);
+}
+
+.filled-black:hover {
+    box-shadow: var(--box-shadow-black);
+}
+
+.outlined-black {
+    color: var(--black);
+    background: transparent;
+}
+
+.outlined-black:hover {
+    background: var(--black);
+    color: var(--white);
+}
+/* White */
+.filled-white {
+    background-color: var(--white);
+    color: var(--black);
+}
+
+.filled-white:hover {
+    box-shadow: var(--box-shadow-white);
+}
+
+.outlined-white {
+    border: 1px solid var(--white); 
+    color: var(--white);
+    background: transparent;
+}
+
+.outlined-white:hover {
+    background: var(--white);
+    color: var(--black);
+}

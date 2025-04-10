@@ -3,18 +3,6 @@
 /* Libre Franklin */
 @import url('https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Franklin:ital,wght@0,100..900;1,100..900&display=swap');
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    border: 0;
-    padding: 0;
-    text-decoration: none;
-}
-
-html {
-    scroll-behavior: smooth;
-}
-
 :root {
     /* Font styles */
     --fancy-font: "Libre Caslon Display", serif;
@@ -46,6 +34,7 @@ html {
     /* Color */
     --black: #0C0C0C;
     --black-v2: #1f1f1f;
+    --grey: #2d2d2db6;
     --white: #F5F5F5;
     --blue: #2287E7;
 
@@ -55,8 +44,6 @@ html {
     /* Transition */
     --transition: all .3s;
 
-
-    
     /* By:Henry */
     --fontsize-of-name:120px;
     --fontsize-of-name-about:50px;
@@ -73,9 +60,136 @@ html {
     --suit-name-font:42px;
 }
 
-body {
-    color: var(--white);
-    font-family: var(--normal-font);
-    font-size: var(--normal-font-size);
+.main-login {
+    height: 100vh;
+    width: 100vw;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--white);
+}
+
+.black-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+    text-transform: uppercase;
+
+    background-color: var(--black);
+}
+
+.logo {
+    height: 150px;
+}
+
+.logo-name {
+    font-family: var(--fancy-font);
+
+    line-height: 1.2;
+    font-size: 40px;
+    letter-spacing: 5px;
+}
+
+.logo-profession {
+    font-size: 14px;
+    letter-spacing: 8px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.white-side {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: var(--black);
+}
+
+.white-container {
+    height: 500px;
+    width: 400px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 30px;
+}
+
+.info-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.welcome {
+    font-size: var(--big-header-size);
+    font-weight: var(--bold);
+}
+
+.welcome-message {
+    width: 300px;
+    font-size: 14px;
+    opacity: var(--opacity);
+}
+
+
+.email,
+.password {
+    width: 100%;
+    font-size: var(--normal-font-size) !important;
+}
+
+.input-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 25px;
+    width: 100%;
+}
+
+.button-container {
+    width: 100%;
+}
+
+.btn-con {
+    height: 55px;
+    margin-bottom: 30px;
+}
+
+.blue {
+    color: var(--blue);
 }
 
