@@ -36,6 +36,7 @@ function Login() {
                         <NormalTextField 
                             label='Email'
                             classes='email'
+                            placeHolder='email@gmail.com'
                         />
 
                         <PassTextField

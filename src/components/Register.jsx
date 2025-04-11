@@ -36,6 +36,7 @@ function Register() {
                         <NormalTextField 
                             label='Email'
                             classes='email'
+                            placeHolder='email@gmail.com'
                         />
 
                         <PassTextField
@@ -53,7 +54,7 @@ function Register() {
 
                         <div className="btn-con">
                             <ButtonElement
-                                label='REGISTER'
+                                label='SING UP'
                                 variant='filled-black'
                             />
                         </div>

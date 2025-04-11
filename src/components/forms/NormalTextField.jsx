@@ -2,7 +2,7 @@ import * as React from 'react';
 import TextField from '@mui/material/TextField';
 
 export default function NormalTextField(props) {
-    const {label, classes} = props
+    const {label, classes, placeHolder} = props
 
     return (
         <>  
@@ -10,6 +10,7 @@ export default function NormalTextField(props) {
                 id="outlined-search" 
                 label={label}
                 type="text"
+                placeholder={placeHolder}
                 sx={{
                     '& .MuiOutlinedInput-root': {
                       fontSize: '16px',
