@@ -75,7 +75,6 @@ html {
 }
 
 body {
-    /* color: var(--white); */
     color: var(--black);
     background-color: var(--white);
     font-family: var(--normal-font);

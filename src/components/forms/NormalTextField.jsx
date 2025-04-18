@@ -1,15 +1,28 @@
 import * as React from 'react';
 import TextField from '@mui/material/TextField';
+import { Controller } from 'react-hook-form';
 
 export default function NormalTextField(props) {
     const {label, classes, placeHolder, name, control} = props
 
     return (
-        <>  
-            <TextField 
-                id="outlined-search" 
+        <> 
+          <Controller 
+            name={name}
+            control={control}
+            render={({
+              field : {onChange, value},
+              fieldState : {error},
+              fieldState,
+            }) => (
+              <TextField 
+                id="outlined-search"
+                onChange={onChange}
+                value={value} 
                 label={label}
                 type="text"
+                error={!!error}
+                helperText={error?.message}
                 placeholder={placeHolder}
                 sx={{
                     '& .MuiOutlinedInput-root': {
@@ -39,10 +52,10 @@ export default function NormalTextField(props) {
                     },
                   }}
 
-                  className={classes}
-                  name={name}
-                  control={control}
-            />
+                className={classes}
+              />
+            )}
+          />
         </>
     );
 }
