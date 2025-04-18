@@ -1,3 +1,4 @@
+import '../index.css'
 import './styles/LoginRegistration.css'
 import React from 'react'
 
@@ -35,15 +36,21 @@ function Login() {
                     <div className="input-container">
                         <NormalTextField 
                             label='Email'
+                            name={'email'}
+                            control={control}
                             classes='email'
                             placeHolder='email@gmail.com'
                         />
 
                         <PassTextField
                             label='Password'
+                            name={'password'}
+                            control={control}
                             classes='password'
                         />
                     </div>
+
+                    <Link to='/request-reset-password' className='blue forgot-password'>Forgot password.</Link>
 
                     <div className="button-container">
 
@@ -51,6 +58,7 @@ function Login() {
                             <ButtonElement
                                 label='LOGIN'
                                 variant='filled-black'
+                                type={'submit'}
                             />
                         </div>
 

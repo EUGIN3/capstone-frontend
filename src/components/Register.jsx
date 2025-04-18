@@ -1,10 +1,11 @@
 import './styles/LoginRegistration.css'
+import '../index.css'
 import React from 'react'
 
 import {Link} from 'react-router-dom'
 
 import NormalTextField from './forms/NormalTextField'
-import PassTextField from './forms/PassTextField'
+import MyPassField from './forms/PassTextField'
 import ButtonElement from './forms/ButtonElement'
 
 import logo from '../assets/estrope-logo.png'
@@ -35,17 +36,23 @@ function Register() {
                     <div className="input-container">
                         <NormalTextField 
                             label='Email'
+                            name={'email'}
+                            control={control}
                             classes='email'
                             placeHolder='email@gmail.com'
                         />
 
-                        <PassTextField
+                        <MyPassField
                             label='Password'
+                            name={'password'}
+                            control={control}
                             classes='password'
                         />
 
-                        <PassTextField
+                        <MyPassField
                             label='Confirm password'
+                            name={'confirmPassword'}
+                            control={control}
                             classes='password'
                         />
                     </div>
@@ -55,6 +62,7 @@ function Register() {
                         <div className="btn-con">
                             <ButtonElement
                                 label='SING UP'
+                                type={'submit'}
                                 variant='filled-black'
                             />
                         </div>

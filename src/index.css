@@ -52,10 +52,11 @@ html {
     /* Text Shadow */
     --text-shadow: -1px 1px 3px var(--white);
 
+    /* Box Shadow */
+    --box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+
     /* Transition */
     --transition: all .3s;
-
-
     
     /* By:Henry */
     --fontsize-of-name:120px;
@@ -74,8 +75,14 @@ html {
 }
 
 body {
-    color: var(--white);
+    /* color: var(--white); */
+    color: var(--black);
+    background-color: var(--white);
     font-family: var(--normal-font);
     font-size: var(--normal-font-size);
 }
 
+hr {
+    border-top: 2px solid var(--black-v2);
+    opacity: .1;
+}

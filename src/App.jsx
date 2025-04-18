@@ -5,6 +5,9 @@ import Dashboard from './components/Dashboard'
 import Login from './components/Login'
 import Register from './components/Register'
 
+import RequestResetPassword from './components/RequestResetPassword'
+import ResetPassword from './components/ResetPassword'
+
 
 function App() {
   return (
@@ -13,7 +16,10 @@ function App() {
       <Routes>
         <Route path='/' element={<Dashboard />}/>
         <Route path='/login' element={<Login />}/>
-        <Route path='/Register' element={<Register />}/>
+        <Route path='/register' element={<Register />}/>
+        <Route path='/request-reset-password' element={<RequestResetPassword />}/>
+        <Route path='/reset-password' element={<ResetPassword />}/>
+        {/* <Route path='/reset-password/:token' element={<RequestResetPassword />}/> */}
       </Routes>
     </div>
   )

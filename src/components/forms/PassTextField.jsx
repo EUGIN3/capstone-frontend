@@ -9,7 +9,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import '../../App.css'
 
 export default function MyPassField(props) {
-  const {label, classes} = props
+  const {label, classes, name, control} = props
 
   const [showPassword, setShowPassword] = React.useState(false);
 
@@ -74,6 +74,8 @@ export default function MyPassField(props) {
                 </InputAdornment>
             }
           label={label}
+          name={name}
+          control={control}
           />
       </FormControl>
     </>

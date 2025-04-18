@@ -2,7 +2,7 @@ import * as React from 'react';
 import TextField from '@mui/material/TextField';
 
 export default function NormalTextField(props) {
-    const {label, classes, placeHolder} = props
+    const {label, classes, placeHolder, name, control} = props
 
     return (
         <>  
@@ -40,6 +40,8 @@ export default function NormalTextField(props) {
                   }}
 
                   className={classes}
+                  name={name}
+                  control={control}
             />
         </>
     );
