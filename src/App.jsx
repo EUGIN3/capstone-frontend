@@ -1,7 +1,6 @@
 import React from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import './App.css'
-import Home from './components/Home'
 import Login from './components/Login'
 import Register from './components/Register'
 
@@ -10,22 +9,28 @@ import ResetPassword from './components/ResetPassword'
 
 import ProtectedRoute from './components/ProtectedRoute'
 
+import Navbar from './components/Navbar/Navbar'
+import NotFound from './components/NotFound';
+
 
 function App() {
   return (
-
     <div className='main'>
       <Routes>
-        <Route path='/login' element={<Login />}/>
+        {/* <Route path='/login' element={<Login />}/>
         <Route path='/register' element={<Register />}/>
         <Route path='/request-reset-password' element={<RequestResetPassword />}/>
-        <Route path='/reset-password/:token' element={<ResetPassword />}/>
-      </Routes>
+        <Route path='/reset-password/:token' element={<ResetPassword />}/> */}
 
-      <Routes>
-        <Route element={<ProtectedRoute />}>
-          <Route path='/home' element={<Home />}/>
-        </Route>
+        <Route path="/" element={<Navigate to="/app/dashboard"/>}/>
+        <Route path='/app/*' element={<Navbar/>}/>
+        
+        {/* <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<Navigate to="/app/dashboard"/>}/>
+          <Route path='/app/*' element={<Navbar/>}/>
+        </Route> */}
+
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   )

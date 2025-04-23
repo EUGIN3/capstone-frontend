@@ -25,7 +25,7 @@ function Login() {
         })
         .then((response) => {
             sessionStorage.setItem("Token", response.data.token)
-            navigate(`/home`)
+            navigate(`/`)
         })
     }
 
