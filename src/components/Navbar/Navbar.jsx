@@ -1,69 +1,107 @@
-import * as React from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+import logo from '../../assets/logo v2.png';
+import mainTheme from './theme';
+import navigation from './navigation';
+import AxiosInstance from '../AxiosInstance';
 
-import logo from '../../assets/estrope-logo.png';
-import demoTheme from './theme';
-import AppRoutes from './AppRoutes';
-import navigation from './navigation'
+import { Routes, Route, Navigate } from 'react-router-dom';
+import Dashboard from '../userComponents/Dashboard';
+
+import DisplayAppointments from '../userComponents/appointmentComponents/DisplayAppointments';
+import SetAppointment from '../userComponents/appointmentComponents/SetAppointment'
 
 function Navbar({ window }) {
   const location = useLocation();
+  const navigate = useNavigate();
 
-  const navigate = useNavigate(); 
+  const [session, setSession] = useState({
+    user: {
+      name: '',
+      email: '',
+      image: '',
+    },
+  });
+
+  const logOUt = () => {
+    AxiosInstance.post('logoutall/', {})
+      .then(() => {
+        sessionStorage.removeItem('Token');
+        sessionStorage.removeItem('UserIsStaff');
+        sessionStorage.removeItem('UserIsSuper');
+        navigate('/login');
+      });
+  };
+
+  const userInformation = () => {
+    AxiosInstance.get('profile/', {})
+      .then((response) => {
+        const { name, email, image } = response.data;
+        setSession({
+          user: {
+            name: name || '',
+            email: email || '',
+            image: image || '',
+          },
+        });
+      })
+  };
+
+  useEffect(() => {
+    userInformation();
+  }, []);
+
+  const authentication = useMemo(() => {
+    return {
+      signIn: () => {
+        setSession({ user: {} });
+      },
+      signOut: () => {
+        logOUt();
+      },
+    };
+  }, []);
 
   const router = {
     pathname: location.pathname,
     navigate: (path) => navigate(path),
   };
 
-  const demoWindow = window !== undefined ? window() : undefined;
-
-  const [session, setSession] = React.useState({
-    user: {
-      name: 'Leslie Faith Nvaja',
-      email: 'sample@gmail.com',
-      image: 'https://scontent.fmnl13-2.fna.fbcdn.net/v/t39.30808-6/475256800_1257300468707046_5844662227146863459_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeGzU0pPQ5gM5YQ8qnQiBnEmhOevaeCSRyCE569p4JJHIDHVQHvWU1fgWMBlBA9aL0qD7XYk_azoiipOJXj4_Eon&_nc_ohc=K8wgMceyQ80Q7kNvwHhth76&_nc_oc=AdnFhB9qqvy0h1N_jmR2-jfyvKWgUImDZ_mg4IESAZH5bFE2OUniKPzSId1pRfyDAoc&_nc_zt=23&_nc_ht=scontent.fmnl13-2.fna&_nc_gid=Iwq4bn1SXP5cg8dyuxY-Lw&oh=00_AfECMfRjc2I62OJnq-fYfEN9Spa3OAoJajXHH9fxE_hwxw&oe=680A6129',
-    },
-  });
-
-  const authentication = React.useMemo(() => {
-    return {
-      signIn: () => {
-        setSession({
-          user: {
-            name: 'Leslie Faith Nvaja',
-            email: 'sample@gmail.com',
-            image: 'https://scontent.fmnl13-2.fna.fbcdn.net/v/t39.30808-6/475256800_1257300468707046_5844662227146863459_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeGzU0pPQ5gM5YQ8qnQiBnEmhOevaeCSRyCE569p4JJHIDHVQHvWU1fgWMBlBA9aL0qD7XYk_azoiipOJXj4_Eon&_nc_ohc=K8wgMceyQ80Q7kNvwHhth76&_nc_oc=AdnFhB9qqvy0h1N_jmR2-jfyvKWgUImDZ_mg4IESAZH5bFE2OUniKPzSId1pRfyDAoc&_nc_zt=23&_nc_ht=scontent.fmnl13-2.fna&_nc_gid=Iwq4bn1SXP5cg8dyuxY-Lw&oh=00_AfECMfRjc2I62OJnq-fYfEN9Spa3OAoJajXHH9fxE_hwxw&oe=680A6129',
-          },
-        });
-      },
-      signOut: () => {
-        setSession(null);
-      },
-    };
-  }, []);
+  const mainWindow = window !== undefined ? window() : undefined;
 
   return (
     <AppProvider
       session={session}
       authentication={authentication}
       navigation={navigation}
-      router={ router }
-      theme={demoTheme}
-      window={demoWindow}
+      router={router}
+      theme={mainTheme}
+      window={mainWindow}
       branding={{
-        logo: <img src={logo} alt="Ramil's logo." style={{ height: 40 }} />,
-        title: 'RAMILE STROPE',
-        homeUrl: '/app/dashboard',
+        logo: <img src={logo} alt="Ramil's logo." style={{ height: '30px', width: '170px' }} />,
+        title: '',
+        homeUrl: '/user/dashboard',
       }}
-    > 
-      <DashboardLayout sidebarExpandedWidth="250px">
+    >
+      <DashboardLayout 
+        sidebarExpandedWidth="280px"
+      >
         <div className='appMainContainer'>
-          <AppRoutes />
+              <Routes>
+                {/* Specified routes */}
+                <Route path="/" element={<Navigate to="/user/dashboard" />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+
+                <Route path="/appointment/all-appointments" element={<DisplayAppointments />} />
+                <Route path="/appointment/set-appointment" element={<SetAppointment />} />
+
+                {/* If routes is not belong to the specified. */}
+                <Route path="*" element={<Navigate to="/not-found" />} />
+              </Routes>
         </div>
       </DashboardLayout>
     </AppProvider>
@@ -75,3 +113,5 @@ Navbar.propTypes = {
 };
 
 export default Navbar;
+
+

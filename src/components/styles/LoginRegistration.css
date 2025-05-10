@@ -36,33 +36,6 @@
     letter-spacing: 8px;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 .white-side {
     display: flex;
     justify-content: center;
@@ -125,6 +98,7 @@
 .btn-con {
     height: 55px;
     margin-bottom: 30px;
+    width: 100%;
 }
 
 .blue {

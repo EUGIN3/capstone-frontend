@@ -17,18 +17,18 @@ function App() {
   return (
     <div className='main'>
       <Routes>
-        {/* <Route path='/login' element={<Login />}/>
+        <Route path='/login' element={<Login />}/>
         <Route path='/register' element={<Register />}/>
         <Route path='/request-reset-password' element={<RequestResetPassword />}/>
-        <Route path='/reset-password/:token' element={<ResetPassword />}/> */}
+        <Route path='/reset-password/:token' element={<ResetPassword />}/>
 
-        <Route path="/" element={<Navigate to="/app/dashboard"/>}/>
-        <Route path='/app/*' element={<Navbar/>}/>
+        {/* <Route path="/" element={<Navigate to="/user/dashboard"/>}/>
+        <Route path='/user/*' element={<Navbar/>}/> */}
         
-        {/* <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<Navigate to="/app/dashboard"/>}/>
-          <Route path='/app/*' element={<Navbar/>}/>
-        </Route> */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<Navigate to="/user"/>}/>
+          <Route path='/user/*' element={<Navbar/>}/>
+        </Route>
 
         <Route path="*" element={<NotFound />} />
       </Routes>
