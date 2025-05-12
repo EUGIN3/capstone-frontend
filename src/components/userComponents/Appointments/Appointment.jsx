@@ -19,7 +19,7 @@ function Appointment(props) {
             </div>
         </div>
 
-        <div className="button-container">
+        <div className="appointment-button-container">
             <div className="edit-icon">
               <EditTwoToneIcon />
             </div>

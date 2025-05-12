@@ -4,18 +4,15 @@ import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import logo from '../../assets/logo v2.png';
-import mainTheme from './theme';
+import logo from '../../../assets/admin.png';
+import mainTheme from '../../Navbar/theme';
 import useNavigation from './navigation';
-import AxiosInstance from '../AxiosInstance';
+import AxiosInstance from '../../AxiosInstance';
 
 import { Routes, Route, Navigate } from 'react-router-dom';
-import Dashboard from '../userComponents/Dashboard';
 
-import DisplayAppointments from '../userComponents/appointmentComponents/DisplayAppointments';
-import SetAppointment from '../userComponents/appointmentComponents/SetAppointment'
 
-function Navbar({ window }) {
+function AdminNavbar({ window }) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -83,9 +80,9 @@ function Navbar({ window }) {
       theme={mainTheme}
       window={mainWindow}
       branding={{
-        logo: <img src={logo} alt="Ramil's logo." style={{ height: '30px', width: '170px' }} />,
+        logo: <img src={logo} alt="Ramil's logo." style={{ height: '50px', width: '200px' }} />, 
         title: '',
-        homeUrl: '/user/dashboard',
+        homeUrl: '/admin',
       }}
     >
       <DashboardLayout 
@@ -93,15 +90,7 @@ function Navbar({ window }) {
       >
         <div className='appMainContainer'>
               <Routes>
-                {/* Specified routes */}
-                <Route path="/" element={<Navigate to="/user/dashboard" />} />
-                <Route path="/dashboard" element={<Dashboard />} />
 
-                <Route path="/appointment/all-appointments" element={<DisplayAppointments />} />
-                <Route path="/appointment/set-appointment" element={<SetAppointment />} />
-
-                {/* If routes is not belong to the specified. */}
-                <Route path="*" element={<Navigate to="/not-found" />} />
               </Routes>
         </div>
       </DashboardLayout>
@@ -109,10 +98,10 @@ function Navbar({ window }) {
   );
 }
 
-Navbar.propTypes = {
+AdminNavbar.propTypes = {
   window: PropTypes.func,
 };
 
-export default Navbar;
+export default AdminNavbar;
 
 

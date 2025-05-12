@@ -38,12 +38,12 @@ export default function MyPassField(props) {
           <FormControl variant="outlined" className={classes}
             sx={{
               '& .MuiOutlinedInput-root': {
-                fontSize: '16px',
+                fontSize: '14px',
                 '&::placeholder': {
-                  fontSize: '16px',
+                  fontSize: '14px',
                 },
                 '& input': {
-                  fontSize: '16px',
+                  fontSize: '14px',
                 },
                 '& fieldset': {
                   borderColor: '#2d2d2db6',
@@ -58,9 +58,11 @@ export default function MyPassField(props) {
               },
               '& .MuiInputLabel-root': {
                 color: '#2d2d2db6',
+                fontSize: '14px',
               },
               '& .MuiInputLabel-root.Mui-focused': {
                 color: '#0C0C0C',
+                fontSize: '14px',
               },
             }}
           >

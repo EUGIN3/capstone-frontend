@@ -25,7 +25,7 @@ html {
     --big-header-letter-space: 1.5px;
 
     /* Normal Font */
-    --normal-font-size: 16px;
+    --normal-font-size: 14px;
     --letter-spacing: 1px;
 
     /* Small Font */
@@ -85,11 +85,6 @@ hr {
     border-top: 2px solid var(--black-v2);
     opacity: .1;
 }
-
-
-
-
-
 
 
 

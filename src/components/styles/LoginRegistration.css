@@ -46,14 +46,14 @@
 
 .white-container {
     height: 500px;
-    width: 400px;
+    width: 440px;
 
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    gap: 30px;
+    gap: 20px;
 }
 
 .info-container {
@@ -74,31 +74,34 @@
     opacity: var(--opacity);
 }
 
-
 .email,
-.password {
+.password,
+.address,
+.pnumber,
+.fblink {
     width: 100%;
     font-size: var(--normal-font-size) !important;
 }
 
-.input-container {
+.register-input-container,
+.login-input-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    gap: 25px;
     width: 100%;
+    gap: 20px;
 }
 
-.button-container {
+.logres-button-container {
     width: 100%;
 }
 
 .btn-con {
-    height: 55px;
-    margin-bottom: 30px;
+    height: 50px;
     width: 100%;
+    margin-bottom: 10px;
 }
 
 .blue {
@@ -108,4 +111,12 @@
 .forgot-password {
     width: 100%;
     text-align:  left;
+}
+
+.resgister-contact-input-con, 
+.resgister-name-input-con {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
 }

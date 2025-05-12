@@ -17,7 +17,7 @@ import AxiosInstance from './AxiosInstance'
 import logo from '../assets/estrope-logo.png'
 
 function Login() {
-    const navigate = useNavigate()
+    const navigate = useNavigate()  
     const { handleSubmit, control } = useForm()
 
     const [showAlert, setShowAlert] = useState(false);
@@ -25,41 +25,72 @@ function Login() {
     const [alertType, setAlertType] = useState('');
 
 
-    const submission = async (data) => {
-        AxiosInstance.post(`login/`, {
-            email : data.email,
-            password : data.password,
-        })
-        .then((response) => {
-            setAlertMessage('Login successful. You will be redirected shortly.');
-            setAlertType('success');
-            setShowAlert(true);
-            sessionStorage.setItem("Token", response.data.token)
+    // const submission = async (data) => {
+    //     AxiosInstance.post(`login/`, {
+    //         email : data.email,
+    //         password : data.password,
+    //     })
+    //     .then((response) => {
+    //         setAlertMessage('Login successful. You will be redirected shortly.');
+    //         setAlertType('success');
+    //         setShowAlert(true);
+    //         sessionStorage.setItem("Token", response.data.token)
             
-            getUserAuthorization()
-            setTimeout(() => {
-                setShowAlert(false);
-                navigate(`/`)
-            }, 1000);
-        })
-        .catch((error) => {
-            setAlertMessage('Login failed. Please check that your email and password are correct.');
-            setAlertType('error');
-            setShowAlert(true);
+    //         getUserAuthorization() 
+
+    //         setTimeout(() => {
+    //             setShowAlert(false);
+    //             navigate(`/`)
+    //         }, 1000);
+    //     })
+    //     .catch((error) => {
+    //         setAlertMessage('Login failed. Please check that your email and password are correct.');
+    //         setAlertType('error');
+    //         setShowAlert(true);
       
-            setTimeout(() => {
-              setShowAlert(false);
-            }, 3000);
-        });
-    }
+    //         setTimeout(() => {
+    //           setShowAlert(false);
+    //         }, 3000);
+    //     });
+    // }
+
+
+    const submission = (data) => {
+    AxiosInstance.post(`login/`, {
+        email : data.email,
+        password : data.password,
+    })
+    .then((response) => { // Mark this inner function async
+        setAlertMessage('Login successful. You will be redirected shortly.');
+        setAlertType('success');
+        setShowAlert(true);
+        sessionStorage.setItem("Token", response.data.token)
+        
+        getUserAuthorization();
+
+        setTimeout(() => {
+            setShowAlert(false);
+            navigate(`/`)
+        }, 1000);
+
+    })
+    .catch((error) => {
+        setAlertMessage('Login failed. Please check that your email and password are correct.');
+        setAlertType('error');
+        setShowAlert(true);
+  
+        setTimeout(() => {
+          setShowAlert(false);
+        }, 3000);
+    });
+}
 
     const getUserAuthorization = () => {
         AxiosInstance.get('profile/')
           .then((response) => {
-            const { is_staff, is_superuser } = response.data;
+            const { is_staff } = response.data;
 
-            sessionStorage.setItem('UserIsStaff', is_staff);
-            sessionStorage.setItem('UserIsSuper', is_superuser);
+            sessionStorage.setItem('IsAdmin', is_staff);
           })
           .catch((error) => {
             console.error('Failed to fetch user authorization:', error);
@@ -91,7 +122,7 @@ function Login() {
                             </p>
                         </div>
 
-                        <div className="input-container">
+                        <div className="login-input-container">
                             <NormalTextField 
                                 label='Email'
                                 name={'email'}
@@ -110,7 +141,7 @@ function Login() {
 
                         <Link to='/request-reset-password' className='blue forgot-password'>Forgot password.</Link>
 
-                        <div className="button-container">
+                        <div className="logres-button-container">
 
                             <div className="btn-con">
                                 <ButtonElement
