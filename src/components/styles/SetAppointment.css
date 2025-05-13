@@ -70,12 +70,12 @@
 
 }
 
-.information-container {
+.setappointment-information-container {
 
 }
 
 
-.info-top-header {
+.setappointment-info-top-header {
     background-color: #0C0C0C;
     color: #F5F5F5;
     font-size: 20px;
@@ -83,7 +83,7 @@
 }
 
 
-.information-input-container {
+.setappointment-information-input-container {
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -96,12 +96,6 @@
 
 }
 
-.firstname {}
-.lastname {}
-.address {}
-.contact-number {}
-.email {}
-.facebook-link {}
 
 .set-appointment-container {
     height: 50px;

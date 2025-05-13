@@ -4,8 +4,6 @@ import React, { useState } from 'react'
 
 import { Link, useNavigate } from 'react-router-dom'
 
-import { useForm } from 'react-hook-form'
-
 import AlertComponent from './Alert'
 
 import NormalTextField from './forms/NormalTextField'
@@ -16,74 +14,53 @@ import AxiosInstance from './AxiosInstance'
 
 import logo from '../assets/estrope-logo.png'
 
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from "yup";
+
 function Login() {
     const navigate = useNavigate()  
-    const { handleSubmit, control } = useForm()
+
+    const schema = yup.object({
+        email : yup.string().email('Invalid email.').required('Email field is required.'),
+        password : yup.string().required('Please enter your password.'),
+    });
+
+    const { handleSubmit, control } = useForm({resolver : yupResolver(schema)})
 
     const [showAlert, setShowAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [alertType, setAlertType] = useState('');
 
-
-    // const submission = async (data) => {
-    //     AxiosInstance.post(`login/`, {
-    //         email : data.email,
-    //         password : data.password,
-    //     })
-    //     .then((response) => {
-    //         setAlertMessage('Login successful. You will be redirected shortly.');
-    //         setAlertType('success');
-    //         setShowAlert(true);
-    //         sessionStorage.setItem("Token", response.data.token)
-            
-    //         getUserAuthorization() 
-
-    //         setTimeout(() => {
-    //             setShowAlert(false);
-    //             navigate(`/`)
-    //         }, 1000);
-    //     })
-    //     .catch((error) => {
-    //         setAlertMessage('Login failed. Please check that your email and password are correct.');
-    //         setAlertType('error');
-    //         setShowAlert(true);
-      
-    //         setTimeout(() => {
-    //           setShowAlert(false);
-    //         }, 3000);
-    //     });
-    // }
-
-
     const submission = (data) => {
-    AxiosInstance.post(`login/`, {
-        email : data.email,
-        password : data.password,
-    })
-    .then((response) => { // Mark this inner function async
-        setAlertMessage('Login successful. You will be redirected shortly.');
-        setAlertType('success');
-        setShowAlert(true);
-        sessionStorage.setItem("Token", response.data.token)
-        
-        getUserAuthorization();
+        AxiosInstance.post(`login/`, {
+            email : data.email,
+            password : data.password,
+        })
+        .then((response) => { 
+            setAlertMessage('Login successful. You will be redirected shortly.');
+            setAlertType('success');
+            setShowAlert(true);
+            sessionStorage.setItem("Token", response.data.token)
+            
+            getUserAuthorization();
 
-        setTimeout(() => {
+            setTimeout(() => {
+                setShowAlert(false);
+                navigate(`/`)
+            }, 1000);
+
+        })
+        .catch((error) => {
+            setAlertMessage('Login failed. Please check that your email and password are correct.');
+            setAlertType('error');
+            setShowAlert(true);
+    
+            setTimeout(() => {
             setShowAlert(false);
-            navigate(`/`)
-        }, 1000);
-
-    })
-    .catch((error) => {
-        setAlertMessage('Login failed. Please check that your email and password are correct.');
-        setAlertType('error');
-        setShowAlert(true);
-  
-        setTimeout(() => {
-          setShowAlert(false);
-        }, 3000);
-    });
-}
+            }, 3000);
+        });
+    }
 
     const getUserAuthorization = () => {
         AxiosInstance.get('profile/')

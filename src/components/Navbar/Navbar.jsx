@@ -39,17 +39,20 @@ function Navbar({ window }) {
   };
 
   const userInformation = () => {
-    AxiosInstance.get('profile/', {})
+    AxiosInstance.get('profile/')
       .then((response) => {
         const { first_name, last_name, email, image } = response.data;
+
+        const fullName = [first_name, last_name].filter(Boolean).join(' ').trim();
+
         setSession({
           user: {
-            name: first_name+' '+last_name || '',
+            name: fullName || '',
             email: email || '',
             image: image || '',
           },
         });
-      })
+      });
   };
 
   useEffect(() => {

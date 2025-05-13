@@ -10,6 +10,8 @@ import '../../App.css'
 
 import { Controller } from 'react-hook-form'
 
+import { FormHelperText } from '@mui/material';
+
 export default function MyPassField(props) {
   const {label, classes, name, control} = props
 
@@ -90,6 +92,7 @@ export default function MyPassField(props) {
                 }
               label={label}
               />
+              <FormHelperText sx={{color:"#d32f2f"}}> {error?.message} </FormHelperText>
           </FormControl>
         )}
       />

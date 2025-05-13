@@ -3,9 +3,6 @@ import '../index.css'
 import React, { useState } from 'react'
 
 import { Link, useNavigate } from 'react-router-dom'
-
-import { useForm } from 'react-hook-form'
-
 import NormalTextField from './forms/NormalTextField'
 import MyPassField from './forms/PassTextField'
 import ButtonElement from './forms/ButtonElement'
@@ -16,9 +13,26 @@ import AxiosInstance from './AxiosInstance'
 
 import logo from '../assets/estrope-logo.png'
 
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from "yup";
+
 function Register() {
     const navigate = useNavigate()
-    const { handleSubmit, control } = useForm()
+
+    
+    const schema = yup.object({
+        fname : yup.string().required('Enter your first name.'),
+        lname : yup.string().required('Enter your last name.'),
+        pnumber : yup.string().required('Enter your contact number.'),
+        email : yup.string().email('Invalid email.').required('Enter your email.'),
+        password : yup.string().required('Enter your password.'),
+                    // .min(8, 'Password must be at least 8 characters long.'),
+        confirmPassword : yup.string().required('Re-enter your password.')
+                    .oneOf([yup.ref('password'), null], 'Password do not match.'),
+    });
+
+    const { handleSubmit, control } = useForm({resolver : yupResolver(schema)})
 
     const [showAlert, setShowAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');

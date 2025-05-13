@@ -4,18 +4,29 @@ import MyPassField from '../forms/PassTextField'
 
 import { useNavigate, useParams } from 'react-router-dom'
 
-import { useForm } from 'react-hook-form'
-
 import AxiosInstance from '../AxiosInstance'
 
 import AlertComponent from '../Alert'
+
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from "yup";
 
 import '../styles/ForgotPassword.css'
 import '../../index.css'
 
 const ResetPassword = () => {
     const navigate = useNavigate()
-    const { handleSubmit, control } = useForm()
+
+    const schema = yup.object({
+        password : yup.string().required('Enter your password.'),
+                    // .min(8, 'Password must be at least 8 characters long.'),
+        confirmNewPassword : yup.string().required('Re-enter your password.')
+                    .oneOf([yup.ref('password'), null], 'Password do not match.'),
+    });
+
+    const { handleSubmit, control } = useForm({resolver : yupResolver(schema)})
+
     const {token} = useParams()
 
     const [showAlert, setShowAlert] = useState(false);
@@ -55,7 +66,7 @@ const ResetPassword = () => {
                 { showAlert && <AlertComponent message={alertMessage} type={alertType} show={showAlert} /> }
 
                 <div className="main-container">
-                    <div className="white-box">
+                    <div className="reset-white-box">
                         <div className="title-container">
                             <p>Forgot Password</p>
                             <hr className='reset-pass-hr'/>

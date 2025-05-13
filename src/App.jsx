@@ -14,6 +14,7 @@ import Navbar from './components/Navbar/Navbar'
 import AdminNavbar from './components/AdminComponents/AdminNavbar/AdminNavbar'
 import NotFound from './components/NotFound';
 
+import ImageInput from './components/forms/ImageInput'
 
 function App() {
 
@@ -48,6 +49,7 @@ function App() {
 
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
+        <Route path="/input" element={<ImageInput />} />
       </Routes>
     </div>
   )
