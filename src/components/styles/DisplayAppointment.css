@@ -14,3 +14,9 @@
     margin-bottom: 20px;
     width: 120px;
 }
+
+.show-appointment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}

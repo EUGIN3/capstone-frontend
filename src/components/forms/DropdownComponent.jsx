@@ -21,13 +21,11 @@ function StatusFilter({ onFilterChange }) {
           onChange={handleChange}
           displayEmpty
         >
-          <MenuItem value="">
-            <em>All</em>
-          </MenuItem>
-          <MenuItem value="approved">Approved</MenuItem>
-          <MenuItem value="declined">Declined</MenuItem>
+          <MenuItem value=""><em>All</em></MenuItem>
+          <MenuItem value="approve">Approved</MenuItem>
+          <MenuItem value="denied">Denied</MenuItem>
           <MenuItem value="pending">Pending</MenuItem>
-          <MenuItem value="cancelled">Cancelled</MenuItem>
+          <MenuItem value="cancell">Cancelled</MenuItem>
         </Select>
       </FormControl>
     </div>

@@ -1,4 +1,9 @@
-button {
+.filled-black,
+.outlined-black,
+.filled-white,
+.outlined-white,
+.filled-green,
+.filled-red {
     width: 100%;
     height: 100%;
     border-radius: 4px;
@@ -48,3 +53,24 @@ button {
     background: var(--white);
     color: var(--black);
 }
+
+/* Green */
+.filled-green {
+    background-color: #11B364;
+    color: var(--white);
+    border: 1px solid #11B364;
+}
+
+/* .filled-green:hover {
+    box-shadow: var(--box-shadow-white);
+} */
+/* Red */
+.filled-red {
+    background-color: #F04438;
+    color: var(--white);
+    border: 1px solid #F04438;
+}
+
+/* .filled-red:hover {
+    box-shadow: var(--box-shadow-white);
+} */

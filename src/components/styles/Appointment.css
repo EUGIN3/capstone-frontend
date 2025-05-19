@@ -21,7 +21,7 @@
     border: 1px solid #F79009;
 }
 
-.appointment-box.approved {
+.appointment-box.approve {
     background-color: rgba(17, 179, 101, 0.055);
     border: 1px solid #11B364;
 }
@@ -120,4 +120,57 @@
     background-color: #0c0c0c22;
     opacity: 1; 
 }
+
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Dialog */
+.update-dialog-container {
+    padding: 20px;
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.update-dialog-title-container {
+    font-weight: 700;
+    font-size: 24px;
+    text-align: center;
+}
+
+.update-dialog-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.update-dialog-time-date-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.update-dialog-button-container {
+    display: flex;
+    height: 40px;
+    gap: 20px;
+}
+
 

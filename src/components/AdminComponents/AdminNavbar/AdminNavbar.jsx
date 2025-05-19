@@ -11,6 +11,11 @@ import AxiosInstance from '../../AxiosInstance';
 
 import { Routes, Route, Navigate } from 'react-router-dom';
 
+import { ManageUser } from '../ManageUser/ManageUser';
+import ManageAppointment from '../ManageAppointments/ManageAppointment';
+import { ManageSchedule } from '../ManageSchedule/ManageSchedule';
+import { GenerateDesign } from '../GenerateDesign/GenerateDesign';
+
 
 function AdminNavbar({ window }) {
   const location = useLocation();
@@ -80,9 +85,9 @@ function AdminNavbar({ window }) {
       theme={mainTheme}
       window={mainWindow}
       branding={{
-        logo: <img src={logo} alt="Ramil's logo." style={{ height: '50px', width: '200px' }} />, 
+        logo: <img src={logo} alt="Ramil's logo." style={{ height: '20px', width: '200px' }} />, 
         title: '',
-        homeUrl: '/admin',
+        homeUrl: '/admin/manage-user',
       }}
     >
       <DashboardLayout 
@@ -90,7 +95,10 @@ function AdminNavbar({ window }) {
       >
         <div className='appMainContainer'>
               <Routes>
-
+                <Route path="/manage-user" element={<ManageUser />} />
+                <Route path="/manage-appointments" element={<ManageAppointment />} />
+                <Route path="/manage-schedule" element={<ManageSchedule />} />
+                <Route path="/generate" element={<GenerateDesign />} />
               </Routes>
         </div>
       </DashboardLayout>

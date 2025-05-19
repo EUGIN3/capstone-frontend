@@ -45,7 +45,7 @@ html {
 
     /* Color */
     --black: #0C0C0C;
-    --black-v2: #1f1f1f;
+    --black-v2: #6c6c6c;
     --white: #F5F5F5;
     --blue: #2287E7;
 
@@ -95,4 +95,10 @@ hr {
     align-items: center;
     justify-content: center;
     font-size: 100px;
+}
+
+.sideNavigaitonIcon {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }

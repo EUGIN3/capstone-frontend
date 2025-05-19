@@ -1,10 +1,13 @@
 import '../../index.css'
 import '../styles/Dashboard.css'
 
+
+import Construction from '../Construction'
+
 const Dashboard = () => {
     return (
-        <div>
-            DASHBOARD
+        <div className='appContainer dashboard-main-container'>
+            <Construction />
         </div>
     )
 }

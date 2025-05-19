@@ -1,11 +1,18 @@
 import React, { useState } from 'react'
+import dayjs from 'dayjs';
 
 import AppHeader from '../userHeader'
 import ButtonElement from '../../forms/ButtonElement'
 import NormalTextField from '../../forms/NormalTextField'
 
+import DatePickerComponent from '../../forms/DatePicker'
+import CalendarComponent from '../../forms/calendarComponent'
+import TimePickerComponent from '../../forms/TimePicker'
+
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from "yup";
 
 import '../../styles/SetAppointment.css'
 
@@ -19,13 +26,22 @@ function SetAppointment() {
     navigate(path)
   }
 
-  const { handleSubmit, control } = useForm()
+  const schema = yup.object({
+    address : yup.string().required('Please enter an address.'),
+    facebookLink : yup.string().required('Please enter a facebook link.'),
+    appointmentDescription : yup.string().required('Please enter a description.')
+  });
+
+  const [selectedDate, setSelectedDate] = useState(dayjs());
+  const [selectedTime, setSelectedTime] = useState(dayjs());
+
+  const { handleSubmit, control } = useForm({resolver : yupResolver(schema)}) 
 
   const [selectedImage, setSelectedImage] = useState(null);
   const submission = (data) => {
     const formData = new FormData();
-    formData.append('date', "2003-10-07");
-    formData.append('time', "12:00:00");
+    formData.append('date', selectedDate.format('YYYY-MM-DD'));
+    formData.append('time', selectedTime.format('HH:mm:00'));
     formData.append('address', data.address);
     formData.append('facebook_link', data.facebookLink);
     formData.append('description', data.appointmentDescription);
@@ -40,7 +56,7 @@ function SetAppointment() {
       }
     })
     .then(response => {
-      null
+      console.log('setted')
     })
     .catch(err => {
       null
@@ -57,7 +73,7 @@ function SetAppointment() {
                 <ButtonElement 
                   label='View appointment' 
                   variant='filled-black' 
-                  type='' 
+                  type='button' 
                   onClick={
                     () => navigation('/user/appointment/all-appointments')
                   } 
@@ -74,68 +90,68 @@ function SetAppointment() {
                 <div className="time-top-header">Select time:</div>
 
                 <div className='time-input-container'>
-                  <NormalTextField 
-                    label='Time'
-                    name={'time'}
-                    control={control}
-                    classes='time'
-                    placeHolder='1:00 PM'
+                  <TimePickerComponent 
+                    value={selectedTime}
+                    onChange={(newValue) => setSelectedTime(newValue)}
                   />
                 </div>
-              </div>
+              </div>  
 
-              <div className="date-continer">
-                <div className="date-top-header">Select date:</div>
-                <div className="date">date</div>
+              <div className="setappointment-right">
+                <div className="setappointment-info-top-header">Enter details:</div>
+                <div className="setappointment-information-container">
+                  <div className="setappointment-information-input-container">
+                    {/* Address */}
+                    <NormalTextField 
+                      label='Address'
+                      name={'address'}
+                      control={control}
+                      classes='address'
+                      placeHolder='Address'
+                    />
+                    {/* Facebook link */}
+                    <NormalTextField 
+                      label='Facebook Link'
+                      name={'facebookLink'}
+                      control={control}
+                      classes='facebook-link'
+                      placeHolder='Facebook link'
+                    />
+                    {/* Appointment description */}
+                    <NormalTextField 
+                      label='Description'
+                      name={'appointmentDescription'}
+                      control={control}
+                      classes='appointment-description'
+                      placeHolder='Appointment description'
+                    />
+                    {/* Image */}
+                    <input
+                      type="file"
+                      name="image"
+                      accept="image/*"
+                      onChange={(e) => setSelectedImage(e.target.files[0])}
+                    />
+                    {/* Button */}
+                    <div className="set-appointment-container">
+                      <ButtonElement 
+                        label='Set an appointment' 
+                        variant='filled-black' 
+                        type={'submit'}   
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-
-
-            <div className="setappointment-right">
-              <div className="setappointment-info-top-header">Enter details:</div>
-              <div className="setappointment-information-container">
-                <div className="setappointment-information-input-container">
-                  {/* Address */}
-                  <NormalTextField 
-                    label='Address'
-                    name={'address'}
-                    control={control}
-                    classes='address'
-                    placeHolder='Address'
-                  />
-                  {/* Facebook link */}
-                  <NormalTextField 
-                    label='Facebook Link'
-                    name={'facebookLink'}
-                    control={control}
-                    classes='facebook-link'
-                    placeHolder='Facebook link'
-                  />
-                  {/* Appointment description */}
-                  <NormalTextField 
-                    label='Description'
-                    name={'appointmentDescription'}
-                    control={control}
-                    classes='appointment-description'
-                    placeHolder='Appointment description'
-                  />
-                  {/* Image */}
-                  <input
-                    type="file"
-                    name="image"
-                    accept="image/*"
-                    onChange={(e) => setSelectedImage(e.target.files[0])}
-                  />
-                  {/* Button */}
-                  <div className="set-appointment-container">
-                    <ButtonElement 
-                      label='Set an appointment' 
-                      variant='filled-black' 
-                      type={'submit'}   
-                    />
-                  </div>
-                </div>
+            <div className="date-continer">
+              <div className="date-top-header">Select date:</div>
+              <div className="date">
+                <CalendarComponent 
+                  value={selectedDate}
+                  onChange={(newValue) => setSelectedDate(newValue)}
+                />
               </div>
             </div>
           </div>

@@ -14,7 +14,13 @@ import Navbar from './components/Navbar/Navbar'
 import AdminNavbar from './components/AdminComponents/AdminNavbar/AdminNavbar'
 import NotFound from './components/NotFound';
 
-import ImageInput from './components/forms/ImageInput'
+import Construction from './components/Construction'
+
+
+
+import DatePickerComponent from './components/forms/DatePicker'
+import TimePickerComponent from './components/forms/TimePicker'
+
 
 function App() {
 
@@ -29,27 +35,30 @@ function App() {
         <Route path="/reset-password/:token" element={<ResetPassword />} />
 
         {/* Protected Routes */}
-        {/* <Route element={<ProtectedRoute />}>
+        <Route element={<ProtectedRoute />}>
           <Route path="/" element={<Navigate to={'/user'} />} />
           <Route path="/user/*" element={<Navbar />} />
 
           <Route element={<AdminRoute />}>
             <Route path="/admin/*" element={<AdminNavbar />} />
+            <Route path="/admin" element={<Navigate to={'/admin/manage-user'} />} />
           </Route>
-        </Route> */}
+        </Route>
 
         {/* For development purposes */}
-        <Route path="/" element={<Navigate to={'/user'} />} />
+        {/* <Route path="/" element={<Navigate to={'/user'} />} />
         <Route path="/user/*" element={<Navbar />} />
 
         <Route element={<AdminRoute />}>
           <Route path="/admin/*" element={<AdminNavbar />} />
-        </Route>
+        </Route> */}
 
 
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
-        <Route path="/input" element={<ImageInput />} />
+        <Route path="/date" element={<DatePickerComponent />} />
+        <Route path="/time" element={<TimePickerComponent />} />  
+        <Route path="/construction" element={<Construction />} />
       </Routes>
     </div>
   )
