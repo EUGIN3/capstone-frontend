@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import dayjs from 'dayjs';
 
 import AppHeader from '../userHeader'
@@ -8,6 +8,8 @@ import NormalTextField from '../../forms/NormalTextField'
 import DatePickerComponent from '../../forms/DatePicker'
 import CalendarComponent from '../../forms/calendarComponent'
 import TimePickerComponent from '../../forms/TimePicker'
+
+import FixTime from '../../forms/FixTime';
 
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
@@ -33,7 +35,11 @@ function SetAppointment() {
   });
 
   const [selectedDate, setSelectedDate] = useState(dayjs());
-  const [selectedTime, setSelectedTime] = useState(dayjs());
+  const [selectedTime, setSelectedTime] = useState('');
+
+  const handleTimeSelect = (time) => {
+    setSelectedTime(time);
+  };
 
   const { handleSubmit, control } = useForm({resolver : yupResolver(schema)}) 
 
@@ -41,7 +47,7 @@ function SetAppointment() {
   const submission = (data) => {
     const formData = new FormData();
     formData.append('date', selectedDate.format('YYYY-MM-DD'));
-    formData.append('time', selectedTime.format('HH:mm:00'));
+    formData.append('time', selectedTime);
     formData.append('address', data.address);
     formData.append('facebook_link', data.facebookLink);
     formData.append('description', data.appointmentDescription);
@@ -58,9 +64,6 @@ function SetAppointment() {
     .then(response => {
       console.log('setted')
     })
-    .catch(err => {
-      null
-    });
   };
 
   return (
@@ -90,10 +93,13 @@ function SetAppointment() {
                 <div className="time-top-header">Select time:</div>
 
                 <div className='time-input-container'>
-                  <TimePickerComponent 
+                  {/* <TimePickerComponent 
                     value={selectedTime}
                     onChange={(newValue) => setSelectedTime(newValue)}
-                  />
+                  /> */}
+
+                  <FixTime onSelect ={handleTimeSelect}/>
+                  
                 </div>
               </div>  
 

@@ -1,0 +1,32 @@
+.statusFilterNavbar {
+    color: #F5F5F5;
+    /* padding: 0px 20px; */
+}
+
+.statusFilterNavbar .MuiTabs-root {
+    background-color: #0C0C0C;
+}
+
+.statusFilterNavbar .MuiTabs-list {
+    display: flex;
+    justify-content: left;
+}
+
+.statusFilterNavbar .MuiTabs-list button {
+    color: #F5F5F5;
+    text-transform: capitalize;
+}
+
+
+.statusFilterNavbar .css-11vcyky-MuiTabs-indicator {
+    background-color: #2287E7;
+}
+
+
+.statusFilterNavbar .MuiTabs-list button.Mui-selected {
+    color: #2287E7;
+}
+
+.statusFilterNavbar-appointmentList {
+    background-color: #F5F5F5;
+}

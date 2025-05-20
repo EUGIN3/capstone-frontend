@@ -1,4 +1,37 @@
 .adminAppointment {
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-    margin-bottom: 20px;
+    /* box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px; */
+    /* margin-bottom: 20px; */
+    border: 1px solid #afafaf;
+    border-width: .5px 1px .5px 1px;
+    color: #0C0C0C;
+    font-size: 16px;
+    padding: 10px 20px;
+
+    display: grid;
+    grid-template-columns: 1fr 100px;
+    align-items: center;
+}
+
+.adminAppointment-details {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.adminAppointment-date {
+    font-style: italic;
+    font-size: 20px;
+    font-weight: 700;
+} 
+
+
+.adminAppointment-name {
+    display: flex;
+    gap: 8px;
+}
+
+.adminAppointment-buttons {
+    display: flex;
+    gap: 10px;
+    height: 40px;
 }

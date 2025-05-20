@@ -22,10 +22,10 @@ function StatusFilter({ onFilterChange }) {
           displayEmpty
         >
           <MenuItem value=""><em>All</em></MenuItem>
-          <MenuItem value="approve">Approved</MenuItem>
+          <MenuItem value="approved">Approved</MenuItem>
           <MenuItem value="denied">Denied</MenuItem>
           <MenuItem value="pending">Pending</MenuItem>
-          <MenuItem value="cancell">Cancelled</MenuItem>
+          <MenuItem value="cancel">Canceled</MenuItem>
         </Select>
       </FormControl>
     </div>

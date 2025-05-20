@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import AppHeader from '../userHeader'
 import ButtonElement from '../../forms/ButtonElement'
 import Appointment from '../Appointments/Appointment'
-import StatusFilter from '../../forms/DropdownComponent'
+import StatusFilter from '../../forms/StatusFilter'
 
 import AxiosInstance from '../../AxiosInstance'
 
@@ -52,7 +52,7 @@ function DisplayAppointments() {
           key={app.id}
           id={app.id}
           date={app.date}
-          time={dayjs(`1000-01-01T${app.time}`).format('hh:mm A')}
+          time={app.time}
           status={app.appointment_status}
           onDelete={handleDelete}
           onUpdate={handleUpdate}

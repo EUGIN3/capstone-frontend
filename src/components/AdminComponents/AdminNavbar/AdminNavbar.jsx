@@ -5,7 +5,7 @@ import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import logo from '../../../assets/admin.png';
-import mainTheme from '../../Navbar/theme';
+import mainTheme from './theme';
 import useNavigation from './navigation';
 import AxiosInstance from '../../AxiosInstance';
 
@@ -16,6 +16,7 @@ import ManageAppointment from '../ManageAppointments/ManageAppointment';
 import { ManageSchedule } from '../ManageSchedule/ManageSchedule';
 import { GenerateDesign } from '../GenerateDesign/GenerateDesign';
 
+import './AdminNavbar.css'
 
 function AdminNavbar({ window }) {
   const location = useLocation();

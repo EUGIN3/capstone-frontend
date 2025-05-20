@@ -16,6 +16,7 @@ import AxiosInstance from '../../AxiosInstance';
 
 import DatePickerComponent from '../../forms/DatePicker';
 import TimePickerComponent from '../../forms/TimePicker';
+import FixTime from '../../forms/FixTime';
 
 function Appointment(props) {
   const { date, time, status, id, onDelete, onUpdate } = props  
@@ -43,7 +44,7 @@ function Appointment(props) {
   const submission = (data) => {
     const formData = new FormData();
     formData.append('date', selectedDate.format('YYYY-MM-DD'));
-    formData.append('time', selectedTime.format('HH:mm:00'));
+    formData.append('time', selectedTime);
     formData.append('facebook_link', data.updatedFacebookLink);
     formData.append('description', data.updatedAppointmentDescription);
     if (selectedImage) {
@@ -58,7 +59,11 @@ function Appointment(props) {
   };
 
   const [selectedDate, setSelectedDate] = useState(dayjs());
-  const [selectedTime, setSelectedTime] = useState(dayjs());
+  const [selectedTime, setSelectedTime] = useState('');
+
+  const handleTimeSelect = (time) => {
+    setSelectedTime(time);
+  };
 
   return (
     <div className={`appointment-box ${status}`}>
@@ -78,11 +83,7 @@ function Appointment(props) {
                     onChange={(newValue) => setSelectedDate(newValue)}
                   />
 
-                  <TimePickerComponent 
-                    name='date'
-                    value={selectedTime}
-                    onChange={(newValue) => setSelectedTime(newValue)}
-                  />
+                  <FixTime onSelect={handleTimeSelect} />
                 </div>
                 {/* New Facebook link */}
                 <NormalTextField 

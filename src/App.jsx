@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import './App.css'
 import Login from './components/Login'
@@ -14,17 +14,32 @@ import Navbar from './components/Navbar/Navbar'
 import AdminNavbar from './components/AdminComponents/AdminNavbar/AdminNavbar'
 import NotFound from './components/NotFound';
 
-import Construction from './components/Construction'
-
+import AdminAppointmentComponent from './components/AdminComponents/AdminAppointmentComponent'
+import { AllAppointment } from './components/AdminComponents/ManageAppointments/AllAppointment'
 
 
 import DatePickerComponent from './components/forms/DatePicker'
 import TimePickerComponent from './components/forms/TimePicker'
+import DropdownConponent from './components/forms/DropDown'
 
 
 function App() {
+  const [selectedAge, setSelectedAge] = useState('');
 
-  const admin = sessionStorage.getItem('IsAdmin') === 'true';
+  const dropdownItems = [
+    { value: 10, label: 'Ten' },
+    { value: 20, label: 'Twenty' },
+    { value: 30, label: 'Thirty' }
+  ];
+
+  const handleDropdownChange = (value) => {
+    setSelectedAge(value);
+  };
+
+  // useEffect(() => {
+  //   console.log('Selected Age:', selectedAge);
+  // }, [selectedAge]);
+
 
   return (
     <div className='main'>
@@ -35,7 +50,7 @@ function App() {
         <Route path="/reset-password/:token" element={<ResetPassword />} />
 
         {/* Protected Routes */}
-        <Route element={<ProtectedRoute />}>
+        {/* <Route element={<ProtectedRoute />}>
           <Route path="/" element={<Navigate to={'/user'} />} />
           <Route path="/user/*" element={<Navbar />} />
 
@@ -43,22 +58,23 @@ function App() {
             <Route path="/admin/*" element={<AdminNavbar />} />
             <Route path="/admin" element={<Navigate to={'/admin/manage-user'} />} />
           </Route>
-        </Route>
+        </Route> */}
 
         {/* For development purposes */}
-        {/* <Route path="/" element={<Navigate to={'/user'} />} />
+        <Route path="/" element={<Navigate to={'/user'} />} />
         <Route path="/user/*" element={<Navbar />} />
 
         <Route element={<AdminRoute />}>
-          <Route path="/admin/*" element={<AdminNavbar />} />
-        </Route> */}
+          <Route path="/admin/*" element={<AdminNavbar   />} />
+        </Route>
 
 
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
         <Route path="/date" element={<DatePickerComponent />} />
-        <Route path="/time" element={<TimePickerComponent />} />  
-        <Route path="/construction" element={<Construction />} />
+        <Route path="/time" element={<TimePickerComponent />} />   
+        <Route path="/all" element={<AllAppointment />} />   
+        <Route path="/dropdown" element={<DropdownConponent items={dropdownItems} onChange={handleDropdownChange} />} />
       </Routes>
     </div>
   )

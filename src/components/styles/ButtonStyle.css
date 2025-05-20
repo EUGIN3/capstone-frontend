@@ -3,7 +3,9 @@
 .filled-white,
 .outlined-white,
 .filled-green,
-.filled-red {
+.filled-red,
+.outlined-blue,
+.filled-blue {
     width: 100%;
     height: 100%;
     border-radius: 4px;
@@ -59,6 +61,17 @@
     background-color: #11B364;
     color: var(--white);
     border: 1px solid #11B364;
+}
+
+.outlined-blue {
+    border: 1px solid #2287E7; 
+    background: var(--white);
+    color: #2287E7;
+}
+.filled-blue {
+    background-color: #2287E7;
+    color: var(--white);
+    border: 1px solid #2287E7;
 }
 
 /* .filled-green:hover {

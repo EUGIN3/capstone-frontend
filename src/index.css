@@ -102,3 +102,7 @@ hr {
     align-items: center;
     justify-content: space-between;
 }
+
+.adminSideIcon svg {
+    color: #F5F5F5 !important;
+}

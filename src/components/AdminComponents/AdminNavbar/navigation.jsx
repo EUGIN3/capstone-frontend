@@ -9,11 +9,31 @@ import '../../../index.css'
 
 const useNavigation = () => {
   return [
-    { segment: 'admin/manage-user', title: 'Manage Users', icon: <ManageAccountsTwoToneIcon /> },
-    { segment: 'admin/manage-appointments', title: 'Manage Appointments', icon: <EventNoteTwoToneIcon /> },
-    { segment: 'admin/manage-schedule', title: 'Manage Schedule', icon: <ScheduleTwoToneIcon /> },
-    { segment: 'admin/generate', title: 'Generate Design', icon: <AddPhotoAlternateTwoToneIcon /> },
-    { segment: 'user/', title: <div className='sideNavigaitonIcon'>Go To User Panel <EastTwoToneIcon/></div>, icon: <AccountCircleTwoToneIcon /> },
+    { segment: 'admin/manage-user', title: 'Manage Users', 
+      icon: 
+        <div className='adminSideIcon'>
+          <ManageAccountsTwoToneIcon />
+        </div> },
+    { segment: 'admin/manage-appointments', title: 'Manage Appointments', 
+      icon: 
+        <div className='adminSideIcon'>
+          <EventNoteTwoToneIcon />
+        </div> },
+    { segment: 'admin/manage-schedule', title: 'Manage Schedule', 
+      icon: 
+        <div className='adminSideIcon'>
+          <ScheduleTwoToneIcon />
+        </div> },
+    { segment: 'admin/generate', title: 'Generate Design', 
+      icon: 
+        <div className='adminSideIcon'>
+          <AddPhotoAlternateTwoToneIcon />
+        </div> },
+    { segment: 'user/', title: <div className='sideNavigaitonIcon adminSideIcon'>Go To User Panel <EastTwoToneIcon/></div>, 
+      icon: 
+        <div className='adminSideIcon'>
+          <AccountCircleTwoToneIcon />
+        </div> },
   ];
 };
 
