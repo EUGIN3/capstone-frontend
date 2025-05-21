@@ -1,13 +1,20 @@
 import React from 'react'
 
 import '../../styles/AdminComponents.css'
+import './ManageSchedule.css'
 
 import Construction from '../../Construction'
 
-export const ManageSchedule = () => {
+import BigCalendar from '../../BigCalendar/BigCalendar'
+
+const ManageSchedule = () => {
   return (
-    <div className='adminAppContainer'>        
-        <Construction />
+    <div className='adminAppContainer manageSchedule'>
+      <div className="manageSchedule-calendar">
+        <BigCalendar />
+      </div>
     </div>
   )
 }
+
+export default ManageSchedule

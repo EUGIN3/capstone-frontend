@@ -13,7 +13,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 
 import { ManageUser } from '../ManageUser/ManageUser';
 import ManageAppointment from '../ManageAppointments/ManageAppointment';
-import { ManageSchedule } from '../ManageSchedule/ManageSchedule';
+import ManageSchedule from '../ManageSchedule/ManageSchedule';
 import { GenerateDesign } from '../GenerateDesign/GenerateDesign';
 
 import './AdminNavbar.css'

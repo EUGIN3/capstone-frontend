@@ -22,24 +22,11 @@ import DatePickerComponent from './components/forms/DatePicker'
 import TimePickerComponent from './components/forms/TimePicker'
 import DropdownConponent from './components/forms/DropDown'
 
+import ManageCalendar from './components/forms/ManageCalendar'
+import BigCalendar from './components/BigCalendar/BigCalendar'
+// import ImageGenerator from './components/ImageGenerator'
 
 function App() {
-  const [selectedAge, setSelectedAge] = useState('');
-
-  const dropdownItems = [
-    { value: 10, label: 'Ten' },
-    { value: 20, label: 'Twenty' },
-    { value: 30, label: 'Thirty' }
-  ];
-
-  const handleDropdownChange = (value) => {
-    setSelectedAge(value);
-  };
-
-  // useEffect(() => {
-  //   console.log('Selected Age:', selectedAge);
-  // }, [selectedAge]);
-
 
   return (
     <div className='main'>
@@ -71,10 +58,7 @@ function App() {
 
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
-        <Route path="/date" element={<DatePickerComponent />} />
-        <Route path="/time" element={<TimePickerComponent />} />   
-        <Route path="/all" element={<AllAppointment />} />   
-        <Route path="/dropdown" element={<DropdownConponent items={dropdownItems} onChange={handleDropdownChange} />} />
+        {/* <Route path="/generate" element={<ImageGenerator />} /> */}
       </Routes>
     </div>
   )
