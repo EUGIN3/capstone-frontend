@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import DropdownConponent from './DropDown';
 
-const FixTime = ({ onSelect }) => {
+const FixTime = ({ onSelect, disabledSlots = {} }) => {
   const timeDropdownItems = [
     { value: '7:00 - 8:30 AM', label: '7:00 - 8:30 AM' },
     { value: '8:30 - 10:00 AM', label: '8:30 - 10:00 AM' },
@@ -19,12 +19,16 @@ const FixTime = ({ onSelect }) => {
   return (
     <div>
       <DropdownConponent 
-        items={timeDropdownItems} 
+        items={timeDropdownItems.map(item => ({
+          ...item,
+          disabled: disabledSlots[item.value] === true,
+        }))} 
         onChange={handleDropdownChange} 
         dropDownLabel={'Select Time'} 
       />
     </div>
   );
 };
+
 
 export default FixTime;

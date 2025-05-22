@@ -21,7 +21,7 @@
     border: 1px solid #F79009;
 }
 
-.appointment-box.approve {
+.appointment-box.approved {
     background-color: rgba(17, 179, 101, 0.055);
     border: 1px solid #11B364;
 }

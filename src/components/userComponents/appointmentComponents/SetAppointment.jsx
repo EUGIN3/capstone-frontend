@@ -22,6 +22,9 @@ import AxiosInstance from '../../AxiosInstance'
 
 
 function SetAppointment() {
+  const [ availabilityData, setAvailabilityData ] = useState({})
+  const [disabledSlots, setDisabledSlots] = useState({});
+
   const navigate = useNavigate()
 
   const navigation = (path) => {
@@ -36,6 +39,12 @@ function SetAppointment() {
 
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [selectedTime, setSelectedTime] = useState('');
+
+  useEffect(() => {
+    const formattedDate = selectedDate.format('YYYY-MM-DD');
+    getAvailability(formattedDate);
+  }, [selectedDate]);
+
 
   const handleTimeSelect = (time) => {
     setSelectedTime(time);
@@ -61,11 +70,29 @@ function SetAppointment() {
         'Content-Type': 'multipart/form-data',
       }
     })
-    .then(response => {
-      console.log('setted')
-    })
   };
 
+  const getAvailability = (date) => {
+    AxiosInstance.get(`unavailability/`)
+      .then((response) => {
+        const data = response.data.find(item => item.date === date);
+        if (data) {
+          setAvailabilityData(data);
+          const unavailableSlots = {
+            '7:00 - 8:30 AM': data.slot_one,
+            '8:30 - 10:00 AM': data.slot_two,
+            '10:00 - 11:30 AM': data.slot_three,
+            '1:00 - 2:30 PM': data.slot_four,
+            '2:30 - 4:00 PM': data.slot_five,
+          };
+          setDisabledSlots(unavailableSlots);
+        } else {
+          setAvailabilityData({});
+          setDisabledSlots({});
+        }
+      });
+  };
+  
   return (
     <div className='appContainer'>
       <form onSubmit={handleSubmit(submission)}>
@@ -93,12 +120,11 @@ function SetAppointment() {
                 <div className="time-top-header">Select time:</div>
 
                 <div className='time-input-container'>
-                  {/* <TimePickerComponent 
-                    value={selectedTime}
-                    onChange={(newValue) => setSelectedTime(newValue)}
-                  /> */}
 
-                  <FixTime onSelect ={handleTimeSelect}/>
+                  <FixTime 
+                    onSelect={handleTimeSelect}
+                    disabledSlots={disabledSlots}
+                  />
                   
                 </div>
               </div>  

@@ -1,0 +1,16 @@
+.manageSchedule-calendar {
+    height: 660px;
+}
+
+/* For update availability modal */
+.setAppointmentAvailability {
+    
+}
+
+.setAppointmentAvailability .selectedDate p {
+    color: red;
+}
+
+.setAppointmentAvailability .MuiSvgIcon-root {
+    color: #0c0c0c;
+}

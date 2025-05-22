@@ -30,7 +30,7 @@ export default function DropdownConponent(props) {
       >
         <MenuItem value="">None</MenuItem>
         {items.map((item, index) => (
-          <MenuItem key={index} value={item.value}>
+          <MenuItem key={index} value={item.value} disabled={item.disabled}>
             {item.label}
           </MenuItem>
         ))}

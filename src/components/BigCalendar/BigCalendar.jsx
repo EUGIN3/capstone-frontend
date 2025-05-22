@@ -6,28 +6,24 @@ import interactionPlugin from "@fullcalendar/interaction";
 
 import '../styles/BigCalendar.css'
 
-function BigCalendar() {
-  const handleDateClick = (arg) => {
-    alert(`You clicked on date: ${arg.dateStr}`);
-    // You can also use arg.date (JS Date object) if you prefer
-    // Perform your action here (e.g., open a modal, navigate, etc.)
-  };
+function BigCalendar( props ) {
+  const { onCLickDate } = props
 
   return (
     <div className="bigCalendar">
       <Fullcalendar
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         initialView={"dayGridMonth"}
-        dateClick={handleDateClick}
-        // height="600px" // Fixed height
-        height="auto" // Let it adjust to content
-        // height="100%" // Fill parent container height
+        dateClick={onCLickDate}
+        height="100%"
+        validRange={{
+          start: new Date().toISOString().split("T")[0],
+        }}
 
         headerToolbar={{
-          right: "today prev,next", // will normally be on the left. if RTL, will be on the right
+          right: "today prev,next", 
           center: "title",
           left: "dayGridMonth,timeGridWeek,timeGridDay" 
-        //   end: "dayGridMonth,timeGridWeek,timeGridDay", // will normally be on the right. if RTL, will be on the left
         }}
       />
     </div>

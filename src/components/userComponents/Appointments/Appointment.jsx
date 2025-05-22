@@ -161,7 +161,7 @@ function Appointment(props) {
           ||
           status === 'denied' && <p className='status-text'>Denied</p>
           ||
-          status === 'approve' && <p className='status-text'>Approved</p>
+          status === 'approved' && <p className='status-text'>Approved</p>
           ||
           status === 'pending' && <p className='status-text'>Pending</p>
         }
