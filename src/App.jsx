@@ -24,7 +24,7 @@ import DropdownConponent from './components/forms/DropDown'
 
 import ManageCalendar from './components/forms/ManageCalendar'
 import BigCalendar from './components/BigCalendar/BigCalendar'
-// import ImageGenerator from './components/GeneratedImagesContext'
+
 
 function App() {
 

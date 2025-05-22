@@ -16,6 +16,8 @@ import ManageAppointment from '../ManageAppointments/ManageAppointment';
 import ManageSchedule from '../ManageSchedule/ManageSchedule';
 import { GenerateDesign } from '../GenerateDesign/GenerateDesign';
 
+import ImageGenerator from '../../ImageGenerator';
+
 import './AdminNavbar.css'
 
 function AdminNavbar({ window }) {
@@ -99,7 +101,7 @@ function AdminNavbar({ window }) {
                 <Route path="/manage-user" element={<ManageUser />} />
                 <Route path="/manage-appointments" element={<ManageAppointment />} />
                 <Route path="/manage-schedule" element={<ManageSchedule />} />
-                <Route path="/generate" element={<GenerateDesign />} />
+                <Route path="/generate" element={<ImageGenerator />} />
               </Routes>
         </div>
       </DashboardLayout>
