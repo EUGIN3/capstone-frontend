@@ -11,7 +11,8 @@ import AxiosInstance from '../../AxiosInstance';
 
 import { Routes, Route, Navigate } from 'react-router-dom';
 
-import { ManageUser } from '../ManageUser/ManageUser';
+// import { ManageUser } from '../ManageUser/ManageUser';
+import {AdminDashboard} from '../AdminDashboard'
 import ManageAppointment from '../ManageAppointments/ManageAppointment';
 import ManageSchedule from '../ManageSchedule/ManageSchedule';
 import { GenerateDesign } from '../GenerateDesign/GenerateDesign';
@@ -98,7 +99,7 @@ function AdminNavbar({ window }) {
       >
         <div className='appMainContainer'>
               <Routes>
-                <Route path="/manage-user" element={<ManageUser />} />
+                <Route path="/dashboard" element={<AdminDashboard />} />
                 <Route path="/manage-appointments" element={<ManageAppointment />} />
                 <Route path="/manage-schedule" element={<ManageSchedule />} />
                 <Route path="/generate" element={<ImageGenerator />} />

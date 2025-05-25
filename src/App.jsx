@@ -37,23 +37,23 @@ function App() {
         <Route path="/reset-password/:token" element={<ResetPassword />} />
 
         {/* Protected Routes */}
-        {/* <Route element={<ProtectedRoute />}>
+        <Route element={<ProtectedRoute />}>
           <Route path="/" element={<Navigate to={'/user'} />} />
           <Route path="/user/*" element={<Navbar />} />
 
           <Route element={<AdminRoute />}>
             <Route path="/admin/*" element={<AdminNavbar />} />
-            <Route path="/admin" element={<Navigate to={'/admin/manage-user'} />} />
+            <Route path="/admin" element={<Navigate to={'/admin/dashboard'} />} />
           </Route>
-        </Route> */}
+        </Route>
 
         {/* For development purposes */}
-        <Route path="/" element={<Navigate to={'/user'} />} />
+        {/* <Route path="/" element={<Navigate to={'/user'} />} />
         <Route path="/user/*" element={<Navbar />} />
 
         <Route element={<AdminRoute />}>
           <Route path="/admin/*" element={<AdminNavbar   />} />
-        </Route>
+        </Route> */}
 
 
         {/* 404 */}

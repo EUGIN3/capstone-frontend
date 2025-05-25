@@ -1,0 +1,39 @@
+.chartComponent {
+    height: 100%;
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    gap: 20px;
+}
+
+.mainGraph {
+    /* height: 100%; */
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+}
+
+.subGraphs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.subGraphOne {
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+}
+
+
+
+.subGraphTwo {
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+}
+
+.title {
+  /* text-align: center; */
+  padding: 5px;
+  font-weight: 700;
+}
+
+.bar,
+.line,
+.pie {
+  height: 90%;
+}

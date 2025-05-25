@@ -4,15 +4,16 @@ import EventNoteTwoToneIcon from '@mui/icons-material/EventNoteTwoTone';
 import ScheduleTwoToneIcon from '@mui/icons-material/ScheduleTwoTone';
 import AddPhotoAlternateTwoToneIcon from '@mui/icons-material/AddPhotoAlternateTwoTone';
 import EastTwoToneIcon from '@mui/icons-material/EastTwoTone';
+import DashboardTwoToneIcon from '@mui/icons-material/DashboardTwoTone';
 
 import '../../../index.css'
 
 const useNavigation = () => {
   return [
-    { segment: 'admin/manage-user', title: 'Manage Users', 
+    { segment: 'admin/dashboard', title: 'Dashboard', 
       icon: 
         <div className='adminSideIcon'>
-          <ManageAccountsTwoToneIcon />
+          <DashboardTwoToneIcon />
         </div> },
     { segment: 'admin/manage-appointments', title: 'Manage Appointments', 
       icon: 

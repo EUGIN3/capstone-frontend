@@ -6,7 +6,7 @@ function AlertComponent(props) {
 
   return (
     <div className={`alert ${show ? 'show' : ''}`}>
-      <Alert severity={type}>
+      <Alert severity={type} variant="filled">
         {message}
       </Alert>
     </div>
