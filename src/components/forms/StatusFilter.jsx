@@ -25,7 +25,7 @@ function StatusFilter({ onFilterChange }) {
           <MenuItem value="approved">Approved</MenuItem>
           <MenuItem value="denied">Denied</MenuItem>
           <MenuItem value="pending">Pending</MenuItem>
-          <MenuItem value="cancel">Canceled</MenuItem>
+          <MenuItem value="cancelled">Cancelled</MenuItem>
         </Select>
       </FormControl>
     </div>

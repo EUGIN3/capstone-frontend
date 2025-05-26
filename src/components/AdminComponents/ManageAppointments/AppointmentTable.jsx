@@ -85,7 +85,7 @@ export default function CustomizedTables({ refreshFlag, onViewDetails }) {
         <TableBody>
           {filteredAppointments.length > 0 ? (
             filteredAppointments.map((appointment) => (
-              <StyledTableRow key={appointment.id}>
+              <StyledTableRow key={appointment.id} onClick={() => onViewDetails(appointment)}>
                 <StyledTableCell align='center'>{appointment.first_name || 'N/A'}</StyledTableCell>
                 <StyledTableCell align='center'>{appointment.last_name || 'N/A'}</StyledTableCell>
                 <StyledTableCell align='center'>{dayjs(appointment.date).format('MMMM DD, YYYY')}</StyledTableCell>

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import dayjs from 'dayjs';
 
 import AppHeader from '../userHeader'
 import ButtonElement from '../../forms/ButtonElement'
@@ -25,7 +24,8 @@ function DisplayAppointments() {
   const listAppointments = () => {
     AxiosInstance.get(`user_appointments/`, {})
     .then((response) => {
-      setUserAppointments(response.data);
+      const reversedList = response.data.slice().reverse();
+      setUserAppointments(reversedList);
     }) 
   }
   

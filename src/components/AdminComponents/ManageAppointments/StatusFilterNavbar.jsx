@@ -22,8 +22,9 @@ export default function StatusFilterNavbar({ onTabChange }) {
       >
         <Tab label="All" value="all" />
         <Tab label="Pending" value="pending" />
-        <Tab label="Approve" value="approved" />
-        <Tab label="Deny" value="denied" />
+        <Tab label="Approved" value="approved" />
+        <Tab label="Cancelled" value="cancelled" />
+        <Tab label="Denied" value="denied" />
       </Tabs>
     </div>
   );

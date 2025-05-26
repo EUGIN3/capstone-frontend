@@ -1,0 +1,85 @@
+#home {
+    width: 100%;
+    height: 100vh;
+}
+
+.home-main-container {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    background-color: var(--black);
+}
+
+.light {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: .5;
+}
+
+
+.bigLogo-cotainer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    padding-top: 150px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.bigLogo-cotainer #profile-ramil-image {
+    width: 60%;
+    height: 60%;
+    object-fit: contain;
+}
+
+.home-details-container {
+    /* position: absolute; */
+    text-align: center;
+    background-color: transparent;
+    width: 100%;
+    bottom: 0;
+    margin-bottom: 100px;
+}
+
+
+.home-details-container p.name {
+    font-family: var(--fancy-font);
+    font-size: var(--extra-large-size);
+    font-weight: var(--semi-bold);
+    letter-spacing: 10px;
+    margin-bottom: 20px;
+
+    text-shadow: var(--text-shadow);
+}
+
+.home-details-container p.career {
+    font-size: 30px;
+    letter-spacing: 15px;
+}
+
+.book-now {
+    padding: 10px;
+    bottom: 0;
+    right: 0;
+    margin: 0px 50px 50px 0px;
+
+    display: flex;
+    align-items: center;
+    position: fixed;
+    transition: all .3s;
+}
+
+.book-now p{
+    margin-right: 10px;
+    color: var(--white);
+    text-decoration: none;
+}
+
+.book-now:hover {
+    transform: translateX(10px);
+}

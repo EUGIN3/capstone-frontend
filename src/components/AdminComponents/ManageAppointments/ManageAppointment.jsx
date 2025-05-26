@@ -68,7 +68,6 @@ function ManageAppointment() {
 
       { selectedAppointment && 
         <Dialog open={open} onClose={handleClose}>
-
           <ModalDetails
             id={selectedAppointment.id}
             firstName={selectedAppointment.first_name}

@@ -14,7 +14,7 @@ import Navbar from './components/Navbar/Navbar'
 import AdminNavbar from './components/AdminComponents/AdminNavbar/AdminNavbar'
 import NotFound from './components/NotFound';
 
-
+import LandingPage from './components/1.LandingPage/LandingPage'
 
 function App() {
 
@@ -48,6 +48,7 @@ function App() {
 
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
+        <Route path="/ramil" element={<LandingPage />} />
         {/* <Route path="/generate" element={<ImageGenerator />} /> */}
       </Routes>
     </div>

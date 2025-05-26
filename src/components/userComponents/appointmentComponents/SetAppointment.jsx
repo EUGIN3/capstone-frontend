@@ -38,20 +38,9 @@ function SetAppointment() {
 
   const schema = yup.object({
     time: yup.string().required('Please select a time.'),
-    address : yup.string().required('Please enter an address.'),
-    facebookLink : yup.string().required('Please enter a facebook link.'),
-    appointmentDescription : yup.string().required('Please enter a description.')
   });
 
   const [selectedTime, setSelectedTime] = useState('');
-
-  // useEffect(() => {
-  //   const formattedDate = selectedDate.format('YYYY-MM-DD');
-  //   getAvailability(formattedDate);
-  // }, [selectedDate]);
-
-
-
 
   const handleTimeSelect = (time) => {
     setSelectedTime(time);
@@ -87,7 +76,19 @@ function SetAppointment() {
         fileInputRef.value = '';
       }
       setSelectedTime('');
-      setSelectedDate(dayjs());
+
+      fetchAllUnavailableDates();
+
+      // Automatically move to the next available date
+      let nextDate = dayjs().add(1, 'day');
+      let formatted = nextDate.format('YYYY-MM-DD');
+
+      while (fullyUnavailableDates.includes(formatted)) {
+        nextDate = nextDate.add(1, 'day');
+        formatted = nextDate.format('YYYY-MM-DD');
+      }
+
+      setSelectedDate(nextDate);
 
       setTimeout(() => {
           setShowAlert(false);
@@ -105,7 +106,7 @@ function SetAppointment() {
   };
 
   const [fullyUnavailableDates, setFullyUnavailableDates] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(null); // initially null
+  const [selectedDate, setSelectedDate] = useState(null);
 
   const fetchAllUnavailableDates = async () => {
     try {
@@ -125,8 +126,8 @@ function SetAppointment() {
         formatted = checkDate.format('YYYY-MM-DD');
       }
 
-      setSelectedDate(checkDate); // set first available date
-      getAvailability(formatted); // also fetch slots for that date
+      setSelectedDate(checkDate); 
+      getAvailability(formatted); 
     } catch (error) {
       console.error('Failed to fetch unavailable dates:', error);
     }
@@ -158,7 +159,6 @@ function SetAppointment() {
           if (allSlotsUnavailable) {
             setFullyUnavailableDates(prev => [...new Set([...prev, date])]);
           } else {
-            // If not fully unavailable, remove the date if it exists
             setFullyUnavailableDates(prev => prev.filter(d => d !== date));
           }
         } else {
