@@ -4,13 +4,17 @@ import Dialog from '@mui/material/Dialog';
 import '../../styles/AdminComponents.css'
 import './ManageSchedule.css'
 
-import Construction from '../../Construction'
 import SetAvailability from './SetAvailability';
 import BigCalendar from '../../BigCalendar/BigCalendar'
 
 import AxiosInstance from '../../AxiosInstance';
 
+import AlertComponent from '../../Alert';
+
 const ManageSchedule = () => {
+  const [showAlert, setShowAlert] = useState(true);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('');
 
   const [ unavailabilityData, setUnavailabilityData ] = useState()
 
@@ -21,14 +25,10 @@ const ManageSchedule = () => {
         setUnavailabilityData(data);
       })
   };
-  // useEffect(() => {
-  //   console.log(unavailabilityData) 
-  // }, [unavailabilityData])
   
   const [selectedDate, setSelectedDate] = useState('')
 
   const handleDateClick = (arg) => {
-
     setSelectedDate(arg.dateStr)
     getAvailability(arg.dateStr)
     handleClickOpen()
@@ -56,10 +56,19 @@ const ManageSchedule = () => {
   
   return (
     <div className='adminAppContainer manageSchedule'>
+      { showAlert && <AlertComponent message={alertMessage} type={alertType} show={showAlert} isNoNavbar={''}/> }
+
       <Dialog open={open} onClose={handleClose}>
         <SetAvailability
           unavailableSlots={slots}
           selectedDate={selectedDate}
+          onAlert={(message, type) => {
+            setAlertMessage(message);
+            setAlertType(type);
+            setShowAlert(true);
+            setTimeout(() => setShowAlert(false), 3000);
+          }}
+          onClose={handleClose}
         />
       </Dialog>
 

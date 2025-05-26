@@ -5,9 +5,7 @@ import AppHeader from '../userHeader'
 import ButtonElement from '../../forms/ButtonElement'
 import NormalTextField from '../../forms/NormalTextField'
 
-import DatePickerComponent from '../../forms/DatePicker'
 import CalendarComponent from '../../forms/calendarComponent'
-import TimePickerComponent from '../../forms/TimePicker'
 
 import FixTime from '../../forms/FixTime';
 
@@ -20,8 +18,13 @@ import '../../styles/SetAppointment.css'
 
 import AxiosInstance from '../../AxiosInstance'
 
+import AlertComponent from '../../Alert';
 
 function SetAppointment() {
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('');
+
   const [ availabilityData, setAvailabilityData ] = useState({})
   const [disabledSlots, setDisabledSlots] = useState({});
 
@@ -31,26 +34,30 @@ function SetAppointment() {
     navigate(path)
   }
 
+  let fileInputRef = null;
+
   const schema = yup.object({
+    time: yup.string().required('Please select a time.'),
     address : yup.string().required('Please enter an address.'),
     facebookLink : yup.string().required('Please enter a facebook link.'),
     appointmentDescription : yup.string().required('Please enter a description.')
   });
 
-  const [selectedDate, setSelectedDate] = useState(dayjs());
   const [selectedTime, setSelectedTime] = useState('');
 
-  useEffect(() => {
-    const formattedDate = selectedDate.format('YYYY-MM-DD');
-    getAvailability(formattedDate);
-  }, [selectedDate]);
+  // useEffect(() => {
+  //   const formattedDate = selectedDate.format('YYYY-MM-DD');
+  //   getAvailability(formattedDate);
+  // }, [selectedDate]);
+
+
 
 
   const handleTimeSelect = (time) => {
     setSelectedTime(time);
   };
 
-  const { handleSubmit, control } = useForm({resolver : yupResolver(schema)}) 
+  const { handleSubmit, control, reset } = useForm({ resolver: yupResolver(schema) });
 
   const [selectedImage, setSelectedImage] = useState(null);
   const submission = (data) => {
@@ -70,7 +77,67 @@ function SetAppointment() {
         'Content-Type': 'multipart/form-data',
       }
     })
+    .then(() => {
+      setAlertMessage('Appointment booked successfully! You can now view it.');
+      setAlertType('success');
+      setShowAlert(true);
+
+      reset();
+      if (fileInputRef) {
+        fileInputRef.value = '';
+      }
+      setSelectedTime('');
+      setSelectedDate(dayjs());
+
+      setTimeout(() => {
+          setShowAlert(false);
+      }, 1000);
+    })
+    .catch((error) => {
+      setAlertMessage('Failed to set the appointment.');
+      setAlertType('error');
+      setShowAlert(true);
+
+      setTimeout(() => {
+        setShowAlert(false);
+      }, 3000);
+    })
   };
+
+  const [fullyUnavailableDates, setFullyUnavailableDates] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null); // initially null
+
+  const fetchAllUnavailableDates = async () => {
+    try {
+      const response = await AxiosInstance.get(`unavailability/`);
+      
+      const fullyBookedDates = response.data
+        .filter(item => item.slot_one && item.slot_two && item.slot_three && item.slot_four && item.slot_five)
+        .map(item => item.date);
+
+      setFullyUnavailableDates(fullyBookedDates);
+
+      let checkDate = dayjs();
+      let formatted = checkDate.format('YYYY-MM-DD');
+
+      while (fullyBookedDates.includes(formatted)) {
+        checkDate = checkDate.add(1, 'day');
+        formatted = checkDate.format('YYYY-MM-DD');
+      }
+
+      setSelectedDate(checkDate); // set first available date
+      getAvailability(formatted); // also fetch slots for that date
+    } catch (error) {
+      console.error('Failed to fetch unavailable dates:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllUnavailableDates();
+  }, []);
+
+
+
 
   const getAvailability = (date) => {
     AxiosInstance.get(`unavailability/`)
@@ -86,16 +153,36 @@ function SetAppointment() {
             '2:30 - 4:00 PM': data.slot_five,
           };
           setDisabledSlots(unavailableSlots);
+
+          const allSlotsUnavailable = Object.values(unavailableSlots).every(val => val === true);
+          if (allSlotsUnavailable) {
+            setFullyUnavailableDates(prev => [...new Set([...prev, date])]);
+          } else {
+            // If not fully unavailable, remove the date if it exists
+            setFullyUnavailableDates(prev => prev.filter(d => d !== date));
+          }
         } else {
           setAvailabilityData({});
           setDisabledSlots({});
+          setFullyUnavailableDates(prev => prev.filter(d => d !== date));
         }
       });
   };
+
+  
+  useEffect(() => {
+    if (selectedDate) {
+      const formattedDate = selectedDate.format('YYYY-MM-DD');
+      getAvailability(formattedDate);
+    }
+  }, [selectedDate]);
+
   
   return (
     <div className='appContainer'>
-      <form onSubmit={handleSubmit(submission)}>
+      { showAlert && <AlertComponent message={alertMessage} type={alertType} show={showAlert} isNoNavbar={''}/> }
+
+      <form onSubmit={handleSubmit(submission)}>    
           <div className='top-set-app'>
               <AppHeader headerTitle='set appointment'/>
 
@@ -105,7 +192,7 @@ function SetAppointment() {
                   variant='filled-black' 
                   type='button' 
                   onClick={
-                    () => navigation('/user/appointment/all-appointments')
+                    () => navigation('/user/all-appointments')
                   } 
                 />
               </div>
@@ -124,6 +211,9 @@ function SetAppointment() {
                   <FixTime 
                     onSelect={handleTimeSelect}
                     disabledSlots={disabledSlots}
+                    value={selectedTime}
+                    control={control}
+                    name={'time'}
                   />
                   
                 </div>
@@ -162,6 +252,7 @@ function SetAppointment() {
                       type="file"
                       name="image"
                       accept="image/*"
+                      ref={(ref) => fileInputRef = ref}
                       onChange={(e) => setSelectedImage(e.target.files[0])}
                     />
                     {/* Button */}
@@ -183,6 +274,7 @@ function SetAppointment() {
                 <CalendarComponent 
                   value={selectedDate}
                   onChange={(newValue) => setSelectedDate(newValue)}
+                  disableDates={fullyUnavailableDates}
                 />
               </div>
             </div>

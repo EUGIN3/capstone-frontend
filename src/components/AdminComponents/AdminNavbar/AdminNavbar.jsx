@@ -91,11 +91,12 @@ function AdminNavbar({ window }) {
       branding={{
         logo: <img src={logo} alt="Ramil's logo." style={{ height: '20px', width: '200px' }} />, 
         title: '',
-        homeUrl: '/admin/manage-user',
+        homeUrl: '/admin/dashboard',
       }}
     >
       <DashboardLayout 
-        sidebarExpandedWidth="280px"
+        sidebarExpandedWidth="240px"
+        disableCollapsibleSidebar
       >
         <div className='appMainContainer'>
               <Routes>

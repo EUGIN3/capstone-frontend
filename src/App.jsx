@@ -14,16 +14,6 @@ import Navbar from './components/Navbar/Navbar'
 import AdminNavbar from './components/AdminComponents/AdminNavbar/AdminNavbar'
 import NotFound from './components/NotFound';
 
-import AdminAppointmentComponent from './components/AdminComponents/AdminAppointmentComponent'
-import { AllAppointment } from './components/AdminComponents/ManageAppointments/AllAppointment'
-
-
-import DatePickerComponent from './components/forms/DatePicker'
-import TimePickerComponent from './components/forms/TimePicker'
-import DropdownConponent from './components/forms/DropDown'
-
-import ManageCalendar from './components/forms/ManageCalendar'
-import BigCalendar from './components/BigCalendar/BigCalendar'
 
 
 function App() {

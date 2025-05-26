@@ -19,7 +19,6 @@ import * as yup from "yup";
 
 function Register() {
     const navigate = useNavigate()
-
     
     const schema = yup.object({
         fname : yup.string().required('Enter your first name.'),
@@ -73,7 +72,7 @@ function Register() {
     return (
         <form onSubmit={handleSubmit(submission)}>
 
-            { showAlert && <AlertComponent message={alertMessage} type={alertType} show={showAlert} /> }
+            { showAlert && <AlertComponent message={alertMessage} type={alertType} show={showAlert} isNoNavbar={'alert-log-reg'}/> }
             
             <div className={'main-login'}>
                 <div className="black-side">

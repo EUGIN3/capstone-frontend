@@ -1,3 +1,8 @@
 /* .MuiListItemIcon-root svg {
   color: #f5f5f5 !important;
 } */
+
+.css-ezihe .MuiButtonBase-root {
+  color: #0c0c0c;
+  border-color: #0c0c0c;
+}

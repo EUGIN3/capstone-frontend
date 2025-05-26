@@ -18,7 +18,7 @@
                 <TextField 
                   id="outlined-search"
                   onChange={onChange}
-                  value={value} 
+                  value={value || ''} 
                   label={label}
                   type="text"
                   error={!!error}

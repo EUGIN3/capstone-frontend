@@ -4,11 +4,23 @@
 
 /* For update availability modal */
 .setAppointmentAvailability {
-    
+    padding: 20px;
 }
 
-.setAppointmentAvailability .selectedDate p {
-    color: red;
+.setAppointmentAvailability-header {
+    font-size: 24px;
+    font-weight: 600;
+    text-transform: uppercase;
+
+}
+
+.setAppointmentAvailability hr {
+    margin: 10px 0;
+}
+
+.setAppointmentAvailability .filled-blue {
+    height: 40px;
+    margin-top: 10px;
 }
 
 .setAppointmentAvailability .MuiSvgIcon-root {

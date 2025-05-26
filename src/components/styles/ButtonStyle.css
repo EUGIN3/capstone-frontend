@@ -68,6 +68,13 @@
     background: var(--white);
     color: #2287E7;
 }
+
+.outlined-blue:hover {
+    border: 1px solid #2287E7; 
+    background: #2287E7;
+    color: #f5f5f5;
+}
+
 .filled-blue {
     background-color: #2287E7;
     color: var(--white);

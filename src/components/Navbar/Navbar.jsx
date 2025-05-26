@@ -92,16 +92,20 @@ function Navbar({ window }) {
       }}
     >
       <DashboardLayout 
-        sidebarExpandedWidth="280px"
+        sidebarExpandedWidth="240px"
+        disableCollapsibleSidebar
       >
         <div className='appMainContainer'>
               <Routes>
                 {/* Specified routes */}
                 <Route path="/" element={<Navigate to="/user/dashboard" />} />
                 <Route path="/dashboard" element={<Dashboard />} />
-
+{/* 
                 <Route path="/appointment/all-appointments" element={<DisplayAppointments />} />
-                <Route path="/appointment/set-appointment" element={<SetAppointment />} />
+                <Route path="/appointment/set-appointment" element={<SetAppointment />} /> */}
+
+                <Route path="/all-appointments" element={<DisplayAppointments />} />
+                <Route path="/set-appointment" element={<SetAppointment />} />
 
                 {/* If routes is not belong to the specified. */}
                 <Route path="*" element={<Navigate to="/not-found" />} />

@@ -1,6 +1,6 @@
 .modalDetails {
     padding: 24px;
-    width: 600px;
+    width: 450px;
 }
 
 .modalDetails-header {
@@ -18,11 +18,6 @@
     align-items: center;
     justify-content: space-between;
 }
-
-/* .modalDetails-status button {
-    width: 100px;
-    padding: 5px;
-} */
 
 .modalDetails-name {
     font-weight: 700;
@@ -72,6 +67,9 @@
     background-color: #2287E7;
 }
 
-.modalDetails-save-button button {
-    height: 50px;
+.modalDetails-save-button {
+    display: flex;
+    gap: 20px;
+    height: 40px;
 }
+

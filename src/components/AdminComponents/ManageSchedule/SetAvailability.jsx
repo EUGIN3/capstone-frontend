@@ -3,9 +3,11 @@ import Checkbox from '@mui/material/Checkbox';
 
 import ButtonElement from '../../forms/ButtonElement';
 
-import AxiosInstance from '../../AxiosInstance'
+import AxiosInstance from '../../AxiosInstance';
 
 import './ManageSchedule.css';
+
+import dayjs from 'dayjs';
 
 const SetUnavailability = (props) => {
   const timeSlots = [
@@ -16,41 +18,42 @@ const SetUnavailability = (props) => {
     '2:30 - 4:00 PM',
   ];
 
-  const { selectedDate, unavailableSlots } = props;
+  const { selectedDate, unavailableSlots, onAlert, onClose } = props;
+
+  const [slots, setSlots] = useState({});
+  const [wholeDay, setWholeDay] = useState(false);
 
   useEffect(() => {
-    if (unavailableSlots) {
-      setSlots({
-        '7:00 - 8:30 AM': unavailableSlots.slot_one,
-        '8:30 - 10:00 AM': unavailableSlots.slot_two,
-        '10:00 - 11:30 AM': unavailableSlots.slot_three,
-        '1:00 - 2:30 PM': unavailableSlots.slot_four,
-        '2:30 - 4:00 PM': unavailableSlots.slot_five,
-      });
-    } else {
-      setSlots({
-        '7:00 - 8:30 AM': false,
-        '8:30 - 10:00 AM': false,
-        '10:00 - 11:30 AM': false,
-        '1:00 - 2:30 PM': false,
-        '2:30 - 4:00 PM': false,
-      });
-    }
+    const initialSlots = {
+      '7:00 - 8:30 AM': unavailableSlots?.slot_one || false,
+      '8:30 - 10:00 AM': unavailableSlots?.slot_two || false,
+      '10:00 - 11:30 AM': unavailableSlots?.slot_three || false,
+      '1:00 - 2:30 PM': unavailableSlots?.slot_four || false,
+      '2:30 - 4:00 PM': unavailableSlots?.slot_five || false,
+    };
+    setSlots(initialSlots);
   }, [unavailableSlots]);
 
-  const [slots, setSlots] = useState({
-    '7:00 - 8:30 AM': false,
-    '8:30 - 10:00 AM': false,
-    '10:00 - 11:30 AM': false,
-    '1:00 - 2:30 PM': false,
-    '2:30 - 4:00 PM': false,
-  });
+  // Watch slot values to derive whole day state
+  useEffect(() => {
+    const allChecked = timeSlots.every((slot) => slots[slot]);
+    setWholeDay(allChecked);
+  }, [slots]);
 
   const handleChange = (slot) => (event) => {
     setSlots((prev) => ({
       ...prev,
       [slot]: event.target.checked,
     }));
+  };
+
+  const handleWholeDayChange = (event) => {
+    const checked = event.target.checked;
+    const updatedSlots = timeSlots.reduce((acc, slot) => {
+      acc[slot] = checked;
+      return acc;
+    }, {});
+    setSlots(updatedSlots);
   };
 
   const handleSave = () => {
@@ -64,26 +67,35 @@ const SetUnavailability = (props) => {
     };
 
     AxiosInstance.post('unavailability/', payload)
-      // .then((response) => {
-      //   console.log('Saved successfully:', response.data);
-      // })
-      // .catch((error) => {
-      //   console.error('Error saving unavailability:', error);
-      // });
+      .then(() => {
+        if (onAlert) onAlert("Schedule updated successfully!", "success");
+        if (onClose) onClose();
+      })
+      .catch(() => {
+        if (onAlert) onAlert("Failed to update schedule.", "error");
+      });
   };
 
   return (
     <div className='setAppointmentAvailability'>
-      <div className="selectedDate">
-        <p>{selectedDate}</p>
-      </div>
+      <p className='setAppointmentAvailability-header'>{dayjs(selectedDate).format('MMMM DD, YYYY')} · Schedule</p>
 
       <hr />
+
+      <div>
+        <Checkbox
+          checked={wholeDay}
+          onChange={handleWholeDayChange}
+          size="small"
+          sx={{ '& .MuiSvgIcon-root': { fontSize: 24 } }}
+        />
+        <span><strong>Whole Day</strong></span>
+      </div>
 
       {timeSlots.map((slot) => (
         <div key={slot}>
           <Checkbox
-            checked={slots[slot]}
+            checked={slots[slot] || false}
             onChange={handleChange(slot)}
             size="small"
             sx={{ '& .MuiSvgIcon-root': { fontSize: 24 } }}
@@ -95,7 +107,7 @@ const SetUnavailability = (props) => {
       <ButtonElement
         label='SAVE UNAVAILABLE'
         variant='filled-blue'
-        type={'button'}
+        type='button'
         onClick={handleSave}
       />
     </div>

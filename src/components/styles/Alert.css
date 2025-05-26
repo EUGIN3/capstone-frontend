@@ -3,6 +3,16 @@
     align-items: center;
     justify-content: center;
     position: fixed;
-    top: 40px;
+    top: 80px;
+    width: 65vw;
+}
+
+.alert-log-reg {
+    top: 80px;
     width: 100vw;
+}
+
+.approval {
+    top: 150px;
+    width: 35vw;
 }

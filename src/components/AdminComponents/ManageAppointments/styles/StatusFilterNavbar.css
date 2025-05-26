@@ -1,10 +1,10 @@
 .statusFilterNavbar {
-    color: #F5F5F5;
+    color: #0C0C0C;
     /* padding: 0px 20px; */
 }
 
 .statusFilterNavbar .MuiTabs-root {
-    background-color: #0C0C0C;
+    background-color: #0c0c0c15;
 }
 
 .statusFilterNavbar .MuiTabs-list {
@@ -13,7 +13,7 @@
 }
 
 .statusFilterNavbar .MuiTabs-list button {
-    color: #F5F5F5;
+    color: #0C0C0C;
     text-transform: capitalize;
 }
 

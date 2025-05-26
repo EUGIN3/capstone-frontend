@@ -10,6 +10,7 @@ import InfoTwoToneIcon from '@mui/icons-material/InfoTwoTone';
 import ModalDetails from './ManageAppointments/ModalDetails';
 
 function AdminAppointmentComponent(props) {
+
     const {
         first_name, 
         last_name, 
@@ -24,7 +25,8 @@ function AdminAppointmentComponent(props) {
         address,
         date_set,
         id, 
-        onUpdate
+        onUpdate,
+        control
     } = props
 
     const [open, setOpen] = useState(false);
@@ -38,11 +40,12 @@ function AdminAppointmentComponent(props) {
     };
 
     const handleUpdate = (updatedAppointment) => {
-    if (onUpdate) onUpdate(updatedAppointment);  // Call grandparent update
+        if (onUpdate) onUpdate(updatedAppointment)
     };
 
     return (
         <div className='adminAppointment'>
+
             <Dialog open={open} onClose={handleClose}>
               <ModalDetails
                 id={id}
@@ -60,6 +63,7 @@ function AdminAppointmentComponent(props) {
                 date_set={date_set}
                 onUpdate={handleUpdate}
                 onClose={handleClose}
+                control={control}
               />
             </Dialog>
             <div className="adminAppointment-details">

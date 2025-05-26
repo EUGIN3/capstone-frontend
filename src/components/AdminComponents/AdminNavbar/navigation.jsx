@@ -15,21 +15,25 @@ const useNavigation = () => {
         <div className='adminSideIcon'>
           <DashboardTwoToneIcon />
         </div> },
+
     { segment: 'admin/manage-appointments', title: 'Manage Appointments', 
       icon: 
         <div className='adminSideIcon'>
           <EventNoteTwoToneIcon />
         </div> },
+
     { segment: 'admin/manage-schedule', title: 'Manage Schedule', 
       icon: 
         <div className='adminSideIcon'>
           <ScheduleTwoToneIcon />
         </div> },
+
     { segment: 'admin/generate', title: 'Generate Design', 
       icon: 
         <div className='adminSideIcon'>
           <AddPhotoAlternateTwoToneIcon />
         </div> },
+        
     { segment: 'user/', title: <div className='sideNavigaitonIcon adminSideIcon'>Go To User Panel <EastTwoToneIcon/></div>, 
       icon: 
         <div className='adminSideIcon'>

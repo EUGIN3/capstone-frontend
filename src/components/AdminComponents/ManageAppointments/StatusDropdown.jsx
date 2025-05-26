@@ -1,34 +1,30 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
-export default function DropdownConponent(props) {
-  const { items, onChange, dropDownLabel } = props;
-  const [selectedValue, setSelectedValue] = useState('');
+export default function StatusDropdown(props) {
+  const { items, onChange, dropDownLabel, value } = props;
 
   const handleChange = (event) => {
-    const value = event.target.value;
-    setSelectedValue(value);
-
+    const newValue = event.target.value;
     if (onChange) {
-      onChange(value);
+      onChange(newValue);
     }
   };
 
   return (
     <FormControl fullWidth>
-      <InputLabel id="demo-simple-select-label">{dropDownLabel}</InputLabel>
+      <InputLabel id="controlled-select-label">{dropDownLabel}</InputLabel>
       <Select
-        labelId="demo-simple-select-label"
-        id="demo-simple-select"
+        labelId="controlled-select-label"
+        id="controlled-select"
         label={dropDownLabel}
-        value={selectedValue}
+        value={value || ''}
         onChange={handleChange}
       >
-        <MenuItem value="">None</MenuItem>
         {items.map((item, index) => (
           <MenuItem key={index} value={item.value} disabled={item.disabled}>
             {item.label}
@@ -38,4 +34,3 @@ export default function DropdownConponent(props) {
     </FormControl>
   );
 }
-

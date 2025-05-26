@@ -3,17 +3,23 @@ import React, {useState, useEffect} from 'react'
 import ButtonElement from '../../forms/ButtonElement'
 
 
-import DropdownConponent from '../../forms/DropDown'
+import StatusDropdown from './StatusDropDown'
 import AxiosInstance from '../../AxiosInstance'
 
 import './styles/ModalAppointment.css'
 
+import dayjs from 'dayjs';
+
 const ModalDetails = (props) => {
   const {firstName, lastName, date, time, description, facebookLink,
     phone_number, email, image, appointment_status, address, date_set,
-    id, onUpdate, onClose} = props
+    id, onUpdate, onClose, control} = props
 
-  const [selectedStatus, setSelectedStatus] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState(appointment_status || '');
+
+  useEffect(() => {
+    setSelectedStatus(appointment_status || '');
+  }, [appointment_status]);
 
   const dropdownItems = [
     { value: 'pending', label: 'Pending' },
@@ -25,16 +31,6 @@ const ModalDetails = (props) => {
     setSelectedStatus(value);
   };
 
-  const handleApproval = (action) => {
-    AxiosInstance.patch(`appointments/${id}/`, {
-      appointment_status: action,
-    })
-    .then((response) => {
-      if (onClose) onClose();       // Close modal first
-      if (onUpdate) onUpdate(response.data); // Then notify parent
-    });
-  };
-  
 
   return (
     <div className='modalDetails'>
@@ -50,7 +46,7 @@ const ModalDetails = (props) => {
         </div>
         
         <p className="modalDetails-date-set">
-          {date_set}
+          {dayjs(date_set).format('MMMM DD, YYYY')}
         </p>
       </div>
 
@@ -67,7 +63,7 @@ const ModalDetails = (props) => {
       <hr />
 
       <div className="modalDetails-date-time">
-        <p className="modalDetails-date">{date}</p>
+        <p className="modalDetails-date">{dayjs(date).format('MMMM DD, YYYY')}</p>
         <p className="modalDetails-time">{time}</p>
       </div> 
 
@@ -78,11 +74,15 @@ const ModalDetails = (props) => {
       </div> 
 
       <hr />
-
       <div className="modalDetails-update-status">
         <div className="modalDetails-update-status-dropdown">
-          <DropdownConponent 
-            items={dropdownItems} onChange={handleDropdownChange} dropDownLabel={'Update Status'}
+          <StatusDropdown
+            items={dropdownItems}
+            onChange={handleDropdownChange}
+            value={selectedStatus}
+            dropDownLabel="Update Status"
+            name="status"
+            control={control}
           />
         </div>
       </div>
@@ -94,7 +94,7 @@ const ModalDetails = (props) => {
           label='Save Changes'
           variant='filled-green'
           type={'button'}
-          onClick={() => handleApproval(selectedStatus)}
+          onClick={() => onUpdate(id, selectedStatus)}
         />
       </div>
     </div>

@@ -53,6 +53,10 @@ function DisplayAppointments() {
           id={app.id}
           date={app.date}
           time={app.time}
+          facebookLink={app.facebook_link}
+          adress={app.address}
+          description={app.description}
+          image={app.image}
           status={app.appointment_status}
           onDelete={handleDelete}
           onUpdate={handleUpdate}
@@ -74,7 +78,7 @@ function DisplayAppointments() {
             label='Set appointment' 
             variant='filled-black' 
             type='button' 
-            onClick={() => navigation('/user/appointment/set-appointment')} />
+            onClick={() => navigation('/user/set-appointment')} />
         </div>
       </div>
 

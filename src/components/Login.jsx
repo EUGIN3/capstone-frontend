@@ -18,7 +18,11 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 
-function Login() {
+function Login() {    
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertType, setAlertType] = useState('');
+
     const navigate = useNavigate()  
 
     const schema = yup.object({
@@ -27,10 +31,6 @@ function Login() {
     });
 
     const { handleSubmit, control } = useForm({resolver : yupResolver(schema)})
-
-    const [showAlert, setShowAlert] = useState(false);
-    const [alertMessage, setAlertMessage] = useState('');
-    const [alertType, setAlertType] = useState('');
 
     const submission = (data) => {
         AxiosInstance.post(`login/`, {
@@ -57,7 +57,7 @@ function Login() {
             setShowAlert(true);
     
             setTimeout(() => {
-            setShowAlert(false);
+                setShowAlert(false);
             }, 3000);
         });
     }
@@ -77,7 +77,7 @@ function Login() {
     return (
         <form onSubmit={handleSubmit(submission)}>
 
-            { showAlert && <AlertComponent message={alertMessage} type={alertType} show={showAlert} /> }
+            { showAlert && <AlertComponent message={alertMessage} type={alertType} show={showAlert} isNoNavbar={'alert-log-reg'}/> }
 
             <div className={'main-login'}>
                 <div className="black-side">
