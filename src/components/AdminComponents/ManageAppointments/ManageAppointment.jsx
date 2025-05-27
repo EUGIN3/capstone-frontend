@@ -69,19 +69,19 @@ function ManageAppointment() {
       { selectedAppointment && 
         <Dialog open={open} onClose={handleClose}>
           <ModalDetails
-            id={selectedAppointment.id}
-            firstName={selectedAppointment.first_name}
-            lastName={selectedAppointment.last_name}
-            date={selectedAppointment.date}
-            time={selectedAppointment.time}
-            description={selectedAppointment.description}
-            facebookLink={selectedAppointment.facebookLink}
-            phone_number={selectedAppointment.phone_number}
-            email={selectedAppointment.email}
-            image={selectedAppointment.image}
-            appointment_status={selectedAppointment.appointment_status}
-            address={selectedAppointment.address}
-            date_set={selectedAppointment.date_set}
+            id={selectedAppointment?.id ?? ''}
+            firstName={selectedAppointment?.first_name === 'undefined' ? '' : selectedAppointment?.first_name ?? ''}
+            lastName={selectedAppointment?.last_name === 'undefined' ? '' : selectedAppointment?.last_name ?? ''}
+            date={selectedAppointment?.date === 'undefined' ? '' : selectedAppointment?.date ?? ''}
+            time={selectedAppointment?.time === 'undefined' ? '' : selectedAppointment?.time ?? ''}
+            description={selectedAppointment?.description === 'undefined' ? '' : selectedAppointment?.description ?? ''}
+            facebookLink={selectedAppointment?.facebookLink === 'undefined' ? '' : selectedAppointment?.facebookLink ?? ''}
+            phone_number={selectedAppointment?.phone_number === 'undefined' ? '' : selectedAppointment?.phone_number ?? ''}
+            email={selectedAppointment?.email === 'undefined' ? '' : selectedAppointment?.email ?? ''}
+            image={selectedAppointment?.image === 'undefined' ? '' : selectedAppointment?.image ?? ''}
+            appointment_status={selectedAppointment?.appointment_status === 'undefined' ? '' : selectedAppointment?.appointment_status ?? ''}
+            address={selectedAppointment?.address === 'undefined' ? '' : selectedAppointment?.address ?? ''}
+            date_set={selectedAppointment?.date_set === 'undefined' ? '' : selectedAppointment?.date_set ?? ''}
             onUpdate={handleApproval}
             onClose={handleClose}
           />

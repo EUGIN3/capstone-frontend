@@ -4,6 +4,7 @@ import CalendarMonthTwoToneIcon from '@mui/icons-material/CalendarMonthTwoTone';
 import EventNoteTwoToneIcon from '@mui/icons-material/EventNoteTwoTone';
 import EditCalendarTwoToneIcon from '@mui/icons-material/EditCalendarTwoTone';
 import EastTwoToneIcon from '@mui/icons-material/EastTwoTone';
+import InsertPhotoTwoToneIcon from '@mui/icons-material/InsertPhotoTwoTone';
 
 // Admin
 import AdminPanelSettingsTwoToneIcon from '@mui/icons-material/AdminPanelSettingsTwoTone';
@@ -26,6 +27,7 @@ const useNavigation = () => {
     // },
     { segment: 'user/all-appointments', title: 'View all appointments', icon: <EventNoteTwoToneIcon /> },
     { segment: 'user/set-appointment', title: 'Set an appointment', icon: <EditCalendarTwoToneIcon /> },
+    { segment: 'user/generate', title: 'Generate a Design', icon: <InsertPhotoTwoToneIcon /> },
     
     ...(admin ? [{ segment: 'admin/', title: <div className='sideNavigaitonIcon'>Go To Admin Panel <EastTwoToneIcon/></div>, icon: <AdminPanelSettingsTwoToneIcon /> }] : []),
   ];

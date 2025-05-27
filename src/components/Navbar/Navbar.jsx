@@ -15,6 +15,8 @@ import Dashboard from '../userComponents/Dashboard';
 import DisplayAppointments from '../userComponents/appointmentComponents/DisplayAppointments';
 import SetAppointment from '../userComponents/appointmentComponents/SetAppointment'
 
+import ImageGeneratorComponent from '../ImageGenerator/ImageGeneratorComponent';
+
 function Navbar({ window }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -106,6 +108,7 @@ function Navbar({ window }) {
 
                 <Route path="/all-appointments" element={<DisplayAppointments />} />
                 <Route path="/set-appointment" element={<SetAppointment />} />
+                <Route path="/generate" element={<ImageGeneratorComponent />} />
 
                 {/* If routes is not belong to the specified. */}
                 <Route path="*" element={<Navigate to="/not-found" />} />
