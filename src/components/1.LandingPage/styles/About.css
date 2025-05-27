@@ -1,38 +1,38 @@
-.about-section{
+#about .about-section{
     width: 100%;
     padding: 100px 20px 100px 20px;
     background-color: var(--black);
 }
 
-.about-main-container {
+#about .about-main-container {
     width: 70%;
     margin: auto;
 }
 
-.about-name-con {
+#about .about-name-con {
     text-align: center;
     margin-bottom: 50px;
 }
 
-.about-name{
+#about .about-name{
     color: var(--white);
     font-family: var(--fancy-font);
     font-size: 80px;
     letter-spacing: 3px;
 }
 
-.about-line {
+#about .about-line {
     border-top: 1px solid var(--white);
     opacity: .2;
     width: 100%;
 }
 
 
-.about-details-container {
+#about .about-details-container {
     padding: 60px 40px;
 }
 
-.about-details {
+#about .about-details {
     display: flex;
     align-items: center;
 
@@ -41,52 +41,52 @@
     letter-spacing: 2px;
 }
 
-.first-about-details {
+#about .first-about-details {
     text-align: right;
     padding-right: 50px;
 }
 
-.about-details-first-container {
+#about .about-details-first-container {
     display: grid;
     grid-template-columns: 1fr 400px;
 }
 
-.first-about-image-container {
+#about .first-about-image-container {
     height: 100%;
     border-left: 1px solid #f5f5f517;
 }
 
-.about-details-second-container {
+#about .about-details-second-container {
     display: grid;
     grid-template-columns: 400px 1fr;
 }
 
-.second-about-details {
+#about .second-about-details {
     text-align: left;
     padding-left: 50px;
 }
 
-.second-about-image-container {
+#about .second-about-image-container {
     height: 100%;
     border-right: 1px solid #f5f5f517;
 }
 
-.second-third-details {
+#about .second-third-details {
     text-align: center;
 }
 
-.about-line1{
+#about .about-line1{
     border: 1px solid;
     width: 1185px;
     color: var(--white);
 }
 
-.about-details-con1{
+#about .about-details-con1{
     display: flex;
     justify-content: center;
 }
 
-.about-details-description1{
+#about .about-details-description1{
     width: 500px;
     height: 200px;
     margin-top: 40px;
@@ -95,17 +95,17 @@
     font-family: var(--fancy-font);
 }
 
-.about-image-con1{
+#about .about-image-con1{
     width: 390px;
     height: 250px;
 } 
-.about-image-1{
+#about .about-image-1{
     width: 390px;
     height: 250px;
     margin-bottom:100px ;
 }
 
-.line2{
+#about .line2{
     width: 100%;
     align-items: center;
     justify-content: center;
@@ -113,30 +113,30 @@
     padding-top: 20px;
 }
 
-.about-line2{
+#about .about-line2{
     border: 1px solid;
     width: 1000px;
     color: var(--white);
 }
 
-.about-details-con2{
+#about .about-details-con2{
     display: flex;
     justify-content: center;
     align-items: center;
     margin-top: 10px;
 }
 
-.about-image-con2{
+#about .about-image-con2{
     width: 390px;
     height: 360px;
 }
 
-.about-image-2{
+#about .about-image-2{
     width: 350px;
     height: 350px;
 }
 
-.about-details-description2{
+#about .about-details-description2{
     width: 500px;   
     height: 150px;
     color: var(--white);
@@ -144,14 +144,14 @@
     font-family: var(--fancy-font);
 }
 
-.about-details-con3{
+#about .about-details-con3{
     display: flex;
     justify-content: center;
     align-items: center;
     margin-top: 20px;
 }
 
-.about-details-description3{
+#about .about-details-description3{
     color: var(--white);
     font-size: var(--font-size-about-descriptions);
     font-family: var(--fancy-font);
@@ -159,7 +159,7 @@
     width: 900px;
 }
 
-.about-book-now-con{
+#about .about-book-now-con{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -167,7 +167,7 @@
     
 }
 
-.about-book-now-button{
+#about .about-book-now-button{
     display: flex;
     align-items: end;
     text-align: end;

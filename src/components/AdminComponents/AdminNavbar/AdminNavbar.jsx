@@ -16,6 +16,7 @@ import {AdminDashboard} from '../AdminDashboard'
 import ManageAppointment from '../ManageAppointments/ManageAppointment';
 import ManageSchedule from '../ManageSchedule/ManageSchedule';
 import { GenerateDesign } from '../GenerateDesign/GenerateDesign';
+import ImageGeneratorComponent from '../../ImageGenerator/ImageGeneratorComponent';
 
 import ImageGenerator from '../../ImageGenerator';
 
@@ -103,7 +104,9 @@ function AdminNavbar({ window }) {
                 <Route path="/dashboard" element={<AdminDashboard />} />
                 <Route path="/manage-appointments" element={<ManageAppointment />} />
                 <Route path="/manage-schedule" element={<ManageSchedule />} />
-                <Route path="/generate" element={<ImageGenerator />} />
+                <Route path="/generate" element={<ImageGeneratorComponent />} />
+
+                {/* <Route path="/generator" element={<ImageGeneratorComponent />} /> */}
               </Routes>
         </div>
       </DashboardLayout>

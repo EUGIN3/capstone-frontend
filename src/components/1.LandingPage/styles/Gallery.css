@@ -1,9 +1,9 @@
-.gallery-section {    
+#gallery .gallery-section {    
     height: 100vh;
     background-color: var(--black);
 }
 
-.gallery-main-container{
+#gallery .gallery-main-container{
     padding-top: 150px;    
     display: flex;
     justify-content: center;
@@ -13,7 +13,7 @@
 }
 
 
-.gallery-container {
+#gallery .gallery-container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -25,19 +25,19 @@
     border:var(--border-glassy-img) ;
 }
 
-.gallery-bottom-container {
+#gallery .gallery-bottom-container {
     width: 35%;
     display: flex;
     align-items: center;
     justify-content: space-around;
 }
 
-.attire{
+#gallery .attire{
     width: 380px;
     height: 340px;
 }
 
-.suit-name-con{
+#gallery .suit-name-con{
     display: flex;
     text-align: center;
     justify-content: center;

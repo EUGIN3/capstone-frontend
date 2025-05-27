@@ -120,3 +120,31 @@
     gap: 10px;
     width: 100%;
 }
+
+.arrow-resgister-login {
+    color: #0c0c0c;
+    position: absolute;
+    bottom: 40px;
+    right: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    transition: all .3s;
+
+
+    /* padding: 10px; */
+}
+
+.arrow-resgister-login img {
+    height: 20px;
+}
+
+.arrow-resgister-login p {
+    font-size: 14px;
+}
+
+.arrow-resgister-login:hover {
+    transform: translateX(10px);
+}
+

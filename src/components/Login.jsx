@@ -13,6 +13,7 @@ import ButtonElement from './forms/ButtonElement'
 import AxiosInstance from './AxiosInstance'
 
 import logo from '../assets/estrope-logo.png'
+import curlyArrowLogRes from '../assets/curly-arrow.png'
 
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -131,6 +132,12 @@ function Login() {
                             <p>Don’t have an account? <Link to='/register' className='blue'>Register here.</Link></p>
                         </div>
                     </div>
+
+
+                    <Link target="" className="arrow-resgister-login" to='/register'>
+                        <p>Register</p>
+                        <img src={curlyArrowLogRes} alt="Clickable arrow to get to the appointment system."/>
+                    </Link>
                 </div>
             </div>
         </form>

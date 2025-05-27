@@ -7,12 +7,6 @@ const ImageGenerator = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Clear image/error when prompt changes
-  useEffect(() => {
-    setImageSrc('');
-    setError('');
-  }, [prompt]);
-
   const handleGenerate = async () => {
     if (!prompt.trim()) {
       setError('Please enter a prompt.');

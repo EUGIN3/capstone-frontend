@@ -17,6 +17,8 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 
+import curlyArrowLogRes from '../assets/curly-arrow.png'
+
 function Register() {
     const navigate = useNavigate()
     
@@ -175,6 +177,11 @@ function Register() {
                             <p>Already have an account? <Link to='/login' className='blue'>Please login.</Link></p>
                         </div>
                     </div>
+
+                    <Link target="" className="arrow-resgister-login" to='/login'>
+                        <p>Log in</p>
+                        <img src={curlyArrowLogRes} alt="Clickable arrow to get to the appointment system."/>
+                    </Link>
                 </div>
             </div>
         </form>
