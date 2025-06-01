@@ -168,7 +168,7 @@ function Register() {
 
                             <div className="btn-con">
                                 <ButtonElement
-                                    label='SING UP'
+                                    label='SIGN UP'
                                     type={'submit'}
                                     variant='filled-black'
                                 />
