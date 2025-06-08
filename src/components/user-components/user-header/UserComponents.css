@@ -1,0 +1,10 @@
+.headerContainer {
+    width: 100%;
+    font-size: 32px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.appContainer {
+    padding: 24px;
+}

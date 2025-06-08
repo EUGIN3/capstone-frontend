@@ -1,0 +1,29 @@
+.bigCalendar {
+    color: #0c0c0c;
+    height: 100%;
+}
+
+.bigCalendar .fc-daygrid-day-frame {
+    cursor: pointer;
+    transition: all .3s;
+}
+
+
+.bigCalendar .fc-daygrid-day-frame:hover {
+    background-color: #0c0c0c25;
+}
+
+.bigCalendar .fc .fc-daygrid-day.fc-day-today {
+  background-color: #1f1f1f !important; 
+  border: 0;
+  color: #f5f5f5; 
+} 
+
+.bigCalendar .fc-button-primary {
+    background-color: #0c0c0c !important;
+    border: 0;
+}
+
+.bigCalendar .fc-button-primary:hover {
+    opacity: .9;
+}

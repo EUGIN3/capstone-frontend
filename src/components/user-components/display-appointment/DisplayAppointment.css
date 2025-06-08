@@ -1,0 +1,22 @@
+.all-app-hr {
+    margin: 20px 0;
+}
+
+.top-all-app {
+    display: flex;
+}
+
+.top-all-app-btn-con {
+    width: 20%;
+}
+
+.status-drop-container {
+    margin-bottom: 20px;
+    width: 120px;
+}
+
+.show-appointment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}

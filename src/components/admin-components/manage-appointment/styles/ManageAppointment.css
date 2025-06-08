@@ -1,0 +1,11 @@
+.manageAppointment {
+    /* background-color: red; */
+    padding: 20px;
+}
+
+
+.manageAppointment p.manageAppointment-header {
+    font-size: 30px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}

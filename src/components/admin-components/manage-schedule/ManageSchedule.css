@@ -1,0 +1,76 @@
+.manageSchedule-calendar {
+    height: 760px;
+}
+
+/* For update availability modal */
+.setAppointmentAvailability {
+    padding: 20px;
+    width: 500px;
+}
+
+.setAppointmentAvailability-header {
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.setAppointmentAvailability hr {
+    margin: 10px 0;
+}
+
+.setAppointmentAvailability .filled-blue {
+    height: 40px;
+    margin-top: 10px;
+}
+
+.setAppointmentAvailability .MuiSvgIcon-root {
+    color: #0c0c0c;
+}
+
+.setAppointmentAvailability button.filled-black {
+    height: 40px;
+}
+
+.timeSlot {
+    cursor: pointer;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    border-radius: 2px;
+    font-weight: 500;
+    user-select: none;
+    width: 100%;
+    text-transform: uppercase;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.available {
+    background-color: #11b36524;
+    color: var(--black);
+    border: 1px solid var(--green);
+}
+
+.unavailable {
+    background-color: #f044381a;
+    color: var(--black);
+    border: 1px solid var(--red);
+}
+
+.timeSlot:hover,
+.wholeDayToggle:hover {
+    opacity: 0.9;
+}
+
+
+.availability-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.disabled-slot {
+  cursor: not-allowed;
+  color: gray;
+}

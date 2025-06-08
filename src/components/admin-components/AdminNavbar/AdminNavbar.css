@@ -1,0 +1,9 @@
+.css-ezihe .MuiButtonBase-root {
+  color: #0c0c0c;
+  border-color: #0c0c0c;
+}
+
+.adminSideIcon svg {
+    color: #F5F5F5 !important;
+    display: flex;
+}

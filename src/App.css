@@ -1,0 +1,143 @@
+/* Libre Caslon Display */
+@import url('https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Franklin:ital,wght@0,100..900;1,100..900&display=swap');
+/* Libre Franklin */
+@import url('https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Franklin:ital,wght@0,100..900;1,100..900&display=swap');
+
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    border: 0;
+    padding: 0;
+    text-decoration: none;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    color: #0C0C0C;
+    /* color: #F5F5F5; */
+    background-color: #F5F5F5;
+    font-family: "Libre Franklin", sans-serif;
+    font-size:  14px;
+}
+
+:root {
+    /* Font styles */
+    --fancy-font: "Libre Caslon Display", serif;
+    --normal-font: "Libre Franklin", sans-serif;
+    /* Big headers */
+    --extra-large-size: 110px;
+    --big-header-size: 46px;
+    --big-header-letter-space: 1.5px;
+
+    /* Normal Font */
+    --normal-font-size: 14px;
+    --letter-spacing: 1px;
+
+    /* Small Font */
+    --small-font-size: 12px;
+
+    /* Font Weight */
+    --semi-bold: 500;
+    --bold: 700;
+    --max-bold: 800;
+
+    /* Input box */
+    --padding: 12px;
+    --opacity: .7;
+
+    /* Border */
+    --border-radius: 2px;
+
+    /* Color */
+    --black: #0C0C0C;
+    --black-v2: #6c6c6c;
+    --white: #F5F5F5;
+    --blue: #2287E7;
+    --red: #F04438;
+    --orange: #F79009;
+    --green : #11B364;
+
+    /* Text Shadow */
+    --text-shadow: -1px 1px 3px var(--white);
+
+    /* Box Shadow */
+    --box-shadow-black: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    --box-shadow-black: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    /* Transition */
+    --transition: all .3s;
+    
+    /* By:Henry */
+    --fontsize-of-name:120px;
+    --fontsize-of-name-about:50px;
+    --fontsize-of-career:32px;
+    --font-size-about-descriptions:20px;
+
+    /* For the glassy background of Images */
+    --glassy-background-image:linear-gradient(135deg, rgba(255, 255, 255, 0.1),rgba(255, 255, 255, 0)) ;
+    --backdrop-filter-image:blur(10px);
+    --webkit-backdrop-filter:blur(10px);
+    --border-glassy-img:1px solid rgba(255, 255, 255, 0.18);
+    
+    /* Suit Name Font Gallery 1*/
+    --suit-name-font:42px;
+}
+
+
+.Toastify__toast--error  {
+    background-color: var(--red) !important;
+}
+
+.Toastify__toast--success  {
+    background-color: var(--green) !important;
+}
+
+.Toastify__toast--info  {
+    background-color: var(--blue) !important;
+}
+
+.Toastify__toast--warning  {
+    background-color: var(--orange) !important;
+}
+
+.admin-sidebar-footer hr.MuiDivider-root,
+.user-sidebar-footer hr.MuiDivider-root {
+    border-color: black;
+    margin: 5px 0px ;
+    border-bottom-width: 2px;
+}
+
+.admin-sidebar-footer hr.MuiDivider-root {
+    border-color: white;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+.button-container {
+    width: 200px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background-color: rebeccapurple;
+}
+
+.button-container button {
+    height: 50px;
+} 
+
+label.label-red {
+    color: rgb(211, 47, 47) !important;
+}

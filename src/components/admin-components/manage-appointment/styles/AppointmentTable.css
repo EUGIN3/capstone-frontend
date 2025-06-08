@@ -1,0 +1,8 @@
+.appointmentTableColumn .outlined-blue{
+    height: 100%;
+    padding: 6px 0;
+}
+
+.MuiTableRow-root {
+    cursor: pointer;
+}

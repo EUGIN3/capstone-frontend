@@ -1,0 +1,38 @@
+.notfound-page {
+    color: var(--black);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    padding: 230px;
+}
+
+.notfound-info-container {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    align-items: start;
+    text-align: left;
+    gap: 30px;
+}
+
+.error {
+    font-size: var(--extra-large-size);
+    font-weight: var(--bold);
+
+}
+
+.error-msg {
+    font-size: 24px;
+    font-weight: var(--semi-bold);
+    color: rgb(134, 134, 134);
+}
+
+.btn-con-notfound {
+    width: 200px;
+}
+
+.notfound-page img {
+    height: 500px;
+}

@@ -1,0 +1,177 @@
+.main-login {
+    height: 100vh;
+    width: 100vw;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--white);
+}
+
+.black-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+    text-transform: uppercase;
+
+    background-color: var(--black);
+    color: var(--white);
+}
+
+.logo {
+    height: 150px;
+}
+
+.logo-name {
+    font-family: var(--fancy-font);
+
+    line-height: 1.2;
+    font-size: 40px;
+    letter-spacing: 5px;
+}
+
+.logo-profession {
+    font-size: 14px;
+    letter-spacing: 8px;
+}
+
+.white-side {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: var(--black);
+}
+
+.white-container {
+    height: 500px;
+    width: 440px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 20px;
+}
+
+.login-white-container {
+    height: 500px;
+    width: 440px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 30px;
+}
+
+.info-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.welcome {
+    font-size: 46px;
+    font-weight: 700;
+}
+
+.welcome-message {
+    width: 300px;
+    font-size: 14px;
+    opacity: .7;
+}
+
+.email,
+.password,
+.address,
+.pnumber,
+.fblink {
+    width: 100%;
+    font-size: 14px !important;
+}
+
+.register-input-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    gap: 10px;
+}
+
+.login-input-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    gap: 25px;
+}
+
+.logres-button-container {
+    width: 100%;
+}
+
+.btn-con {
+    height: 50px;
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+.blue {
+    color: var(--blue);
+    opacity: .8;
+    transition: var(--transition);
+}
+
+.blue:hover {
+    opacity: 1;
+    font-weight: 600;
+}
+
+.forgot-password {
+    width: 100%;
+    margin-left: 20px;
+    text-align:  left;
+}
+
+.resgister-contact-input-con, 
+.resgister-name-input-con {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+}
+
+.arrow-resgister-login {
+    color: #0c0c0c;
+    position: absolute;
+    bottom: 40px;
+    right: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    transition: all .3s;
+}
+
+.arrow-resgister-login img {
+    height: 20px;
+}
+
+.arrow-resgister-login p {
+    font-size: 14px;
+}
+
+.arrow-resgister-login:hover {
+    transform: translateX(10px);
+}
+

@@ -1,0 +1,176 @@
+.appointment-box {
+    color: #0C0C0C;
+    display: grid;
+    grid-template-columns: 1fr 50px;
+    padding: 10px;
+    position: relative;
+}
+
+.appointment-box.pending {
+    background-color: rgba(19, 98, 255, 0.055);
+    border: 1px solid #1362ff;
+}
+
+.appointment-box.cancelled {
+    background-color: rgba(240, 68, 56, 0.055);
+    border: 1px solid #F04438;
+}
+
+.appointment-box.denied {
+    background-color: rgba(247, 144, 9, 0.055);
+    border: 1px solid #F79009;
+}
+
+.appointment-box.approved {
+    background-color: rgba(17, 179, 101, 0.055);
+    border: 1px solid #11B364;
+}
+
+.information-container {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    align-items: center;
+}
+
+.appointment-date {
+    font-style: italic;
+    font-size: 24px;
+}
+
+.appointment-time {
+    font-weight: 600;
+    opacity: .6;
+}
+
+/* .status-text-container {
+    position: absolute;
+    height: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+} */
+
+.status-text {
+    font-size: 60px;
+    font-weight: 800;
+    text-transform: uppercase;
+    opacity: .1;
+    position: absolute;
+    height: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.cancelled {
+
+}
+
+.approved {
+
+}
+
+.denied {
+
+}
+
+.pending {
+
+}
+
+
+
+.appointment-button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    height: 100%;
+}
+
+.edit-icon {
+
+}
+
+.cancel-icon {
+
+    color: #F04438;
+}
+
+.cancel-icon,
+.edit-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    opacity: .6;
+    padding: 5px;
+    border-radius: 50%;
+    transition: all .3s;
+}
+
+.cancel-icon:hover {
+    background-color: #F0443822;
+    opacity: 1;
+}
+
+.edit-icon:hover { 
+    background-color: #0c0c0c22;
+    opacity: 1; 
+}
+
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Dialog */
+.update-dialog-container {
+    padding: 20px;
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.update-dialog-title-container {
+    font-weight: 700;
+    font-size: 24px;
+    text-align: center;
+}
+
+.update-dialog-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.update-dialog-time-date-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.update-dialog-button-container {
+    display: flex;
+    height: 40px;
+    gap: 20px;
+}
+
+
