@@ -1,7 +1,6 @@
-import ButtonElement from './forms/ButtonElement'
+import ButtonElement from '../forms/button/ButtonElement'
 import { useNavigate } from 'react-router-dom'; 
-import './styles/NotFound.css'
-import '../index.css'
+import './NotFound.css'
 
 import ghost from '../../assets/ghost.png'
 

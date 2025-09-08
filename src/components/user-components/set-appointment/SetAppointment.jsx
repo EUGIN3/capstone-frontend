@@ -116,7 +116,7 @@ function SetAppointment() {
             theme: "colored",
             transition: Slide,
             closeButton: false,
-        }
+        } 
       );
     })
   };

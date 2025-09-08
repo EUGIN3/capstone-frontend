@@ -1,0 +1,50 @@
+#gallery .gallery-section {    
+    height: 100vh;
+    background-color: var(--black);
+}
+
+#gallery .gallery-main-container{
+    padding-top: 150px;    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 40px;
+}
+
+
+#gallery .gallery-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 390px;
+    height: 440px;
+    background:var(--glassy-background-image) ;  
+    backdrop-filter: var(--backdrop-filter-image);
+    -webkit-backdrop-filter: var(--webkit-backdrop-filter);
+    border:var(--border-glassy-img) ;
+}
+
+#gallery .gallery-bottom-container {
+    width: 35%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+#gallery .attire{
+    width: 380px;
+    height: 340px;
+}
+
+#gallery .suit-name-con{
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    font-family: var(--normal-font);
+    font-size: var(--suit-name-font);
+    font-style: var(--bold);
+    font-weight: bold;
+    color: var(--white);
+    background-color: var(--black);
+}

@@ -1,0 +1,17 @@
+.notification-container {
+    padding: 20px;
+}
+
+.notification-content {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+p.no-notif {
+    text-align: center;
+    color: #888;
+    user-select: none;
+}

@@ -1,0 +1,88 @@
+.imageGeneratorMain {
+    padding: 20px;
+}
+
+.imageGeneratorTitle {
+    width: 100%;
+    font-size: 32px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 14px;
+}
+
+.imageGenerator-bottomPart {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 20px;
+}
+
+.imageGeneratorInputContainer {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border-radius: 10px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;  
+}
+
+.imageGeneratorInputContainer .imageGenerator-explanation {
+    color: #0c0c0ca1;
+    font-size: 11px;
+    font-style: italic;
+    margin-top: 20px;
+}
+
+.imageGeneratorImageContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    
+}
+
+.imageGeneratorGeneratedImage {
+    padding: 20px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px; 
+}
+
+.imageGeneratorImageContainer .filled-black {
+    height: 60px;
+}
+
+
+.imageGeneratorMain .MuiFormHelperText-root {
+    /* color: blue !important; */
+    position: absolute;
+    bottom: -18px;
+    left: -12px;
+    font-size: 10px;
+}
+
+.imageGenerator-genderContainer .MuiFormControlLabel-label {
+    font-size: 14px;
+}
+
+.imageGeneratorMain .MuiFormLabel-root {
+    color: #0c0c0c !important;
+}
+
+.imageGeneratorMain .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #0c0c0c !important; 
+}
+
+
+/* Selected */
+.css-1rwwkew-MuiSvgIcon-root {
+    text-decoration-color: #0c0c0c !important;
+    border-bottom-color: #0c0c0c !important;
+    border-left-color: #0c0c0c !important;
+    border-right-color: #0c0c0c !important;
+    border-top-color: #0c0c0c !important;
+    color: #0c0c0c !important;
+    fill: #0c0c0c !important;
+    text-decoration-color: #0c0c0c !important;
+}  

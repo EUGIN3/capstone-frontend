@@ -13,12 +13,16 @@ import AxiosInstance from '../../API/AxiosInstance'
 
 import SidebarFooterAccount from './SidebarFooterAccount';
 
-// import Dashboard from '../userComponents/Dashboard';
+import UserDashboard from '../user-dashboard/UserDashboard'
 
 import SetAppointment from '../set-appointment/SetAppointment';
 import DisplayAppointments from '../display-appointment/DisplayAppointments'
 
-// import ImageGeneratorComponent from '../ImageGenerator/ImageGeneratorComponent';
+import ImageGeneratorComponent from '../../ImageGenerator/ImageGeneratorComponent';
+
+import Notification from '../../Notification/Notification';
+
+import UserGallery from '../user-gallery/UserGallery';
 
 function Navbar({ window }) {
   const location = useLocation();
@@ -107,14 +111,18 @@ function Navbar({ window }) {
               <Routes>
                 {/* Specified routes */}
                 <Route path="/" element={<Navigate to="/user/dashboard" />} />
-                {/* <Route path="/dashboard" element={<Dashboard />} /> */}
+                <Route path="/dashboard" element={<UserDashboard />} />
 
                 {/* <Route path="/appointment/all-appointments" element={<DisplayAppointments />} />
                 <Route path="/appointment/set-appointment" element={<SetAppointment />} /> */}
 
                 <Route path="/all-appointments" element={<DisplayAppointments />} />
                 <Route path="/set-appointment" element={<SetAppointment />} />
-                {/* <Route path="/generate" element={<ImageGeneratorComponent />} /> */}
+                <Route path="/generate" element={<ImageGeneratorComponent />} />
+
+                <Route path="/notification" element={<Notification />} />
+
+                <Route path="/gallery" element={<UserGallery />} />
 
                 {/* If routes is not belong to the specified. */}
                 {/* <Route path="*" element={<Navigate to="/not-found" />} /> */}

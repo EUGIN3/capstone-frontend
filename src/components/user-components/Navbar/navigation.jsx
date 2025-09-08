@@ -16,7 +16,6 @@ const useNavigation = () => {
     { segment: 'user/notification', title: 'Notification', icon: <NotificationsNoneTwoToneIcon /> },
     { segment: 'user/message', title: 'Message', icon: <ForumTwoToneIcon /> },
     { segment: 'user/generate', title: 'Generate Design', icon: <AddPhotoAlternateTwoToneIcon /> },
-    { segment: 'user/schedule', title: 'Schedule', icon: <ScheduleTwoToneIcon /> },
     { segment: 'user/set-appointment', title: 'Set Appointment', icon: <EditCalendarTwoToneIcon /> },
     { segment: 'user/all-appointments', title: 'Appointments', icon: <EventNoteTwoToneIcon /> },
     { segment: 'user/gallery', title: 'Gallery', icon: <CollectionsTwoToneIcon /> },

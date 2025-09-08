@@ -110,6 +110,19 @@ function DisplayAppointments() {
         { 
           renderAppointmentsByStatus(filterStatus)
         }
+
+        <Appointment
+          key='1'
+          id='1'
+          date='2025-08-19'
+          time='7:00-7:00'
+          facebookLink='sample'
+          adress='Lucena City, Quezon'
+          description='Long gown'
+          image='sample image'
+          status='pending'
+          onUpdate={handleUpdate}
+        />
       </div>
       
       <ToastContainer />

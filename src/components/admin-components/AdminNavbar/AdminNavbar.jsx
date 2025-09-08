@@ -17,13 +17,16 @@ import SidebarFooterAccount from './SidebarFooterAccount'
 
 
 // import { ManageUser } from '../ManageUser/ManageUser';
-// import {AdminDashboard} from '../AdminDashboard'
+import AdminDashboard from '../admin-dashboard/AdminDashboard';
 import ManageAppointment from '../manage-appointment/ManageAppointment';
 import ManageSchedule from '../manage-schedule/ManageSchedule';
-// import ImageGeneratorComponent from '../../ImageGenerator/ImageGeneratorComponent';
+import ImageGeneratorComponent from '../../ImageGenerator/ImageGeneratorComponent';
 
-// import ImageGenerator from '../../ImageGenerator';
+import ManageUser from '../manage-user/ManageUser'
 
+import Notification from '../../Notification/Notification';
+
+import AdminGallery from '../admin-gallery/AdminGallery'
 
 function AdminNavbar({ window }) {
   const location = useLocation();
@@ -107,12 +110,14 @@ function AdminNavbar({ window }) {
       >
         <div className='appMainContainer'>
               <Routes>
-                {/* <Route path="/dashboard" element={<AdminDashboard />} /> */}
+                <Route path="/dashboard" element={<AdminDashboard />} />
                 <Route path="/manage-appointments" element={<ManageAppointment />} />
                 <Route path="/manage-schedule" element={<ManageSchedule />} />
-                {/* <Route path="/generate" element={<ImageGeneratorComponent />} /> */}
+                <Route path="/generate" element={<ImageGeneratorComponent />} />
+                <Route path="/manage-user" element={<ManageUser />} />
+                <Route path="/manage-gallery" element={<AdminGallery />} />
 
-                {/* <Route path="/generator" element={<ImageGeneratorComponent />} /> */}
+                <Route path="/notification" element={<Notification />} />
               </Routes>
         </div>
       </DashboardLayout>

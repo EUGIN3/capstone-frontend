@@ -1,0 +1,109 @@
+/* Libre Caslon Display */
+@import url('https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Franklin:ital,wght@0,100..900;1,100..900&display=swap');
+/* Libre Franklin */
+@import url('https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Franklin:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    border: 0;
+    padding: 0;
+    text-decoration: none;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+
+:root {
+    /* Font styles */
+    --fancy-font: "Libre Caslon Display", serif;
+    --normal-font: "Libre Franklin", sans-serif;
+    /* Big headers */
+    --extra-large-size: 110px;
+    --big-header-size: 46px;
+    --big-header-letter-space: 1.5px;
+
+    /* Normal Font */
+    --normal-font-size: 16px;
+    --letter-spacing: 1px;
+
+    /* Small Font */
+    --small-font-size: 12px;
+
+    /* Font Weight */
+    --semi-bold: 500;
+    --bold: 700;
+    --max-bold: 800;
+
+    /* Input box */
+    --padding: 12px;
+    --opacity: .7;
+
+    /* Border */
+    --border-radius: 2px;
+
+    /* Color */
+    --black: #0C0C0C;
+    --black-v2: #1f1f1f;
+    --white: #F5F5F5;
+    --blue: #2287E7;
+
+    /* Text Shadow */
+    --text-shadow: -2px 2px 3px #cacaca92;
+
+    /* Transition */
+    --transition: all .3s;
+
+
+    
+    /* By:Henry */
+    --fontsize-of-name:120px;
+    --fontsize-of-name-about:50px;
+    --fontsize-of-career:32px;
+    --font-size-about-descriptions:20px;
+
+    /* For the glassy background of Images */
+    --glassy-background-image:linear-gradient(135deg, rgba(255, 255, 255, 0.1),rgba(255, 255, 255, 0)) ;
+    --backdrop-filter-image:blur(10px);
+    --webkit-backdrop-filter:blur(10px);
+    --border-glassy-img:1px solid rgba(255, 255, 255, 0.18);
+    
+    /* Suit Name Font Gallery 1*/
+    --suit-name-font:42px;
+}
+
+body {
+    color: var(--white);
+    font-family: var(--normal-font);
+    font-size: var(--normal-font-size);
+}
+
+.book-now {
+    padding: 10px;
+    bottom: 0;
+    right: 0;
+    margin: 0px 40px 30px 0px;
+
+    display: flex;
+    align-items: center;
+    position: fixed;
+    transition: all .3s;
+
+
+    z-index: 100;
+}
+
+.book-now p{
+    font-size: 14px;
+    margin-right: 10px;
+    color: var(--white);
+    text-decoration: none;    
+    transition: all .3s;
+}
+
+.book-now:hover {
+    transform: translateX(10px);
+}
+

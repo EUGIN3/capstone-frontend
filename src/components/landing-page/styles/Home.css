@@ -1,0 +1,123 @@
+#home {
+    height: 100vh;
+    background-color: var(--black);
+}
+
+.home-info {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-top: 100px;
+    gap: 20px;
+}
+
+.home-info h2 {
+    font-size: 220px;
+    letter-spacing: 3px;
+    font-weight: 700;
+}
+
+.animated-text span{
+    position: relative;
+    text-transform: uppercase;
+}
+
+.animated-text span::before{
+    content: "Beauty";
+    color: var(--white);
+    animation: words 30s infinite;
+}
+
+.animated-text span::after{
+    content: "";
+    position: absolute;
+    width: calc(100% + 8px);
+    height: 100%;
+    background-color: var(--black);
+    border-left: 2px solid var(--white);
+    right: -8px;
+    animation: cursor .8s infinite, typing 30s steps(14) infinite;
+}
+
+@keyframes cursor {
+    to{
+        border-left: 2px solid #ff7f5000;
+    }
+}
+
+@keyframes words {
+    0%,20%{
+        content: "Beauty";
+    }
+    21%,40%{
+        content: "Elegance";
+    }
+    41%,60%{
+        content: "Style";
+    }
+    61%,80%{
+        content: "Designs";
+    }
+    81%,100%{
+        content: "Fashion";
+    }
+}
+
+@keyframes typing {
+    10%,15%,30%,35%,50%,55%,70%,75%,90%,95%{
+        width: 0;
+    }
+    5%,20%,25%,40%,45%,60%,65%,80%,85%{
+        width: calc(100% + 8px);
+    }
+}
+
+.home-info p {
+    font-size: 16px;
+    opacity: 0.6;
+    letter-spacing: 3px;
+    width: 50%;
+    text-align: center;
+    line-height: 22px;
+    margin-top: 20px;
+}
+
+.home-info .home-btn {
+    height: 50px;
+    width: 180px;
+    margin-top: 20px;
+    cursor: pointer;
+
+    background-color: transparent;
+    border: 1px solid #f5f5f5;
+    color: #f5f5f5;
+    font-size: 16px;
+    border-radius: 4px;
+    transition: all 0.3s ease-in-out;
+    z-index: 2;
+}
+
+.home-info .home-btn:hover {
+    box-shadow: rgba(238, 238, 238, 0.2) 0px 7px 29px 0px;
+    background-color: var(--white);
+    color: var(--black);
+}
+
+.backdrop-container {
+    position: absolute;
+    top: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+
+    z-index: 1;
+}
+
+.backdrop {
+    opacity: 0.5;
+}
