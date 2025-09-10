@@ -1,7 +1,4 @@
 import './Notification.css';
-import { useState, useEffect } from 'react';
-
-import React from 'react'
 
 function Notification() {
   return (

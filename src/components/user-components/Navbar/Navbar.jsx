@@ -24,6 +24,8 @@ import Notification from '../../Notification/Notification';
 
 import UserGallery from '../user-gallery/UserGallery';
 
+import UserMessages from '../user-messages/UserMessages';
+
 function Navbar({ window }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -123,6 +125,8 @@ function Navbar({ window }) {
                 <Route path="/notification" element={<Notification />} />
 
                 <Route path="/gallery" element={<UserGallery />} />
+
+                <Route path="/message" element={<UserMessages />} />
 
                 {/* If routes is not belong to the specified. */}
                 {/* <Route path="*" element={<Navigate to="/not-found" />} /> */}

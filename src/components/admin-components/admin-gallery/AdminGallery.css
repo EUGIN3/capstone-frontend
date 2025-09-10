@@ -11,9 +11,10 @@
 }
 
 .gallery-header h2 {
-  font-size: 24px;
-  font-weight: bold;
-  margin: 0;
+  width: 100%;
+  font-size: 32px;
+  text-transform: uppercase;
+  font-weight: 600;
 }
 
 .search-box {

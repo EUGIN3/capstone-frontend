@@ -28,6 +28,8 @@ import Notification from '../../Notification/Notification';
 
 import AdminGallery from '../admin-gallery/AdminGallery'
 
+import AdminMessages from '../admin-messages/AdminMessages';
+
 function AdminNavbar({ window }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -118,6 +120,8 @@ function AdminNavbar({ window }) {
                 <Route path="/manage-gallery" element={<AdminGallery />} />
 
                 <Route path="/notification" element={<Notification />} />
+
+                <Route path="/message" element={<AdminMessages />} />
               </Routes>
         </div>
       </DashboardLayout>

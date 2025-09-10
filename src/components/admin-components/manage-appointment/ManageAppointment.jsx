@@ -78,9 +78,6 @@ function ManageAppointment() {
 
   return (
     <div className='manageAppointment'>
-      {/* { showAlert && <AlertComponent message={alertMessage} type={alertType} show={showAlert} isNoNavbar={''}/> } */}
-
-
       <p className='manageAppointment-header'>
         Manage Appointment
       </p>

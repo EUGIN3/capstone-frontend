@@ -5,7 +5,8 @@
 
 
 .manageAppointment p.manageAppointment-header {
-    font-size: 30px;
-    font-weight: 600;
-    margin-bottom: 20px;
+  width: 100%;
+  font-size: 32px;
+  text-transform: uppercase;
+  font-weight: 600;
 }
