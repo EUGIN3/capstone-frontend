@@ -1,0 +1,85 @@
+.drag-area {
+  border: 2px dashed #050505;
+  height: 500px;
+  width: 100%;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: border 0.3s ease;
+}
+
+.drag-area.active {
+  border: 2px solid #000000;
+}
+
+.drag-area .icon {
+  font-size: 100px;
+  color: #d3d3d3;
+}
+
+.drag-area header {
+  font-size: 30px;
+  font-weight: 500;
+  color: #000000;
+}
+
+.drag-area span {
+  font-size: 25px;
+  font-weight: 500;
+  color: #0e0e0e;
+  margin: 10px 0 15px;
+}
+
+.drag-area button {
+  padding: 10px 25px;
+  font-size: 20px;
+  font-weight: 500;
+  border: none;
+  background: #000000;
+  color: #ffffff;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.drag-area button:hover {
+  opacity: 0.8;
+}
+
+.drag-area button:active {
+  opacity: 1;
+}
+
+.drag-area img {
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+  border-radius: 5px;
+}
+
+/* @media (max-width: 745px) {
+  .drag-area {
+    height: 400px;
+    width: 450px;
+  }
+
+  .drag-area .icon {
+    font-size: 80px;
+  }
+
+  .drag-area header {
+    font-size: 25px;
+  }
+
+  .drag-area span {
+    font-size: 20px;
+  }
+
+  .drag-area button {
+    padding: 8px 20px;
+    font-size: 18px;
+  }
+} */

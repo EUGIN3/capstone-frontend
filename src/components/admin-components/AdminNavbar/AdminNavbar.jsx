@@ -30,6 +30,8 @@ import AdminGallery from '../admin-gallery/AdminGallery'
 
 import AdminMessages from '../admin-messages/AdminMessages';
 
+import Designs from '../manage-designs/Designs';
+
 function AdminNavbar({ window }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -114,6 +116,7 @@ function AdminNavbar({ window }) {
               <Routes>
                 <Route path="/dashboard" element={<AdminDashboard />} />
                 <Route path="/manage-appointments" element={<ManageAppointment />} />
+                <Route path="/manage-designs" element={<Designs />} />
                 <Route path="/manage-schedule" element={<ManageSchedule />} />
                 <Route path="/generate" element={<ImageGeneratorComponent />} />
                 <Route path="/manage-user" element={<ManageUser />} />

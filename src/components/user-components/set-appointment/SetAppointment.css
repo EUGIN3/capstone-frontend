@@ -1,104 +1,41 @@
-.set-app-hr {
-    margin: 20px 0;
+.top-all-app {
+    margin-bottom: 20px;
 }
 
-.top-set-app {
-    display: flex;
-}
-
-.top-set-app-btn-con {
-    width: 20%;
-}
-
-.set-input-main-container {
-    display: grid;
-    grid-template-columns: 1fr 500px;
-    gap: 20px;
-}
-
-.setappointment-left {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.time-continer {
-    background-color: #ffffff;
-
-    box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
-}
-
-.time-top-header {
-    background-color: #0C0C0C;
-    color: #F5F5F5;
-    font-size: 20px;
-    padding: 12px 20px;
-}
-
-.time-input-container {
-    padding: 12px;
-}
-
-.time {
-    width: 100%; 
-    
-}
-
-.date-continer {
-    flex: 1;
-}
-
-.date-top-header {
-    background-color: #0C0C0C;
-    color: #F5F5F5;
-    font-size: 20px;
-    padding: 12px 20px;
-}
-
-.date {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    
-    background-color: #ffffff;
-    
-    box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
-
-    height: 370px;
-}
-
-
-.setappointment-right {
-
-}
-
-.setappointment-information-container {
-
-}
-
-
-.setappointment-info-top-header {
-    background-color: #0C0C0C;
-    color: #F5F5F5;
-    font-size: 20px;
-    padding: 12px 20px;
-}
-
-
-.setappointment-information-input-container {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+.info-con {
+    background-color: #f9f9f9;
     padding: 20px;
-
-    background-color: #ffffff;
-
-    box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
-
-
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
 }
 
+.number-note-con {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 8px;
+}
 
-.set-appointment-container {
+.number-note-con .note {
+    font-size: 14px;
+    color: #333;
+}
+
+.step-number {
+    color: #F5F5F5;
+    background-color: #0C0C0C;
+    border-radius: 50%;
+    height: 32px;
+    width: 32px;
+    font-size: 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.set-appointment-submit-btn-con {
     height: 50px;
 }
