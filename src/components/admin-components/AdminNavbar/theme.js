@@ -52,6 +52,13 @@ const mainTheme = createTheme({
         },
       },
     },
+    MuiSvgIcon: {
+      styleOverrides: {
+        root: {
+          color: '#0C0C0C', // make all icons white
+        },
+      },
+    },
   },
 });
 

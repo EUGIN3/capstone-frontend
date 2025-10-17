@@ -74,3 +74,10 @@
   cursor: not-allowed;
   color: gray;
 }
+
+
+.wholeDaySwitch {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

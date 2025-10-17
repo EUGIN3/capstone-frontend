@@ -1,19 +1,19 @@
 import React from 'react'
 import './ManageAppointment.css'
 
-import AppointmentTable from './AppointmentTable'
+import ApprovedAppointmentTable from './ApproveTable'
 
 
-function ManageAppointment() {
+function ManageApproveAppointment() {
   return (
     <div className='manage-appointment appContainer'>
       <div className="content-container">
         <div className="table">
-          <AppointmentTable />
+          <ApprovedAppointmentTable />
         </div>
       </div>
     </div>
   )
 }
 
-export default ManageAppointment
+export default ManageApproveAppointment

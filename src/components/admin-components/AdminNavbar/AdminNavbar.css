@@ -7,3 +7,21 @@
     color: #F5F5F5 !important;
     display: flex;
 }
+
+svg[data-testid="ExpandMoreIcon"] {
+  color: #F5F5F5 !important;
+}
+
+svg[data-testid="PersonIcon"] {
+  color: #0C0C0C !important;
+}
+
+svg[data-testid="AccountCircleTwoToneIcon"],
+.admin-sidebar-footer svg[data-testid="LogoutIcon"] {
+  color: #F5F5F5 !important;
+}
+
+
+
+
+

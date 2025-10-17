@@ -1,16 +1,17 @@
 import * as React from 'react';
 import TextField from '@mui/material/TextField';
 
-export default function MultilineTextFields({  placeholder, className }) {
+export default function MultilineTextFields({ value, onChange, placeholder, className }) {
   return (
     <TextField
       id="outlined-multiline-static"
-      // label={label}
       className={className}
       placeholder={placeholder}
       multiline
       rows={4}
       fullWidth
+      value={value}
+      onChange={onChange}
       sx={{
         width: '100%',
         '& .MuiOutlinedInput-root': {
@@ -29,3 +30,4 @@ export default function MultilineTextFields({  placeholder, className }) {
     />
   );
 }
+

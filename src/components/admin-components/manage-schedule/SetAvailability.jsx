@@ -1,9 +1,9 @@
 import './ManageSchedule.css';
-
 import React, { useState, useEffect } from 'react';
 import ButtonElement from '../../forms/button/ButtonElement';
 import AxiosInstance from '../../API/AxiosInstance';
 import dayjs from 'dayjs';
+import { Switch } from '@mui/material'; // ✅ Import MUI Switch
 
 const SetUnavailability = ({ selectedDate, unavailableSlots, onClose, onAlert }) => {
   const timeSlots = [
@@ -39,11 +39,13 @@ const SetUnavailability = ({ selectedDate, unavailableSlots, onClose, onAlert })
     setWholeDay(allUnavailable);
   }, [slots]);
 
-  // ✅ Fixed: filter by date on the frontend
   useEffect(() => {
     const fetchApprovedAppointments = async () => {
       try {
         const response = await AxiosInstance.get('appointment/user_appointments/');
+
+        // 🟩 Logs all data fetched from API
+        console.log("✅ API Response Data:", response.data);
 
         const times = response.data
           .filter(app =>
@@ -52,9 +54,12 @@ const SetUnavailability = ({ selectedDate, unavailableSlots, onClose, onAlert })
           )
           .map(app => app.time);
 
+        // 🟩 Logs which slots are approved for the selected date
+        console.log("✅ Approved Times for", formattedDate, ":", times);
+
         setApprovedTimes(times);
       } catch (error) {
-        console.error('Failed to fetch approved appointments', error);
+        console.error('❌ Failed to fetch approved appointments', error);
         setApprovedTimes([]);
       }
     };
@@ -110,6 +115,9 @@ const SetUnavailability = ({ selectedDate, unavailableSlots, onClose, onAlert })
       slot_five: !slots['2:30 - 4:00 PM'],
     };
 
+    // 🟩 Log payload before sending it
+    console.log("🟦 Payload being sent:", payload);
+
     AxiosInstance.post('availability/set_unavailability/', payload)
       .then(() => {
         if (onClose) onClose();
@@ -127,11 +135,16 @@ const SetUnavailability = ({ selectedDate, unavailableSlots, onClose, onAlert })
       </p>
 
       <hr />
-      <ButtonElement
-        label={'Unavailable Whole Day'}
-        onClick={toggleWholeDay}
-        variant='filled-black'
-      />
+
+      <div className="wholeDaySwitch">
+        <span>Whole Day</span>
+        <Switch
+          checked={wholeDay}
+          onChange={toggleWholeDay}
+          color="error"
+        />
+      </div>
+
       <hr />
 
       <div className="availability-container">

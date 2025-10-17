@@ -1,7 +1,7 @@
 import './ImageUpload.css'
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
-export default function UploadBox() {
+export default function UploadBox({ onImageSelect, resetTrigger }) {
   const [preview, setPreview] = useState(null);
   const dropAreaRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -13,6 +13,7 @@ export default function UploadBox() {
       const reader = new FileReader();
       reader.onload = () => {
         setPreview(reader.result);
+        if (onImageSelect) onImageSelect(file);
       };
       reader.readAsDataURL(file);
     } else {
@@ -39,6 +40,14 @@ export default function UploadBox() {
     handleFile(e.dataTransfer.files[0]);
   };
 
+  // ✅ Reset preview when parent triggers reset
+  useEffect(() => {
+    if (resetTrigger) {
+      setPreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }, [resetTrigger]);
+
   return (
     <div
       className="drag-area"
@@ -54,7 +63,7 @@ export default function UploadBox() {
           <div className="icon">📁</div>
           <header>Drag & Drop to Upload File</header>
           <span>OR</span>
-          <button onClick={onBrowse}>Browse File</button>
+          <button onClick={onBrowse} type='button'>Browse File</button>
           <input
             type="file"
             ref={fileInputRef}

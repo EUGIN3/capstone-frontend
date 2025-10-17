@@ -1,0 +1,193 @@
+.modalDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-sizing: border-box;
+}
+
+.modalDetailsTop {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 10px;
+}
+
+.image-section {
+  user-select: none;
+  background-color: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 250px; /* ✅ Fixed container height */
+  overflow: hidden;
+}
+
+.modalDetails-image {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modalDetails-preview {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* ✅ Keeps aspect ratio */
+  border-radius: 4px;
+  cursor: zoom-in;
+  transition: transform 0.3s ease;
+}
+
+
+/* Fullscreen Image Overlay */
+.image-fullscreen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  cursor: zoom-out;
+}
+
+.image-fullscreen {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+  object-fit: contain;
+}
+
+.modalDetails-preview {
+  cursor: zoom-in;
+  transition: transform 0.3s ease;
+}
+
+.modalDetails-preview:hover {
+  transform: scale(1.05);
+}
+
+.info-section {
+    background-color: #ffffff;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-sizing: border-box;
+}
+
+.modalDetails-status {
+    width: 100%;
+    gap: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modalDetails-status-label {
+    text-transform: uppercase;
+}
+
+.modalDetails-status-label p {
+    color: white;
+    padding: 5px 15px;
+    border-radius: 2px;
+    font-size: 12px;
+}
+
+.modalDetails-status-label p.pending {
+    background-color: #2287E7;
+}
+.modalDetails-status-label p.cancelled {
+    background-color: #F04438;
+}
+.modalDetails-status-label p.denied {
+    background-color: #F79009;
+}
+.modalDetails-status-label p.approved {
+    background-color: #11B364;
+}
+
+.modalDetails-personal-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+.modalDetails-personal-info p {
+  color: #000;
+  transition: all 0.3s ease;
+}
+
+.modalDetails-personal-info p:hover {
+  font-weight: bold;
+  color: #131313;
+  transform: translateX(5px);
+}
+
+
+.modalDetails-fblink {
+    font-style: italic;
+}
+
+.modalDetails-date-set {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    text-transform: uppercase;
+}
+
+.modalDetails-date-set span {
+    font-size: 12px;
+}
+
+
+.modalDetails-date-time {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #0c0c0c;
+    padding: 6px 12px;
+    border-radius: 2px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #f5f5f5;
+}
+
+
+.modalDetailsBottom {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.modalDetails-description {
+    background-color: #ffffff;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px 20px;
+    height: 100px;
+}
+
+
+.modalDetails-update-status {
+    background-color: #ffffff;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+}
+
+.modalDetails-save-button {
+    height: 50px;
+}

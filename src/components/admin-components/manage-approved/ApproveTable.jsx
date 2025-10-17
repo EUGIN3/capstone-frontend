@@ -12,38 +12,28 @@ import TableRow from '@mui/material/TableRow';
 import AxiosInstance from '../../API/AxiosInstance';
 import SearchIcon from '@mui/icons-material/Search';
 import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import ModalDetails from './ModalDetails';
 import AppHeader from '../../user-components/user-header/userHeader';
-import StatusDropdown from './StatusDropdown';
 
-export default function AppointmentTable() {
+export default function ApprovedAppointmentTable() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [rows, setRows] = useState([]);
   const [totalAppointments, setTotalAppointments] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all'); // 👈 active dropdown filter
-  const [open, setOpen] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState(null);
 
-  // -------------------------------
-  // Dropdown options
-  // -------------------------------
-  const statusOptions = [
-    { label: 'All', value: 'all' },
-    { label: 'Approved', value: 'approved' },
-    { label: 'Pending', value: 'pending' },
-    { label: 'Denied', value: 'denied' },
-    { label: 'Cancelled', value: 'cancelled' },
-  ];
+  // Define order of time slots
+  const timeOrder = {
+    '7:00 - 8:30 AM': 1,
+    '8:30 - 10:00 AM': 2,
+    '10:00 - 11:30 AM': 3,
+    '1:00 - 2:30 PM': 4,
+    '2:30 - 4:00 PM': 5,
+  };
 
-  // -------------------------------
   // Table Columns
-  // -------------------------------
   const columns = [
     { id: 'image', label: 'Image', minWidth: 60, align: 'left' },
-    { id: 'firstName', label: 'First Name', minWidth: 150, align: 'center'},
+    { id: 'firstName', label: 'First Name', minWidth: 150, align: 'center' },
     { id: 'lastName', label: 'Last Name', minWidth: 150, align: 'center' },
     { id: 'date', label: 'Date', minWidth: 100, align: 'center' },
     { id: 'time', label: 'Time', minWidth: 100, align: 'center' },
@@ -51,19 +41,29 @@ export default function AppointmentTable() {
     { id: 'actions', label: 'Actions', minWidth: 100, align: 'center' },
   ];
 
-  // -------------------------------
-  // Fetch appointments
-  // -------------------------------
+  // Fetch and sort approved appointments
   const fetchAppointments = async () => {
     try {
       const response = await AxiosInstance.get('appointment/appointments/');
-      const sortedAppointments = response.data.sort(
-        (a, b) => new Date(b.updated_at) - new Date(a.updated_at)
-      );
-      setRows(sortedAppointments);
-      setTotalAppointments(sortedAppointments.length);
+      const approvedAppointments = response.data
+        .filter((app) => app.appointment_status?.toLowerCase() === 'approved')
+        .sort((a, b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+
+          if (dateA.getTime() !== dateB.getTime()) {
+            return dateA - dateB; // earlier date first
+          }
+
+          const timeA = timeOrder[a.time] || 999;
+          const timeB = timeOrder[b.time] || 999;
+          return timeA - timeB; // earlier slot first
+        });
+
+      setRows(approvedAppointments);
+      setTotalAppointments(approvedAppointments.length);
     } catch (error) {
-      console.error('Failed to fetch appointments:', error);
+      console.error('❌ Failed to fetch appointments:', error);
     }
   };
 
@@ -71,25 +71,9 @@ export default function AppointmentTable() {
     fetchAppointments();
   }, []);
 
-  // -------------------------------
-  // Helpers
-  // -------------------------------
-  const handleOpen = (appointment) => {
-    setSelectedAppointment(appointment);
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setSelectedAppointment(null);
-    setOpen(false);
-  };
-
+  // Handlers
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value.toLowerCase());
-  };
-
-  const handleFilterChange = (newStatus) => {
-    setFilterStatus(newStatus);
   };
 
   const handleChangePage = (event, newPage) => setPage(newPage);
@@ -100,58 +84,33 @@ export default function AppointmentTable() {
   };
 
   const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case 'pending':
-        return '#2287E7';
-      case 'cancelled':
-        return '#F04438';
-      case 'denied':
-        return '#F79009';
-      case 'approved':
-        return '#11B364';
-      default:
-        return '#000000';
-    }
+    if (status?.toLowerCase() === 'approved') return '#11B364';
+    return '#000000';
   };
 
-  // -------------------------------
-  // Filtering logic
-  // -------------------------------
-  const filteredRows = rows.filter((appointment) => {
-    const matchesSearch = Object.values(appointment)
+  // Filter by search only
+  const filteredRows = rows.filter((appointment) =>
+    Object.values(appointment)
       .join(' ')
       .toLowerCase()
-      .includes(searchTerm);
+      .includes(searchTerm)
+  );
 
-    const matchesStatus =
-      filterStatus === 'all' ||
-      appointment.appointment_status?.toLowerCase() === filterStatus.toLowerCase();
-
-    return matchesSearch && matchesStatus;
-  });
-
-  // Update total appointments count based on filter
   useEffect(() => {
     setTotalAppointments(filteredRows.length);
   }, [filteredRows]);
 
-  // -------------------------------
+  // Handle view button click
+  const handleViewClick = (appointment) => {
+    console.log('Viewing appointment:', appointment);
+    // You can open modal or navigate here
+  };
+
   // Render
-  // -------------------------------
   return (
     <>
       <div className="manage-appointment-header">
-          <AppHeader headerTitle="Manage appointment" />
-
-
-          <div className="main-dropdown">
-            <StatusDropdown
-              items={statusOptions}
-              value={filterStatus}
-              onChange={handleFilterChange}
-            />
-          </div>
-  
+        <AppHeader headerTitle="Approved Appointments" />
       </div>
 
       <div className="table-header">
@@ -159,7 +118,7 @@ export default function AppointmentTable() {
           <SearchIcon />
           <TextField
             variant="outlined"
-            placeholder="Search appointment..."
+            placeholder="Search approved appointment..."
             sx={{
               '& .MuiOutlinedInput-root': {
                 '& fieldset': { border: 'none' },
@@ -191,7 +150,7 @@ export default function AppointmentTable() {
             },
           }}
         >
-          <Table stickyHeader aria-label="appointments table">
+          <Table stickyHeader aria-label="approved appointments table">
             <TableHead>
               <TableRow>
                 {columns.map((column) => (
@@ -210,19 +169,14 @@ export default function AppointmentTable() {
               {filteredRows.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={columns.length} align="center">
-                    No Data Available
+                    No Approved Appointments
                   </TableCell>
                 </TableRow>
               ) : (
                 filteredRows
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((appointment) => (
-                    <TableRow
-                      hover
-                      key={appointment.id}
-                      className="appointment-row"
-                      onClick={() => handleOpen(appointment)}
-                    >
+                    <TableRow hover key={appointment.id}>
                       <TableCell align="left">
                         {appointment.image ? (
                           <img
@@ -234,18 +188,10 @@ export default function AppointmentTable() {
                           '—'
                         )}
                       </TableCell>
-                      <TableCell align="center">
-                        {appointment.first_name || '—'}
-                      </TableCell>
-                      <TableCell align="center">
-                        {appointment.last_name || '—'}
-                      </TableCell>
-                      <TableCell align="center">
-                        {appointment.date || '—'}
-                      </TableCell>
-                      <TableCell align="center">
-                        {appointment.time || '—'}
-                      </TableCell>
+                      <TableCell align="center">{appointment.first_name || '—'}</TableCell>
+                      <TableCell align="center">{appointment.last_name || '—'}</TableCell>
+                      <TableCell align="center">{appointment.date || '—'}</TableCell>
+                      <TableCell align="center">{appointment.time || '—'}</TableCell>
                       <TableCell align="center">
                         <span
                           style={{
@@ -267,10 +213,7 @@ export default function AppointmentTable() {
                             cursor: 'pointer',
                           }}
                           className="view-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOpen(appointment);
-                          }}
+                          onClick={() => handleViewClick(appointment)}
                         >
                           View
                         </button>
@@ -291,31 +234,6 @@ export default function AppointmentTable() {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
-
-        <Dialog
-          open={open}
-          onClose={handleClose}
-          fullWidth
-          maxWidth={false}
-          PaperProps={{
-            style: {
-              width: 'auto',
-              maxWidth: '90vw',
-              height: 'auto',
-              maxHeight: '90vh',
-              borderRadius: '4px',
-              padding: '24px',
-            },
-          }}
-        >
-          {selectedAppointment && (
-            <ModalDetails
-              {...selectedAppointment}
-              onUpdate={fetchAppointments}
-              onClose={handleClose}
-            />
-          )}
-        </Dialog>
       </Paper>
     </>
   );

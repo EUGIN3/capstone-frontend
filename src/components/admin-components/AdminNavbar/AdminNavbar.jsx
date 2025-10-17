@@ -15,8 +15,6 @@ import AxiosInstance from '../../API/AxiosInstance';
 
 import SidebarFooterAccount from './SidebarFooterAccount'
 
-
-// import { ManageUser } from '../ManageUser/ManageUser';
 import AdminDashboard from '../admin-dashboard/AdminDashboard';
 import ManageAppointment from '../manage-appointment/ManageAppointment';
 import ManageSchedule from '../manage-schedule/ManageSchedule';
@@ -31,6 +29,8 @@ import AdminGallery from '../admin-gallery/AdminGallery'
 import AdminMessages from '../admin-messages/AdminMessages';
 
 import Designs from '../manage-designs/Designs';
+
+import ManageApproveAppointment from '../manage-approved/ManageApproved';
 
 function AdminNavbar({ window }) {
   const location = useLocation();
@@ -121,6 +121,7 @@ function AdminNavbar({ window }) {
                 <Route path="/generate" element={<ImageGeneratorComponent />} />
                 <Route path="/manage-user" element={<ManageUser />} />
                 <Route path="/manage-gallery" element={<AdminGallery />} />
+                <Route path="/approved-appointment" element={<ManageApproveAppointment />} />
 
                 <Route path="/notification" element={<Notification />} />
 

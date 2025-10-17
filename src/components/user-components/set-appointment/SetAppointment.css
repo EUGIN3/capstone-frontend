@@ -39,3 +39,18 @@
 .set-appointment-submit-btn-con {
     height: 50px;
 }
+
+.step-number, .note {
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+/* When completed */
+.completed-step .step-number,
+.completed-step .note {
+  color: #11B364; 
+}
+
+.completed-step .step-number {
+  border-color: #11B364;
+  background-color: #d5f8e4;
+}

@@ -6,7 +6,9 @@ import NotificationsNoneTwoToneIcon from '@mui/icons-material/NotificationsNoneT
 import ForumTwoToneIcon from '@mui/icons-material/ForumTwoTone';
 import CollectionsTwoToneIcon from '@mui/icons-material/CollectionsTwoTone';
 import PeopleTwoToneIcon from '@mui/icons-material/PeopleTwoTone';
-
+import CalendarMonthTwoToneIcon from '@mui/icons-material/CalendarMonthTwoTone';
+import FreeCancellationTwoToneIcon from '@mui/icons-material/FreeCancellationTwoTone';
+import EventAvailableTwoToneIcon from '@mui/icons-material/EventAvailableTwoTone';
 
 import './AdminNavbar.css'
 
@@ -29,7 +31,15 @@ const useNavigation = () => {
       icon: 
         <div className='adminSideIcon'>
           <EventNoteTwoToneIcon />
-        </div> },
+        </div>,
+    },
+
+    { segment: 'admin/approved-appointment', title: 'Approved', 
+      icon: 
+        <div className='adminSideIcon'>
+          <EventAvailableTwoToneIcon />
+        </div>,
+    },
 
     { segment: 'admin/notification', title: 'Notifications', 
       icon: 
@@ -48,7 +58,7 @@ const useNavigation = () => {
         <div className='adminSideIcon'>
           <AddPhotoAlternateTwoToneIcon />
         </div> },
-
+        
     { segment: 'admin/manage-gallery', title: 'Gallery', 
       icon: 
         <div className='adminSideIcon'>

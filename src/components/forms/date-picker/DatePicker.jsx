@@ -4,13 +4,14 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
-export default function DatePickerComponent({ value, onChange }) {
+export default function DatePickerComponent({ value, onChange, disableDates = [] }) {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DatePicker
         value={value}
         onChange={onChange}
         disablePast
+        shouldDisableDate={(date) => disableDates.includes(dayjs(date).format('YYYY-MM-DD'))}
         slotProps={{
           textField: {
             fullWidth: true, // ✅ stretch to parent width
