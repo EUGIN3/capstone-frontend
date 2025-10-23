@@ -1,0 +1,38 @@
+.ManageOngoingUpdates {
+  padding: 20px;
+}
+
+.updates-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.4s;
+  width: 400px;
+  cursor: pointer;
+}
+
+.updates-header:hover {
+  transform: translateX(-6px);
+}
+
+.arrow-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.arrow-back {
+  transform: rotate(180deg);
+  cursor: pointer;
+  height: 18px;
+}
+
+
+.update-text p {
+  font-size: 22px;
+  font-weight: 600;
+  margin-left: 10px;
+  font-style: italic;
+}
+

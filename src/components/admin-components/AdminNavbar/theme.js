@@ -27,6 +27,8 @@ const mainTheme = createTheme({
           paper: {
             backgroundColor: '#0C0C0C', // Only affects sidebar
             color: '#F5F5F5', // Text inside sidebar
+            scrollbarWidth: 'thin',              // For Firefox
+            scrollbarColor: '#555 #0C0C0C', 
           },
         },
       },

@@ -13,6 +13,11 @@ import AxiosInstance from '../../API/AxiosInstance';
 import SearchIcon from '@mui/icons-material/Search';
 import TextField from '@mui/material/TextField';
 import AppHeader from '../../user-components/user-header/userHeader';
+import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
+import CheckCircleTwoToneIcon from '@mui/icons-material/CheckCircleTwoTone';
+import Dialog from '@mui/material/Dialog';
+import ModalDetails from '../manage-appointment/ModalDetails';
+import ProjectModal from './project-modal/ProjectModal';
 
 export default function ApprovedAppointmentTable() {
   const [page, setPage] = useState(0);
@@ -21,7 +26,10 @@ export default function ApprovedAppointmentTable() {
   const [totalAppointments, setTotalAppointments] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Define order of time slots
+  const [open, setOpen] = useState(false);
+  const [openCreate, setOpenCreate] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+
   const timeOrder = {
     '7:00 - 8:30 AM': 1,
     '8:30 - 10:00 AM': 2,
@@ -30,7 +38,6 @@ export default function ApprovedAppointmentTable() {
     '2:30 - 4:00 PM': 5,
   };
 
-  // Table Columns
   const columns = [
     { id: 'image', label: 'Image', minWidth: 60, align: 'left' },
     { id: 'firstName', label: 'First Name', minWidth: 150, align: 'center' },
@@ -41,7 +48,6 @@ export default function ApprovedAppointmentTable() {
     { id: 'actions', label: 'Actions', minWidth: 100, align: 'center' },
   ];
 
-  // Fetch and sort approved appointments
   const fetchAppointments = async () => {
     try {
       const response = await AxiosInstance.get('appointment/appointments/');
@@ -50,14 +56,10 @@ export default function ApprovedAppointmentTable() {
         .sort((a, b) => {
           const dateA = new Date(a.date);
           const dateB = new Date(b.date);
-
-          if (dateA.getTime() !== dateB.getTime()) {
-            return dateA - dateB; // earlier date first
-          }
-
+          if (dateA.getTime() !== dateB.getTime()) return dateA - dateB;
           const timeA = timeOrder[a.time] || 999;
           const timeB = timeOrder[b.time] || 999;
-          return timeA - timeB; // earlier slot first
+          return timeA - timeB;
         });
 
       setRows(approvedAppointments);
@@ -71,13 +73,33 @@ export default function ApprovedAppointmentTable() {
     fetchAppointments();
   }, []);
 
-  // Handlers
+  const handleOpen = (appointment) => {
+    setSelectedAppointment(appointment);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setSelectedAppointment(null);
+    setOpen(false);
+    fetchAppointments();
+  };
+
+  const handleOpenCreate = (appointment) => {
+    setSelectedAppointment(appointment);
+    setOpenCreate(true);
+  };
+
+  const handleCloseCreate = () => {
+    setSelectedAppointment(null);
+    setOpenCreate(false);
+    fetchAppointments();
+  };
+
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value.toLowerCase());
   };
 
   const handleChangePage = (event, newPage) => setPage(newPage);
-
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
@@ -88,25 +110,14 @@ export default function ApprovedAppointmentTable() {
     return '#000000';
   };
 
-  // Filter by search only
   const filteredRows = rows.filter((appointment) =>
-    Object.values(appointment)
-      .join(' ')
-      .toLowerCase()
-      .includes(searchTerm)
+    Object.values(appointment).join(' ').toLowerCase().includes(searchTerm)
   );
 
   useEffect(() => {
     setTotalAppointments(filteredRows.length);
   }, [filteredRows]);
 
-  // Handle view button click
-  const handleViewClick = (appointment) => {
-    console.log('Viewing appointment:', appointment);
-    // You can open modal or navigate here
-  };
-
-  // Render
   return (
     <>
       <div className="manage-appointment-header">
@@ -176,7 +187,11 @@ export default function ApprovedAppointmentTable() {
                 filteredRows
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((appointment) => (
-                    <TableRow hover key={appointment.id}>
+                    <TableRow 
+                      hover 
+                      key={appointment.id}
+                      className="appointment-row"
+                    >
                       <TableCell align="left">
                         {appointment.image ? (
                           <img
@@ -203,20 +218,56 @@ export default function ApprovedAppointmentTable() {
                         </span>
                       </TableCell>
                       <TableCell align="center">
-                        <button
-                          style={{
-                            background: '#1976d2',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '5px',
-                            padding: '5px 10px',
-                            cursor: 'pointer',
-                          }}
-                          className="view-btn"
-                          onClick={() => handleViewClick(appointment)}
-                        >
-                          View
-                        </button>
+                        <div className="actions">
+                          <button
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                            className="view-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpen(appointment);
+                            }}
+                          >
+                            <VisibilityTwoToneIcon
+                              sx={{
+                                color: 'rgba(56, 56, 56, 0.72)',
+                                fontSize: 26,
+                                cursor: 'pointer',
+                                '&:hover': { color: '#000000ff' },
+                                transition: 'all 0.3s ease',
+                              }}
+                            />
+                          </button>
+
+                          <button
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                            className="done-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenCreate(appointment);
+                            }}
+                          >
+                            <CheckCircleTwoToneIcon
+                              sx={{
+                                color: '#11b3658a',
+                                fontSize: 24,
+                                cursor: 'pointer',
+                                '&:hover': { color: '#11b365ff' },
+                              }}
+                            />
+                          </button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))
@@ -234,6 +285,55 @@ export default function ApprovedAppointmentTable() {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
+
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          fullWidth
+          maxWidth={false}
+          PaperProps={{
+            style: {
+              width: 'auto',
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              padding: '0px',
+              backgroundColor: 'transparent',
+              boxShadow: 'none',
+            },
+          }}
+        >
+          {selectedAppointment && (
+            <ModalDetails
+              {...selectedAppointment}
+              onUpdate={fetchAppointments}
+              onClose={handleClose}
+            />
+          )}
+        </Dialog>
+
+        <Dialog
+          open={openCreate}
+          onClose={handleCloseCreate}
+          fullWidth
+          maxWidth={false}
+          PaperProps={{
+            style: {
+              width: 'auto',
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              padding: '0px',
+              backgroundColor: 'transparent',
+              boxShadow: 'none',
+            },
+          }}
+        >
+          {selectedAppointment && (
+            <ProjectModal 
+              onClose={handleCloseCreate}
+              appointment={selectedAppointment}
+            />
+          )}
+        </Dialog>
       </Paper>
     </>
   );

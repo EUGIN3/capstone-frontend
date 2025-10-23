@@ -1,0 +1,74 @@
+/* Libre Caslon Display */
+@import url('https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Franklin:ital,wght@0,100..900;1,100..900&display=swap');
+/* Libre Franklin */
+@import url('https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Franklin:ital,wght@0,100..900;1,100..900&display=swap');
+
+.ProjectDetails {
+  width: 100%;
+  margin: 20px 0px;
+  background-color: #ffffff;
+
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+
+  display: flex;
+  gap: 20px;
+  font-family: "Libre Franklin", sans-serif;
+  position: relative;
+}
+
+.image-container {
+  width: 160px;
+  height: 160px;
+  background-color: #0c0c0c25;
+  border-radius: 2px;
+}
+
+.image-container .appointment-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+  object-fit: contain;
+}
+
+.project-info-container {
+  flex: 1;
+  text-align: left;
+}
+
+.ProjectDetails .info-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.info {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.bottom-part-details {
+  display: flex;
+}
+
+.bottom-part-details .info-container {
+  flex-direction: column;
+}
+
+.label {
+  color: #858585;
+  font-size: 12px;
+  line-height: 8px;
+  /* font-style: italic; */
+  font-weight: 600;
+}
+
+.info-text {
+  font-weight: 700;
+  font-size: 16px;
+  /* font-style: italic; */
+  text-transform: uppercase;
+}
+
+

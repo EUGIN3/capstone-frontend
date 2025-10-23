@@ -1,0 +1,88 @@
+.createProjectModal {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-sizing: border-box;
+    padding: 24px;
+    background-color: #f5f5f5;
+}
+
+.projectOuterModal {
+    padding: 12px;
+    background-color: transparent;
+    width: 600px;
+}
+
+.close-modal {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  background-color: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.project-modal-body .project-title {
+  font-size: 24px;
+  font-weight: 600;
+  text-transform: uppercase;
+  text-align: center;
+
+  /* background-color: #ffffff; */
+  background-color: transparent ;
+  border-radius: 4px;
+  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+  padding: 8px;
+}
+
+.project-user {
+  font-size: 18px;
+  text-transform: uppercase;
+}
+
+.project-user span {
+  font-weight: bold;
+}
+
+.project-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.date-status-container,
+.payment-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 10px;
+}
+
+.targeted-date-container,
+.progress-status-container,
+.payment-status-container,
+.amount-paid-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.project-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 54px;
+}
+
+.save-container {
+  height: 50px;
+}

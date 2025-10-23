@@ -6,8 +6,9 @@ import NotificationsNoneTwoToneIcon from '@mui/icons-material/NotificationsNoneT
 import ForumTwoToneIcon from '@mui/icons-material/ForumTwoTone';
 import CollectionsTwoToneIcon from '@mui/icons-material/CollectionsTwoTone';
 import PeopleTwoToneIcon from '@mui/icons-material/PeopleTwoTone';
-import CalendarMonthTwoToneIcon from '@mui/icons-material/CalendarMonthTwoTone';
-import FreeCancellationTwoToneIcon from '@mui/icons-material/FreeCancellationTwoTone';
+import CheckroomIcon from '@mui/icons-material/Checkroom';
+import TableChartIcon from '@mui/icons-material/TableChart';
+import UpdateIcon from '@mui/icons-material/Update';
 import EventAvailableTwoToneIcon from '@mui/icons-material/EventAvailableTwoTone';
 
 import './AdminNavbar.css'
@@ -38,8 +39,38 @@ const useNavigation = () => {
       icon: 
         <div className='adminSideIcon'>
           <EventAvailableTwoToneIcon />
-        </div>,
-    },
+        </div> },
+
+    // { segment: 'admin/on-going-project', title: 'On Going', 
+    //   icon: 
+    //     <div className='adminSideIcon'>
+    //       <CheckroomIcon />
+    //     </div>,
+    //   children: [
+    //     {
+    //       segment: 'table',
+    //       title: 'Projects',
+    //       icon: 
+    //         <div className='adminSideIcon'>
+    //           <TableChartIcon />
+    //         </div>,
+    //     },
+    //     {
+    //       segment: 'updates',
+    //       title: 'Updates',
+    //       icon: 
+    //         <div className='adminSideIcon'>
+    //           <UpdateIcon />
+    //         </div>,
+    //     },
+    //   ]
+    // },
+
+    { segment: 'admin/on-going-project', title: 'On Going', 
+      icon: 
+        <div className='adminSideIcon'>
+          <CheckroomIcon />
+        </div> },
 
     { segment: 'admin/notification', title: 'Notifications', 
       icon: 
@@ -51,12 +82,6 @@ const useNavigation = () => {
       icon: 
         <div className='adminSideIcon'>
           <ForumTwoToneIcon />
-        </div> },
-
-    { segment: 'admin/generate', title: 'Generate Design', 
-      icon: 
-        <div className='adminSideIcon'>
-          <AddPhotoAlternateTwoToneIcon />
         </div> },
         
     { segment: 'admin/manage-gallery', title: 'Gallery', 

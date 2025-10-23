@@ -82,8 +82,7 @@
 }
 
 .appointment-row td {
-  padding-top: 5px !important;
-  padding-bottom: 5px !important;
+  height: 80px;
 }
 
 .manage-appointment-header .main-dropdown {
@@ -100,4 +99,11 @@
 
 .manage-appointment .MuiTableCell-root {
   padding: 6px 10px !important;
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
 }

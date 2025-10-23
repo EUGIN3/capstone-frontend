@@ -18,7 +18,6 @@ import SidebarFooterAccount from './SidebarFooterAccount'
 import AdminDashboard from '../admin-dashboard/AdminDashboard';
 import ManageAppointment from '../manage-appointment/ManageAppointment';
 import ManageSchedule from '../manage-schedule/ManageSchedule';
-import ImageGeneratorComponent from '../../ImageGenerator/ImageGeneratorComponent';
 
 import ManageUser from '../manage-user/ManageUser'
 
@@ -31,6 +30,11 @@ import AdminMessages from '../admin-messages/AdminMessages';
 import Designs from '../manage-designs/Designs';
 
 import ManageApproveAppointment from '../manage-approved/ManageApproved';
+
+import OnGoingProjectsTable from '../manage-ongoing/ongoing-table/OnGoingProjectsTable';
+import ManageOngoingUpdates from '../manage-ongoing/ongoing-updates/ManageOngoingUpdates';
+import ProjectDetails from '../manage-ongoing/ongoing-updates/ProjectDetails';
+
 
 function AdminNavbar({ window }) {
   const location = useLocation();
@@ -116,9 +120,17 @@ function AdminNavbar({ window }) {
               <Routes>
                 <Route path="/dashboard" element={<AdminDashboard />} />
                 <Route path="/manage-appointments" element={<ManageAppointment />} />
+
+
                 <Route path="/manage-designs" element={<Designs />} />
+                <Route path="/on-going-project" element={<OnGoingProjectsTable />} />
+                <Route path="/on-going-project/:projectId" element={<ManageOngoingUpdates />} />
+
+                {/* <Route path="/on-going-project/updates" element={<ManageOngoingUpdates />} /> */}
+
+
+
                 <Route path="/manage-schedule" element={<ManageSchedule />} />
-                <Route path="/generate" element={<ImageGeneratorComponent />} />
                 <Route path="/manage-user" element={<ManageUser />} />
                 <Route path="/manage-gallery" element={<AdminGallery />} />
                 <Route path="/approved-appointment" element={<ManageApproveAppointment />} />

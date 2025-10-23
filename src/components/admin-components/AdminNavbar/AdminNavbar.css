@@ -21,6 +21,15 @@ svg[data-testid="AccountCircleTwoToneIcon"],
   color: #F5F5F5 !important;
 }
 
+.MuiToolbar-root .MuiIconButton-root {
+  color: inherit;
+  margin-left: 8px;
+}
+
+.MuiToolbar-root .MuiIconButton-root:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
 
 
 

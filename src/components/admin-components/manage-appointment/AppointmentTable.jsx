@@ -15,7 +15,8 @@ import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import ModalDetails from './ModalDetails';
 import AppHeader from '../../user-components/user-header/userHeader';
-import StatusDropdown from './StatusDropdown';
+import StatusDropdown from './StatusDropDown';
+import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
 
 export default function AppointmentTable() {
   const [page, setPage] = useState(0);
@@ -32,7 +33,7 @@ export default function AppointmentTable() {
   // -------------------------------
   const statusOptions = [
     { label: 'All', value: 'all' },
-    { label: 'Approved', value: 'approved' },
+    // { label: 'Approved', value: 'approved' },
     { label: 'Pending', value: 'pending' },
     { label: 'Denied', value: 'denied' },
     { label: 'Cancelled', value: 'cancelled' },
@@ -118,6 +119,10 @@ export default function AppointmentTable() {
   // Filtering logic
   // -------------------------------
   const filteredRows = rows.filter((appointment) => {
+    const status = appointment.appointment_status?.toLowerCase();
+
+    if (status === 'approved' || status === 'done') return false;
+
     const matchesSearch = Object.values(appointment)
       .join(' ')
       .toLowerCase()
@@ -259,12 +264,12 @@ export default function AppointmentTable() {
                       <TableCell align="center">
                         <button
                           style={{
-                            background: '#1976d2',
-                            color: 'white',
+                            background: 'transparent',
                             border: 'none',
-                            borderRadius: '5px',
-                            padding: '5px 10px',
-                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems:'center',
+                            justifyContent: 'center',
+                            width:'100%',
                           }}
                           className="view-btn"
                           onClick={(e) => {
@@ -272,7 +277,18 @@ export default function AppointmentTable() {
                             handleOpen(appointment);
                           }}
                         >
-                          View
+                          <VisibilityTwoToneIcon 
+                             sx={{
+                              color: '#383838ff',      // blue color
+                              fontSize: 26,          // make it bigger
+                              cursor: 'pointer',     // show pointer on hover
+                              '&:hover': {
+                                color: '#0c0c0c',    // darker on hover
+                              },
+                              margin: '0',
+                              padding: '0'
+                            }}                      
+                          />
                         </button>
                       </TableCell>
                     </TableRow>
@@ -291,6 +307,7 @@ export default function AppointmentTable() {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
+        
 
         <Dialog
           open={open}
@@ -301,10 +318,10 @@ export default function AppointmentTable() {
             style: {
               width: 'auto',
               maxWidth: '90vw',
-              height: 'auto',
               maxHeight: '90vh',
-              borderRadius: '4px',
-              padding: '24px',
+              padding: '0px',
+              backgroundColor: 'transparent',
+              boxShadow: 'none', 
             },
           }}
         >
