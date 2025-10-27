@@ -1,6 +1,6 @@
 .drag-area {
   border: 2px dashed #050505;
-  height: 100%;                /* Fill parent height */
+  height: 100%; /* ✅ Now it fills the height of its container */
   width: 100%;
   border-radius: 5px;
   display: flex;
@@ -9,43 +9,35 @@
   justify-content: center;
   text-align: center;
   transition: border 0.3s ease;
-  overflow: hidden;            /* Prevent image from expanding box */
-  box-sizing: border-box;
+  cursor: pointer;
+  padding: 20px;
 }
 
 .drag-area.active {
   border: 2px solid #000000;
-  background-color: #f8f8f8;
 }
 
 .drag-area .icon {
-  font-size: 80px;
+  font-size: 40px;
   color: #d3d3d3;
 }
 
 .drag-area header {
-  font-size: 1.5rem;
+  font-size: 18px;
   font-weight: 500;
   color: #000000;
 }
 
-.drag-area span {
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: #0e0e0e;
-  margin: 10px 0 15px;
-}
-
 .drag-area button {
   padding: 10px 25px;
-  font-size: 1rem;
+  font-size: 20px;
   font-weight: 500;
   border: none;
   background: #000000;
   color: #ffffff;
   border-radius: 5px;
   cursor: pointer;
-  transition: opacity 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .drag-area button:hover {
@@ -54,13 +46,11 @@
 
 .drag-area button:active {
   opacity: 1;
-} 
+}
 
 .drag-area img {
+  height: 100%;
   width: 100%;
-  height: auto;                 /* Keep natural aspect ratio */
-  max-height: 100%;             /* Prevent overflowing */
-  object-fit: contain;          /* Fit nicely inside the box */
+  object-fit: contain;
   border-radius: 5px;
-  display: block;
 }

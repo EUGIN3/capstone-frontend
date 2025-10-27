@@ -1,0 +1,8 @@
+svg[data-testid="ArrowBackIosNewTwoToneIcon"] {
+    color: #0c0c0c !important;
+    font-size: 14px;
+}
+
+svg[data-testid="ArrowBackIosNewTwoToneIcon"]:hover {
+    color: #0c0c0c !important;
+}

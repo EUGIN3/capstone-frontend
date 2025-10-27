@@ -4,6 +4,12 @@
 
 .updates-header {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.updates-header-left {
+  display: flex;
   justify-content: center;
   align-items: center;
   gap: 10px;
@@ -12,7 +18,7 @@
   cursor: pointer;
 }
 
-.updates-header:hover {
+.updates-header-left:hover {
   transform: translateX(-6px);
 }
 
@@ -28,11 +34,24 @@
   height: 18px;
 }
 
+.update-text {
+  display: flex;
+  align-items: center;
+}
 
 .update-text p {
   font-size: 22px;
   font-weight: 600;
   margin-left: 10px;
   font-style: italic;
+}
+
+.add-update-btn {
+  height: 40px;
+  align-self: right;
+}
+
+.add-update-btn .outlined-black {
+  padding: 10px 16px;
 }
 

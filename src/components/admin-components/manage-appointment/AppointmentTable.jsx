@@ -17,6 +17,8 @@ import ModalDetails from './ModalDetails';
 import AppHeader from '../../user-components/user-header/userHeader';
 import StatusDropdown from './StatusDropDown';
 import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
+import noImage from '../../../assets/no-image.jpg'
+
 
 export default function AppointmentTable() {
   const [page, setPage] = useState(0);
@@ -213,7 +215,7 @@ export default function AppointmentTable() {
 
             <TableBody>
               {filteredRows.length === 0 ? (
-                <TableRow>
+                <TableRow  sx={{height:'100px'}}>
                   <TableCell colSpan={columns.length} align="center">
                     No Data Available
                   </TableCell>
@@ -229,15 +231,11 @@ export default function AppointmentTable() {
                       onClick={() => handleOpen(appointment)}
                     >
                       <TableCell align="left">
-                        {appointment.image ? (
                           <img
-                            src={appointment.image}
+                            src={appointment.image ? appointment.image : noImage}
                             alt="appointment"
                             className="appointment-image"
                           />
-                        ) : (
-                          '—'
-                        )}
                       </TableCell>
                       <TableCell align="center">
                         {appointment.first_name || '—'}

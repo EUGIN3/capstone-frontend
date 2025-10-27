@@ -66,19 +66,22 @@ function DisplayAppointments() {
         ? true
         : app.appointment_status === statusLabel
       )
+      
       .map((app) => (
-        <Appointment
-          key={app.id}
-          id={app.id}
-          date={app.date}
-          time={app.time}
-          facebookLink={app.facebook_link}
-          adress={app.address}
-          description={app.description}
-          image={app.image}
-          status={app.appointment_status}
-          onUpdate={handleUpdate}
-        />
+        (app.appointment_status === 'done'? null :
+            <Appointment
+            key={app.id}
+            id={app.id}
+            date={app.date}
+            time={app.time}
+            facebookLink={app.facebook_link}
+            adress={app.address}
+            description={app.description}
+            image={app.image}
+            status={app.appointment_status}
+            onUpdate={handleUpdate}
+          />
+        )
       ));
   };
 
@@ -110,19 +113,6 @@ function DisplayAppointments() {
         { 
           renderAppointmentsByStatus(filterStatus)
         }
-
-        <Appointment
-          key='1'
-          id='1'
-          date='2025-08-19'
-          time='7:00-7:00'
-          facebookLink='sample'
-          adress='Lucena City, Quezon'
-          description='Long gown'
-          image='sample image'
-          status='pending'
-          onUpdate={handleUpdate}
-        />
       </div>
       
       <ToastContainer />

@@ -1,0 +1,74 @@
+.AddUpdateModal {
+  width: 100%;
+  margin: 20px 0px;
+  background-color: #f5f5f5;
+
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  font-family: "Libre Franklin", sans-serif;
+  position: relative;
+  width: 500px;
+
+}
+
+.outerAddUpdateModal {
+    padding: 12px;
+    background-color: transparent;
+}
+
+.close-update-modal {
+  position: absolute;
+  top: 20px;
+  right: 0px;
+  background-color: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.AddUpdateModal .image-container,
+.AddUpdateModal .message-container {
+  width: 100%;
+} 
+
+
+.AddUpdateModal .payment-status-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+
+.AddUpdateModal .status-container {
+  height: 54px;
+}
+
+.AddUpdateModal .save-container {
+  width: 100%;
+}
+
+.AddUpdateModal .image-container {
+  display: flex;
+  flex-direction: column;
+  border: none;
+}
+
+.AddUpdateModal .image-container p {
+  font-size: 12px;
+  color: #555;
+  font-weight: 500;
+  font-style: italic;
+}

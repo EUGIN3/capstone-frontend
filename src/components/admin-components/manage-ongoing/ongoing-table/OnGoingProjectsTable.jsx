@@ -31,9 +31,9 @@ export default function OnGoingProjectsTable() {
     { id: 'user', label: 'UserName', minWidth: 150, align: 'center' },
     { id: 'attire_type', label: 'Attire Type', minWidth: 150, align: 'center' },
     { id: 'targeted_date', label: 'Target Date', minWidth: 150, align: 'center' },
-    { id: 'process_status', label: 'Process Status', minWidth: 150, align: 'center' },
+    { id: 'process_status', label: 'Status', minWidth: 150, align: 'center' },
     { id: 'payment_status', label: 'Payment Status', minWidth: 150, align: 'center' },
-    { id: 'amount_paid', label: 'Amount Paid', minWidth: 150, align: 'center' },
+    { id: 'balance', label: 'Balance', minWidth: 150, align: 'center' },
     { id: 'actions', label: 'Actions', minWidth: 100, align: 'center' },
   ];
 
@@ -178,7 +178,7 @@ export default function OnGoingProjectsTable() {
 
             <TableBody>
               {filteredRows.length === 0 ? (
-                <TableRow>
+                <TableRow sx={{height:'100px'}}>
                   <TableCell colSpan={columns.length} align="center">
                     No Ongoing Projects
                   </TableCell>
@@ -197,7 +197,7 @@ export default function OnGoingProjectsTable() {
                       <TableCell align="center">{formatDate(project.targeted_date)}</TableCell>
                       <TableCell align="center">{project.process_status || '—'}</TableCell>
                       <TableCell align="center">{project.payment_status || '—'}</TableCell>
-                      <TableCell align="center">{project.amount_paid || '—'}</TableCell>
+                      <TableCell align="center">{project.balance || '—'}</TableCell>
                       <TableCell align="center">
                         <button
                           style={{

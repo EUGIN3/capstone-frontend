@@ -19,6 +19,10 @@ import Dialog from '@mui/material/Dialog';
 import ModalDetails from '../manage-appointment/ModalDetails';
 import ProjectModal from './project-modal/ProjectModal';
 
+import noImage from '../../../assets/no-image.jpg'
+
+import { Tooltip } from '@mui/material';
+
 export default function ApprovedAppointmentTable() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -178,7 +182,7 @@ export default function ApprovedAppointmentTable() {
 
             <TableBody>
               {filteredRows.length === 0 ? (
-                <TableRow>
+                <TableRow sx={{height:'100px'}}>
                   <TableCell colSpan={columns.length} align="center">
                     No Approved Appointments
                   </TableCell>
@@ -193,15 +197,11 @@ export default function ApprovedAppointmentTable() {
                       className="appointment-row"
                     >
                       <TableCell align="left">
-                        {appointment.image ? (
-                          <img
-                            src={appointment.image}
-                            alt="appointment"
-                            className="appointment-image"
-                          />
-                        ) : (
-                          '—'
-                        )}
+                      <img
+                        src={appointment.image ? appointment.image : noImage}
+                        alt="appointment"
+                        className="appointment-image"
+                      />
                       </TableCell>
                       <TableCell align="center">{appointment.first_name || '—'}</TableCell>
                       <TableCell align="center">{appointment.last_name || '—'}</TableCell>

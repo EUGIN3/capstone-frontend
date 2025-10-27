@@ -69,6 +69,10 @@
   align-items: center;
 }
 
+.modalDetails-image img {
+    border: 1px solid #0c0c0c;
+}
+
 .modalDetails-preview {
   max-width: 100%;
   max-height: 100%;

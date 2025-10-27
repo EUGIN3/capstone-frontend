@@ -1,0 +1,240 @@
+@import url('https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Franklin:ital,wght@0,100..900;1,100..900&display=swap');
+
+.IndividualProject {
+  width: 100%;
+  margin: 20px 0px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.IndividualProject .indi-container-main {
+  background-color: #6d6d6d28;
+  border: 2px solid #0c0c0c52;
+  border-radius: 6px;
+  width: 90%;
+  padding: 12px;
+  position: relative;
+  font-family: "Libre Franklin", sans-serif;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.IndividualProject .indi-container-main:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: #6d6d6d28;
+  border: 2px solid #0c0c0c;
+}
+
+
+.IndividualProject .indi-container-main:hover .indi-view {
+  color: #0c0c0c;
+}
+
+.indi-colapse-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  width: 100%;
+}
+
+.indi-left-section {
+  display: grid;
+  grid-template-columns: 50px 1fr;
+  gap: 15px;
+}
+
+.indi-image-container {
+  height: 50px;
+  border-radius: 3px;
+  border: 1px solid #0c0c0c;
+}
+
+.indi-image-container img {
+  height: 100%;
+  width: 100%;
+  border-radius: 3px;
+  object-fit: cover;
+}
+
+.indi-details-sections {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.indi-time-date {
+  font-size: 10px;
+  color: #757575;
+  font-style: italic;
+  line-height: 10px;
+}
+
+.indi-type {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.indi-view {
+  color: #757575;
+  font-size: 16px;
+  margin-right: 20px;
+  cursor: pointer;
+  transition: all .3s;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.indi-noproject {
+  background-color: #6d6d6d28;
+  color: #0c0c0c73;
+  border: 2px solid #0c0c0c52;
+  border-radius: 6px;
+  width: 100%;
+  padding: 12px;
+  font-size: 22px;
+  text-transform: uppercase;
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.indi-details {
+  width: 100%;
+}
+
+.indi-hr-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.indi-details hr {
+  width: 90%;
+  border: 1px solid #0c0c0c1a;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.indi-informtaion {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.indi-informtaion .label,
+.indi-details-container .label {
+  text-align: left;
+  width: 90%;
+}
+
+.indi-information-top {
+  margin-bottom: 10px;
+}
+
+.indi-information-top,
+.indi-information-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 10px;
+  width: 90%;
+
+}
+
+.indi-information-top span,
+.indi-information-bottom span {
+  font-weight: 600;
+  font-size: 12px;
+  color: #757575;
+  font-style: italic;
+  line-height: 5px;
+}
+
+.indi-information-top p,
+.indi-information-bottom p,
+.indi-details .label {
+  line-height: 15px;
+  font-size: 14px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.indi-details-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  margin-bottom: 20px;
+}
+
+.indi-update-container {
+  width: 90%;
+  background-color: #6d6d6d28;
+  border: 2px solid #0c0c0c52;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.indi-details-container .label {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+
+span.indi-show-update {
+  color: #757575;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all .3s;
+
+  cursor: pointer;
+  font-weight: 400;
+  text-transform: capitalize;
+  display: flex;
+  align-items: center;
+}
+
+span.indi-show-update:hover {
+  color: #0c0c0c;
+}
+
+.indi-update-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px
+}
+
+.indi-update-top p {
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.indi-paid,
+.indi-status {
+  display: flex;
+  gap: 4px;
+}
+
+.indi-note p {
+  font-size: 14px;
+  text-transform: initial;
+}

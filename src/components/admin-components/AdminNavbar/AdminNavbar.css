@@ -1,12 +1,18 @@
-.css-ezihe .MuiButtonBase-root {
-  color: #0c0c0c;
-  border-color: #0c0c0c;
+svg[data-testid="ChevronLeftIcon"], 
+svg[data-testid="MenuIcon"],
+svg[data-testid="MoreVertIcon"], 
+svg[data-testid="MenuOpenIcon"] {
+  color: #f5f5f5 
 }
 
-.adminSideIcon svg {
+button.MuiButtonBase-root:hover {
+  background-color: #f5f5f52f;
+}
+
+/* .adminSideIcon svg {
     color: #F5F5F5 !important;
     display: flex;
-}
+} */
 
 svg[data-testid="ExpandMoreIcon"] {
   color: #F5F5F5 !important;
@@ -26,9 +32,21 @@ svg[data-testid="AccountCircleTwoToneIcon"],
   margin-left: 8px;
 }
 
-.MuiToolbar-root .MuiIconButton-root:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+.profile-picture {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
 }
+
+.css-1bmc26r-MuiToolbar-root {
+  padding: 10px !important;
+}
+
+.admin-arrow {
+  transform: rotate(180deg);
+  height: 20px;
+}
+  
 
 
 

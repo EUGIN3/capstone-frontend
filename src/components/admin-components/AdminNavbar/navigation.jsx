@@ -41,41 +41,10 @@ const useNavigation = () => {
           <EventAvailableTwoToneIcon />
         </div> },
 
-    // { segment: 'admin/on-going-project', title: 'On Going', 
-    //   icon: 
-    //     <div className='adminSideIcon'>
-    //       <CheckroomIcon />
-    //     </div>,
-    //   children: [
-    //     {
-    //       segment: 'table',
-    //       title: 'Projects',
-    //       icon: 
-    //         <div className='adminSideIcon'>
-    //           <TableChartIcon />
-    //         </div>,
-    //     },
-    //     {
-    //       segment: 'updates',
-    //       title: 'Updates',
-    //       icon: 
-    //         <div className='adminSideIcon'>
-    //           <UpdateIcon />
-    //         </div>,
-    //     },
-    //   ]
-    // },
-
     { segment: 'admin/on-going-project', title: 'On Going', 
       icon: 
         <div className='adminSideIcon'>
           <CheckroomIcon />
-        </div> },
-
-    { segment: 'admin/notification', title: 'Notifications', 
-      icon: 
-        <div className='adminSideIcon'>
-          <NotificationsNoneTwoToneIcon />
         </div> },
 
     { segment: 'admin/message', title: 'Messages', 

@@ -1,139 +1,341 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { AppProvider } from '@toolpad/core/AppProvider';
-import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { useLocation, useNavigate } from 'react-router-dom';
-// Images
-import logo from '../../../assets/logo v2.png';
-import mainTheme from './theme';
-// Components
-import useNavigation from './navigation';
+import React, { useState, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import AxiosInstance from '../../API/AxiosInstance'
-
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import {
+  Box,
+  CssBaseline,
+  Typography,
+  IconButton,
+  Toolbar,
+  Divider,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  AppBar as MuiAppBar,
+  Drawer as MuiDrawer,
+  Tooltip,
+  Badge,
+} from '@mui/material';
+import { styled, useTheme, ThemeProvider } from '@mui/material/styles';
+import MenuIcon from '@mui/icons-material/Menu';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import Logout from '@mui/icons-material/Logout';
+import { Account } from '@toolpad/core/Account';
+import { AppProvider } from '@toolpad/core/AppProvider';
+import './Navbar.css'
+import ArrowBackIosNewTwoToneIcon from '@mui/icons-material/ArrowBackIosNewTwoTone';
+// Custom imports
+import AxiosInstance from '../../API/AxiosInstance';
+import useNavigation from './navigation';
+import mainTheme from './theme';
 import SidebarFooterAccount from './SidebarFooterAccount';
+import logo from '../../../assets/logo v2.png';
 
-import UserDashboard from '../user-dashboard/UserDashboard'
-
+// Pages
+import UserDashboard from '../user-dashboard/UserDashboard';
 import SetAppointment from '../set-appointment/SetAppointment';
-import DisplayAppointments from '../display-appointment/DisplayAppointments'
-
+import DisplayAppointments from '../display-appointment/DisplayAppointments';
 import ImageGeneratorComponent from '../../ImageGenerator/ImageGeneratorComponent';
-
 import Notification from '../../Notification/Notification';
-
 import UserGallery from '../user-gallery/UserGallery';
-
 import UserMessages from '../user-messages/UserMessages';
+import ButtonElement from '../../forms/button/ButtonElement';
+import MailTwoToneIcon from '@mui/icons-material/MailTwoTone';
+import NotificationsTwoToneIcon from '@mui/icons-material/NotificationsTwoTone';
+import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+import UserProjects from '../user-projects/UserProjects';
+
+// Drawer width
+const drawerWidth = 240;
+
+// ✅ Persistent Drawer Layout Components (Same as Admin)
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
+  ({ theme, open }) => ({
+    flexGrow: 1,
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    marginLeft: `-${drawerWidth}px`,
+    ...(open && {
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginLeft: 0,
+    }),
+  })
+);
+
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== 'open',
+})(({ theme, open }) => ({
+  zIndex: theme.zIndex.drawer + 1,
+  transition: theme.transitions.create(['width', 'margin'], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && {
+    marginLeft: drawerWidth,
+    width: `calc(100% - ${drawerWidth}px)`,
+    transition: theme.transitions.create(['width', 'margin'], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}));
+
+const DrawerHeader = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: theme.spacing(0, 1),
+  ...theme.mixins.toolbar,
+}));
 
 function Navbar({ window }) {
+  const theme = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
-
-  const navigation = useNavigation()
+  const navigation = useNavigation();
+  const [open, setOpen] = useState(false);
 
   const [session, setSession] = useState({
-    user: {
-      name: '',
-      email: '',
-      image: '',
-    },
+    user: { name: '', email: '', image: '' },
   });
 
+  const handleDrawerOpen = () => setOpen(true);
+  const handleDrawerClose = () => setOpen(false);
+
   const logOUt = () => {
-    AxiosInstance.post('logoutall/', {})
-      .then(() => {
-        sessionStorage.removeItem('Token');
-        sessionStorage.removeItem('IsAdmin');
-        navigate('/login');
-      });
+    AxiosInstance.post('logoutall/', {}).then(() => {
+      sessionStorage.removeItem('Token');
+      sessionStorage.removeItem('IsAdmin');
+      navigate('/login');
+    });
   };
 
   const userInformation = () => {
-    AxiosInstance.get(`auth/profile/`)
-      .then((response) => {
-        const { first_name, last_name, email, image } = response.data;
-
-        const fullName = [first_name, last_name].filter(Boolean).join(' ').trim();
-
-        setSession({
-          user: {
-            name: fullName || '',
-            email: email || '',
-            image: image || '',
-          },
-        });
+    AxiosInstance.get('auth/profile/').then((response) => {
+      const { first_name, last_name, email, image } = response.data;
+      const fullName = [first_name, last_name].filter(Boolean).join(' ').trim();
+      setSession({
+        user: {
+          name: fullName || '',
+          email: email || '',
+          image: image || '',
+        },
       });
+    });
   };
 
   useEffect(() => {
     userInformation();
   }, []);
 
-  const authentication = useMemo(() => {
-    return {
-      signIn: () => {
-        setSession({ user: {} });
-      },
-      signOut: () => {
-        logOUt();
-      },
-    };
-  }, []);
-
-  const router = {
-    pathname: location.pathname,
-    navigate: (path) => navigate(path),
-  };
-
-  const mainWindow = window !== undefined ? window() : undefined;
+  const authentication = useMemo(
+    () => ({
+      signOut: logOUt,
+    }),
+    []
+  );
 
   return (
-    <AppProvider
-      session={session}
-      authentication={authentication}
-      navigation={navigation}
-      router={router}
-      theme={mainTheme}
-      window={mainWindow}
-      branding={{
-        logo: <img src={logo} alt="Ramil's logo." style={{ height: '30px', width: '170px' }} />,
-        title: '',
-        homeUrl: '/user/dashboard',
-      }}
-    >
-      <DashboardLayout
-        slots={{
-          sidebarFooter: SidebarFooterAccount,
-        }}
-        sidebarExpandedWidth="240px"
-        disableCollapsibleSidebar
-      >
-        <div className='appMainContainer'>
-              <Routes>
-                {/* Specified routes */}
-                <Route path="/" element={<Navigate to="/user/dashboard" />} />
-                <Route path="/dashboard" element={<UserDashboard />} />
+    <ThemeProvider theme={mainTheme}>
+      <AppProvider authentication={authentication} session={session} theme={mainTheme}>
+        <Box sx={{ display: 'flex' }}>
+          <CssBaseline />
 
-                {/* <Route path="/appointment/all-appointments" element={<DisplayAppointments />} />
-                <Route path="/appointment/set-appointment" element={<SetAppointment />} /> */}
+          {/* ✅ Top AppBar */}
+          <AppBar position="fixed" open={open}>
+            <Toolbar>
+              { open ? 
+                <Tooltip title='Close' arrow>
+                  <IconButton
+                    color="inherit"
+                    aria-label="open drawer"
+                    onClick={open ? handleDrawerClose : handleDrawerOpen}
+                    edge="start"
+                    sx={{ marginRight: 2}}
+                  >
+                    <MenuOpenIcon />
+                  </IconButton>
+                </Tooltip>
+                :
+                <Tooltip title='Menu' arrow>
+                  <IconButton
+                    color="inherit"
+                    aria-label="open drawer"
+                    onClick={open ? handleDrawerClose : handleDrawerOpen}
+                    edge="start"
+                    sx={{ marginRight: 2}}
+                  >
+                    <MenuIcon />
+                  </IconButton>
+                </Tooltip> 
+              }
 
-                <Route path="/all-appointments" element={<DisplayAppointments />} />
-                <Route path="/set-appointment" element={<SetAppointment />} />
-                <Route path="/generate" element={<ImageGeneratorComponent />} />
+              <img
+                src={logo}
+                alt="Logo"
+                style={{ height: '30px', width: '170px', marginRight: '16px' }}
+              />
 
-                <Route path="/notification" element={<Notification />} />
+              <Box sx={{ flexGrow: 1 }} />
 
-                <Route path="/gallery" element={<UserGallery />} />
+              <Tooltip title="Messages" arrow>
+                <IconButton color="inherit">
+                  <Badge badgeContent={4} color="error">
+                    <MailTwoToneIcon sx={{ color: '#f5f5f5' }} />
+                  </Badge>
+                </IconButton>
+              </Tooltip>
 
-                <Route path="/message" element={<UserMessages />} />
+              <Tooltip title="Notifications" arrow>
+                <IconButton color="inherit">
+                  <Badge badgeContent={17} color="error">
+                    <NotificationsTwoToneIcon sx={{ color: '#f5f5f5' }} />
+                  </Badge>
+                </IconButton>
+              </Tooltip>
 
-                {/* If routes is not belong to the specified. */}
-                {/* <Route path="*" element={<Navigate to="/not-found" />} /> */}
-              </Routes>
-        </div>
-      </DashboardLayout>
-    </AppProvider>
+              <Box sx={{ ml: 1 }}>
+                <Account
+                  slotProps={{
+                    signInButton: { color: 'success' },
+                    signOutButton: { color: 'black', startIcon: <Logout /> },
+                    popover: { sx: { '&::before': { display: 'none' }, borderRadius: '12px' } },
+                    preview: {
+                      variant: 'collapsed',
+                      slotProps: {
+                        avatarIconButton: {
+                          sx: { width: 40, height: 40, marginLeft: '8px' },
+                        },
+                        avatar: { variant: 'circular' },
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Toolbar>
+          </AppBar>
+
+          {/* ✅ Sidebar Drawer */}
+          <MuiDrawer
+            sx={{
+              width: drawerWidth,
+              '& .MuiDrawer-paper': {
+                width: drawerWidth,
+                boxSizing: 'border-box',
+                backgroundColor: '#f5f5f5',
+                color: '#0c0c0c8f',
+              },
+            }}
+            variant="persistent"
+            anchor="left"
+            open={open}
+          >
+            <DrawerHeader>
+              <Box
+                sx={{
+                  display:'flex',
+                  flexDirection:'column',
+                  justifyContent:'center',
+                  width:'100%',
+                  height:'100%',
+                }}
+              
+              >
+                <Typography 
+                  sx={{
+                    fontSize:'14px',
+                    width:'100%',
+                    textAlign:'center',
+                    color: '#0c0c0c',
+                    lineHeight:'15px'
+                  }}
+                >{session.user.name}</Typography>
+                <Typography 
+                  sx={{
+                    fontSize:'12px',
+                    width:'100%',
+                    textAlign:'center'
+                  }}
+                >{session.user.email}</Typography>
+              </Box>
+              
+            </DrawerHeader>
+
+            <Divider
+              sx={{marginTop:'3.5px', marginBottom:'5px'}}
+            />
+
+            <List>
+              {navigation.map((item) => (
+                <ListItem key={item.segment} disablePadding>
+                  <ListItemButton
+                    onClick={() => navigate(`/${item.segment}`)}
+                    selected={location.pathname === `/${item.segment}`}
+                    sx={{
+                      mx: 1,
+                      borderRadius: '6px',
+                      marginLeft: '15px',
+                      marginRight: '15px',
+                      '& .MuiListItemIcon-root': {
+                        color: '#0c0c0c8f',
+                      },
+                      '&.Mui-selected': {
+                        backgroundColor: '#0c0c0c54',
+                        borderLeft: '4px solid #0c0c0c',
+                        color: '#0c0c0c',
+                        '& .MuiListItemIcon-root': {
+                          color: '#0c0c0c', 
+                        },
+                      },
+                      '&:hover': {
+                        backgroundColor: '#0c0c0c30',
+                      },
+                      '&.Mui-selected:hover': {
+                        backgroundColor: '#0c0c0c80',
+                      },
+                    }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 0, mr: open ? 2 : 'auto' }}>
+                      {item.icon}
+                    </ListItemIcon>
+                    <ListItemText primary={item.title} sx={{ opacity: open ? 1 : 0 }} />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+
+            {/* ✅ Footer (same spacing as Admin) */}
+
+            <Box sx={{ mt: 'auto',marginBottom: '10px', marginLeft: '20px', marginRight: '20px', height:'40px', }}> 
+              <ButtonElement label='ADMIN PANEL' variant='outlined-black admin-user' type='button' onClick={() => navigate('/admin')} /> 
+            </Box> 
+          </MuiDrawer>
+
+          {/* ✅ Main Content */}
+          <Main open={open}>
+            <DrawerHeader />
+            <Routes>
+              <Route path="/" element={<Navigate to="/user/dashboard" />} />
+              <Route path="/dashboard" element={<UserDashboard />} />
+              <Route path="/all-appointments" element={<DisplayAppointments />} />
+              <Route path="/set-appointment" element={<SetAppointment />} />
+              <Route path="/projects" element={<UserProjects />} />
+              <Route path="/generate" element={<ImageGeneratorComponent />} />
+              <Route path="/gallery" element={<UserGallery />} />
+              <Route path="/message" element={<UserMessages />} />
+            </Routes>
+          </Main>
+        </Box>
+      </AppProvider>
+    </ThemeProvider>
   );
 }
 
@@ -142,5 +344,3 @@ Navbar.propTypes = {
 };
 
 export default Navbar;
-
-

@@ -9,11 +9,11 @@ const mainTheme = createTheme({
       palette: {
         mode: 'light', // Only mode 'light'.
         primary: { 
-          main: '#0C0C0C' // Main color for text, sidebar (navigation bar) text color when selected. 
+          main: '#0c0c0c6c' // Main color for text, sidebar (navigation bar) text color when selected. 
         }, 
         background: { 
           default: '#F5F5F5', // Background color of the app pages.
-          paper: '#F5F5F5' // Background color of the sidebar (navigation bar).
+          
         },
       },
     },
@@ -32,7 +32,7 @@ const mainTheme = createTheme({
     MuiIconButton: {
       styleOverrides: {
         root: {
-          color: '#F5F5F5', // Color of the burger icon.
+          color: '#f5f5f565', // Color of the burger icon.
         },
       },
     },

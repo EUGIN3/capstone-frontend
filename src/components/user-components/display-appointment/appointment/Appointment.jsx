@@ -14,15 +14,14 @@ import AxiosInstance from '../../../API/AxiosInstance';
 import DatePickerComponent from '../../../forms/date-picker/DatePicker';
 import FixTime from '../../../forms/fixtime/FixTime';
 import CancelTwoToneIcon from '@mui/icons-material/CancelTwoTone';
+import UploadBox from '../../../forms/upload-file/ImageUpload';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 
+import { Tooltip } from '@mui/material';
 
 function Appointment(props) {
-  let fileInputRef = null;
-
   const { date, time, status, id, onUpdate, facebookLink, adress, description, image} = props  
   const [open, setOpen] = useState(false);
-
-
   const [selectedImage, setSelectedImage] = useState(null);
 
   const [selectedDate, setSelectedDate] = useState(dayjs());
@@ -30,8 +29,16 @@ function Appointment(props) {
 
   const [ availabilityData, setAvailabilityData ] = useState({})
   const [ disabledSlots, setDisabledSlots ] = useState({});
-  
+  const [resetUploadBox, setResetUploadBox] = useState(false);
+
+  const getFullImageUrl = (image) => {
+    if (!image) return '/placeholder.png';
+    return image.startsWith('http') ? image : `http://127.0.0.1:8000${image}`;
+  };
+
   const handleClickOpen = () => {
+    
+    console.log(image)
     setOpen(true);
   };
 
@@ -43,8 +50,6 @@ function Appointment(props) {
 
       reset({
         time: time || '',
-        updatedFacebookLink: facebookLink && facebookLink !== 'undefined' ? facebookLink : '',
-        updatedAddress: adress && adress !== 'undefined' ? adress : '',
         updatedAppointmentDescription: description && description !== 'undefined' ? description : '',
       });
     }
@@ -54,9 +59,6 @@ function Appointment(props) {
     setOpen(false);
 
     reset();
-    if (fileInputRef) {
-      fileInputRef.value = '';
-    }
     setSelectedTime('');
     setSelectedDate(dayjs(date))
   };
@@ -99,18 +101,13 @@ function Appointment(props) {
     });
   };
 
-  const schema = yup.object({
-    time: yup.string().required('Please select a time.'),
-  });
-
-  const { handleSubmit, control, reset } = useForm({ resolver: yupResolver(schema) });
+  const { handleSubmit, control, reset } = useForm();
 
 
   const submission = (data) => {
     const formData = new FormData();
     formData.append('date', selectedDate.format('YYYY-MM-DD'));
     formData.append('time', selectedTime);
-    formData.append('facebook_link', data.updatedFacebookLink);
     formData.append('description', data.updatedAppointmentDescription);
 
     if (selectedImage) {
@@ -127,11 +124,11 @@ function Appointment(props) {
       if (onUpdate) onUpdate(response.data); 
 
       reset();
-      if (fileInputRef) {
-        fileInputRef.value = '';
-      }
       setSelectedTime('');
       setSelectedDate(dayjs(date))
+
+      setSelectedImage(null);
+      setResetUploadBox(prev => !prev);
     })
   };
 
@@ -141,76 +138,90 @@ function Appointment(props) {
 
   return (
     <div className={`appointment-box ${status}`}>
-        <Dialog open={open} onClose={handleClose}>
-          <form onSubmit={handleSubmit(submission)}>
-            <div className='update-dialog-container'>
-              <div className='update-dialog-title-container'>
-                <p>Update Appointment</p>
-              </div>
-
-              <div className='update-dialog-input-container'>
-                <div className="update-dialog-time-date-container">
-                   {/* New Date */}
-                  <DatePickerComponent
-                    name='date'
-                    value={selectedDate}
-                    onChange={(newValue) => setSelectedDate(newValue)}
+        <Dialog 
+          open={open} onClose={handleClose}
+          PaperProps={{
+            style: {
+              width: 'auto',
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              padding: '0px',
+              backgroundColor: 'transparent',
+              boxShadow: 'none',
+            },
+          }}
+        >
+          <form onSubmit={handleSubmit(submission)} className='update-appointment-form'>
+            <div className="outerUpdateAppointment">
+              <Tooltip title='Close' arrow>
+                <button className="close-modal" onClick={handleClose}>
+                  <CloseRoundedIcon
+                    sx={{
+                      color: '#f5f5f5',
+                      fontSize: 28,
+                      padding: '2px',
+                      backgroundColor: '#0c0c0c',
+                      borderRadius: '50%',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                    }}
                   />
+                </button>
+              </Tooltip>
 
-                  <FixTime 
-                    onSelect={handleTimeSelect}
-                    disabledSlots={disabledSlots}
-                    value={selectedTime}
+              <div className='update-dialog-container'>
+                <div className='update-dialog-title-container'>
+                  <p>Update Appointment</p>
+                </div>
+
+                <div className='update-dialog-input-container'>
+                  <div className="update-appointment-image">
+                    <div className="current-image">
+                      <img 
+                        src={getFullImageUrl(image)} 
+                        alt="Appointment" />
+                    </div>
+
+                    <UploadBox 
+                      onImageSelect={(file) => setSelectedImage(file)}
+                      resetTrigger={resetUploadBox}
+                    />
+                  </div>
+
+
+                  <div className="update-dialog-time-date-container">
+                    {/* New Date */}
+                    <DatePickerComponent
+                      name='date'
+                      value={selectedDate}
+                      onChange={(newValue) => setSelectedDate(newValue)}
+                    />
+
+                    <FixTime 
+                      onSelect={handleTimeSelect}
+                      disabledSlots={disabledSlots}
+                      value={selectedTime}
+                      control={control}
+                      name={'time'}
+                    />
+                  </div>
+
+                  <NormalTextField 
+                    label='Description'
+                    name={'updatedAppointmentDescription'}
                     control={control}
-                    name={'time'}
+                    classes='appointment-description'
+                    placeHolder='Appointment description'
                   />
                 </div>
-                {/* New Facebook link */}
-                <NormalTextField 
-                  label='Facebook Link'
-                  name={'updatedFacebookLink'}
-                  control={control}
-                  classes='facebook-link'
-                  placeHolder='Facebook link'
-                />
-                {/* New Facebook link */}
-                <NormalTextField 
-                  label='Address'
-                  name={'updatedAddress'}
-                  control={control}
-                  classes='address'
-                  placeHolder='Address'
-                />
-                {/* New Appointment description */}
-                <NormalTextField 
-                  label='Description'
-                  name={'updatedAppointmentDescription'}
-                  control={control}
-                  classes='appointment-description'
-                  placeHolder='Appointment description'
-                />
-                <input
-                  type="file"
-                  name="image"
-                  accept="image/*"
-                  ref={(ref) => fileInputRef = ref}
-                  onChange={(e) => setSelectedImage(e.target.files[0])}
-                />
-              </div>
 
-              <div className="update-dialog-button-container">
-                <ButtonElement
-                  label='Close'
-                  variant='filled-red'
-                  type={'button'}
-                  onClick={handleClose}
-                />
-
-                <ButtonElement
-                  label='Save'
-                  variant='filled-green'
-                  type={'submit'}
-                />
+                <div className="update-dialog-button-container">
+                  <ButtonElement
+                    label='Save'
+                    variant='filled-black'
+                    type={'submit'}
+                  />
+                </div>  
               </div>
             </div>
           </form>

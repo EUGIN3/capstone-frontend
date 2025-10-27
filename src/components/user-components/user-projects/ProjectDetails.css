@@ -11,7 +11,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 20px;
+  gap: 50px;
   font-family: "Libre Franklin", sans-serif;
   position: relative;
   transition: box-shadow 0.2s ease-in-out;
@@ -79,7 +79,6 @@
   font-weight: 600;
   letter-spacing: 0.5px;
   line-height: 5px;
-  font-style: italic;
 }
 
 .ProjectDetails .info-text {
@@ -94,18 +93,18 @@
 .ProjectDetails .info-text:hover {
   transform: translateX(5px);
 } 
-/* 
+
 .ProjectDetails .balance-text {
-  color: #e53935; 
+  color: #e53935; /* red tone for visibility */
 }
 
 .ProjectDetails .paid-text {
-  color: #43a047; 
+  color: #43a047; /* green tone for visibility */
 }
 
 .ProjectDetails .total-amount {
-  color: #1565c0; 
-} */
+  color: #1565c0; /* blue tone for visibility */
+}
 
 .ProjectDetails a {
   color: #1565c0;

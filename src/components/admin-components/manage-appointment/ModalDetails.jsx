@@ -6,6 +6,10 @@ import ButtonElement from '../../forms/button/ButtonElement';
 import StatusDropdown from './StatusDropDown';
 import AxiosInstance from '../../API/AxiosInstance';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import noImage from '../../../assets/no-image.jpg'
+
+import { Tooltip } from '@mui/material';
+
 
 const ModalDetails = (props) => {
   const {
@@ -170,23 +174,22 @@ const ModalDetails = (props) => {
 
     <div className="outerModal">
       <div className='modalDetails'>
-        <button className="close-modal" onClick={onClose}>
-          <CloseRoundedIcon
-            sx={{
-              color: '#0c0c0c',
-              fontSize: 28,
-              padding: '2px',
-              backgroundColor: '#f5f5f5',
-              borderRadius: '50%',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease', 
-              '&:hover': {
+        
+        <Tooltip title='Close' arrow>
+          <button className="close-modal" onClick={onClose}>
+            <CloseRoundedIcon
+              sx={{
                 color: '#f5f5f5',
+                fontSize: 28,
+                padding: '2px',
                 backgroundColor: '#0c0c0c',
-              },
-            }}
-          />
-        </button>
+                borderRadius: '50%',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+              }}
+              />
+          </button>
+        </Tooltip>
 
         <div className="title">
           Appointment Details 
@@ -194,16 +197,14 @@ const ModalDetails = (props) => {
 
         <div className="modalDetailsTop">
           <div className="image-section">
-            {image && (
-              <div className="modalDetails-image">
-                <img
-                  src={image}
-                  alt="Appointment"
-                  className="modalDetails-preview"
-                  onClick={handleImageClick}
-                />
-              </div>
-            )}
+            <div className="modalDetails-image">
+              <img
+                src={image ? image : noImage }
+                alt="Appointment"
+                className="modalDetails-preview"
+                onClick={handleImageClick}
+              />
+            </div>
           </div>
 
           <div className="info-section">

@@ -9,8 +9,17 @@ import { useForm } from 'react-hook-form';
 import AxiosInstance from '../../../API/AxiosInstance';
 import CircularProgress from '@mui/material/CircularProgress';
 
+import { Tooltip } from '@mui/material';
+
 function ProjectModal({ onClose, appointment }) {
-  const { control, handleSubmit, reset } = useForm();
+  // ✅ Set default form values here
+  const { control, handleSubmit, reset } = useForm({
+    defaultValues: {
+      process_status: 'designing',
+      payment_status: 'no_payment',
+    },
+  });
+
   const [targetDate, setTargetDate] = useState(null);
   const [referenceImage, setReferenceImage] = useState(null);
 
@@ -34,12 +43,11 @@ function ProjectModal({ onClose, appointment }) {
   };
 
   const handleUpdateStatus = async (appointment_id) => {
-      await AxiosInstance.patch(`appointment/appointments/${appointment_id}/`, {
-        appointment_status: 'done',
-      });
-  }
+    await AxiosInstance.patch(`appointment/appointments/${appointment_id}/`, {
+      appointment_status: 'done',
+    });
+  };
 
-  // ✅ Save handler
   const handleSave = async (data) => {
     if (!targetDate) {
       alert('Please select a target date.');
@@ -47,12 +55,12 @@ function ProjectModal({ onClose, appointment }) {
     }
 
     try {
-      // Prepare the payload
       const formData = new FormData();
       formData.append('attire_type', data.attire_type || '');
       formData.append('targeted_date', targetDate.toISOString().split('T')[0]);
-      formData.append('process_status', data.process_status || '');
-      formData.append('payment_status', data.payment_status || '');
+      formData.append('process_status', data.process_status || 'designing'); // ✅ default fallback
+      formData.append('total_amount', data.total_amount || '');
+      formData.append('payment_status', data.payment_status || 'no_payment'); // ✅ default fallback
       formData.append('amount_paid', data.amount_paid || '');
       formData.append('description', data.description || '');
       formData.append('user', appointment.user);
@@ -62,45 +70,41 @@ function ProjectModal({ onClose, appointment }) {
         formData.append('reference_image', referenceImage);
       }
 
-      // ✅ POST request
       await AxiosInstance.post('design/designs/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      handleUpdateStatus(appointment.id)
+      await handleUpdateStatus(appointment.id);
 
       alert('✅ Project created successfully!');
-      reset();
+      reset(); // resets with defaults again
       onClose();
     } catch (error) {
       console.error('Failed to create project:', error);
       alert('❌ Failed to create project. Please try again.');
-    } 
+    }
   };
 
   return (
     <div className="projectOuterModal">
       <div className="createProjectModal">
         {/* Close Button */}
-        <button className="close-modal" onClick={onClose}>
-          <CloseRoundedIcon
-            sx={{
-              color: '#0c0c0c',
-              fontSize: 28,
-              padding: '2px',
-              backgroundColor: '#f5f5f5',
-              borderRadius: '50%',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              '&:hover': {
+        <Tooltip title='Close' arrow>
+          <button className="close-modal" onClick={onClose}>
+            <CloseRoundedIcon
+              sx={{
                 color: '#f5f5f5',
+                fontSize: 28,
+                padding: '2px',
                 backgroundColor: '#0c0c0c',
-              },
-            }}
-          />
-        </button>
+                borderRadius: '50%',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+              }}
+            />
+          </button>
+        </Tooltip>
 
-        {/* Modal Content */}
         <div className="project-modal-body">
           <div className="project-title">Create Project</div>
           <div className="project-user">
@@ -127,6 +131,7 @@ function ProjectModal({ onClose, appointment }) {
             </div>
 
             <div className="progress-status-container project-container">
+              {/* ✅ Default process_status = designing */}
               <DropdownComponentTime
                 items={processStatusItems}
                 dropDownLabel="Process Status"
@@ -136,9 +141,19 @@ function ProjectModal({ onClose, appointment }) {
             </div>
           </div>
 
+          <div className="total-container project-container">
+            <NormalTextField
+              label="Attire Total Cost"
+              name="total_amount"
+              control={control}
+              placeHolder="Enter Total Cost"
+            />
+          </div>
+
           {/* Payment Section */}
           <div className="payment-container">
             <div className="payment-status-container project-container">
+              {/* ✅ Default payment_status = no_payment */}
               <DropdownComponentTime
                 items={paymentStatusItems}
                 dropDownLabel="Payment Status"
@@ -172,7 +187,7 @@ function ProjectModal({ onClose, appointment }) {
           {/* Save Button */}
           <div className="save-container">
             <ButtonElement
-              label='Save'
+              label="Save"
               variant="filled-black"
               type="button"
               onClick={handleSubmit(handleSave)}

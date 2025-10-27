@@ -1,7 +1,8 @@
-import './ImageUpload.css'
+import './SmallImageUpload.css'
 import React, { useState, useRef, useEffect } from "react";
+import {Tooltip} from '@mui/material';
 
-export default function UploadBox({ onImageSelect, resetTrigger }) {
+export default function SmallImageUpload({ onImageSelect, resetTrigger }) {
   const [preview, setPreview] = useState(null);
   const dropAreaRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -22,18 +23,25 @@ export default function UploadBox({ onImageSelect, resetTrigger }) {
   };
 
   const onBrowse = () => fileInputRef.current.click();
+
   const onFileChange = (e) => handleFile(e.target.files[0]);
+
   const onDragOver = (e) => {
     e.preventDefault();
     dropAreaRef.current.classList.add("active");
   };
-  const onDragLeave = () => dropAreaRef.current.classList.remove("active");
+
+  const onDragLeave = () => {
+    dropAreaRef.current.classList.remove("active");
+  };
+
   const onDrop = (e) => {
     e.preventDefault();
     dropAreaRef.current.classList.remove("active");
     handleFile(e.dataTransfer.files[0]);
   };
 
+  // ✅ Reset preview when parent triggers reset
   useEffect(() => {
     if (resetTrigger) {
       setPreview(null);
@@ -42,30 +50,31 @@ export default function UploadBox({ onImageSelect, resetTrigger }) {
   }, [resetTrigger]);
 
   return (
-    <div
-      className="drag-area"
-      ref={dropAreaRef}
-      onDragOver={onDragOver}
-      onDragLeave={onDragLeave}
-      onDrop={onDrop}
-    >
-      {preview ? (
-        <img src={preview} alt="preview" />
-      ) : (
-        <>
-          <div className="icon">📁</div>
-          <header>Drag & Drop to Upload File</header>
-          <span>OR</span>
-          <button onClick={onBrowse} type="button">Browse File</button>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={onFileChange}
-            hidden
-            accept="image/*"
-          />
-        </>
-      )}
-    </div>
+    <Tooltip title='Browse' arrow>
+        <div
+            className="drag-area"
+            ref={dropAreaRef}
+            onDragOver={onDragOver}
+            onDragLeave={onDragLeave}
+            onDrop={onDrop}
+            onClick={onBrowse}
+            >
+            {preview ? (
+                <img src={preview} alt="preview" />
+            ) : (
+                <>
+                <div className="icon">📁</div>
+                <header>Drag & Drop to Upload File</header>
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={onFileChange}
+                    hidden
+                    accept="image/*"
+                />
+                </>
+            )}
+        </div>
+    </Tooltip>
   );
 }

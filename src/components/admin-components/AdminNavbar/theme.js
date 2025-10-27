@@ -25,10 +25,10 @@ const mainTheme = createTheme({
       MuiDrawer: {
         styleOverrides: {
           paper: {
-            backgroundColor: '#0C0C0C', // Only affects sidebar
-            color: '#F5F5F5', // Text inside sidebar
+            backgroundColor: '#ee2424ff', // Only affects sidebar
+            color: '#ce0d0dff', // Text inside sidebar
             scrollbarWidth: 'thin',              // For Firefox
-            scrollbarColor: '#555 #0C0C0C', 
+            scrollbarColor: '#ff0000ff #ec1818ff', 
           },
         },
       },
@@ -39,25 +39,10 @@ const mainTheme = createTheme({
           },
         },
       },
-      MuiIconButton: {
-        styleOverrides: {
-          root: {
-            color: '#F5F5F5', // Color of the burger icon.
-          },
-        },
-      },
       MuiListItemText: {
       styleOverrides: {
         primary: {
           fontSize: '14px', // Sidebar (navigation bar) font size.
-          color: '#F5F5F5',
-        },
-      },
-    },
-    MuiSvgIcon: {
-      styleOverrides: {
-        root: {
-          color: '#0C0C0C', // make all icons white
         },
       },
     },

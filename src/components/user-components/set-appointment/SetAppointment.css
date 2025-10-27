@@ -54,3 +54,11 @@
   border-color: #11B364;
   background-color: #d5f8e4;
 }
+
+.set-appointment-image-con {
+  height: 500px;          /* Or min-height if you want it flexible */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
