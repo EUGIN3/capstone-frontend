@@ -9,6 +9,8 @@ import { useForm } from 'react-hook-form';
 import AxiosInstance from '../../../API/AxiosInstance';
 import CircularProgress from '@mui/material/CircularProgress';
 
+import useNotificationCreator from '../../../notification/UseNotificationCreator';
+
 import { Tooltip } from '@mui/material';
 
 function ProjectModal({ onClose, appointment }) {
@@ -16,12 +18,12 @@ function ProjectModal({ onClose, appointment }) {
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       process_status: 'designing',
-      payment_status: 'no_payment',
     },
   });
 
   const [targetDate, setTargetDate] = useState(null);
   const [referenceImage, setReferenceImage] = useState(null);
+  const { sendDefaultNotification } = useNotificationCreator();
 
   // Dropdown options
   const processStatusItems = [
@@ -31,12 +33,6 @@ function ProjectModal({ onClose, appointment }) {
     { value: 'done', label: 'Done' },
   ];
 
-  const paymentStatusItems = [
-    { value: 'no_payment', label: 'No Payment' },
-    { value: 'partial_payment', label: 'Partial Payment' },
-    { value: 'fully_paid', label: 'Fully Paid' },
-  ];
-
   // Handle image change
   const handleImageChange = (e) => {
     setReferenceImage(e.target.files[0]);
@@ -44,7 +40,7 @@ function ProjectModal({ onClose, appointment }) {
 
   const handleUpdateStatus = async (appointment_id) => {
     await AxiosInstance.patch(`appointment/appointments/${appointment_id}/`, {
-      appointment_status: 'done',
+      appointment_status: 'archived',
     });
   };
 
@@ -77,7 +73,9 @@ function ProjectModal({ onClose, appointment }) {
       await handleUpdateStatus(appointment.id);
 
       alert('✅ Project created successfully!');
+
       reset(); // resets with defaults again
+      sendDefaultNotification('project_created', appointment.user)
       onClose();
     } catch (error) {
       console.error('Failed to create project:', error);
@@ -152,16 +150,6 @@ function ProjectModal({ onClose, appointment }) {
 
           {/* Payment Section */}
           <div className="payment-container">
-            <div className="payment-status-container project-container">
-              {/* ✅ Default payment_status = no_payment */}
-              <DropdownComponentTime
-                items={paymentStatusItems}
-                dropDownLabel="Payment Status"
-                name="payment_status"
-                control={control}
-              />
-            </div>
-
             <div className="amount-paid-container project-container">
               <NormalTextField
                 label="Amount Paid"

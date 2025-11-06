@@ -28,7 +28,7 @@ export default function OnGoingProjectsTable() {
 
 
   const columns = [
-    { id: 'user', label: 'UserName', minWidth: 150, align: 'center' },
+    { id: 'user', label: 'UserName', minWidth: 150, align: 'left' },
     { id: 'attire_type', label: 'Attire Type', minWidth: 150, align: 'center' },
     { id: 'targeted_date', label: 'Target Date', minWidth: 150, align: 'center' },
     { id: 'process_status', label: 'Status', minWidth: 150, align: 'center' },
@@ -188,15 +188,19 @@ export default function OnGoingProjectsTable() {
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((project) => (
                     <TableRow hover key={project.id} className="ongoing-projects-row">
-                      <TableCell align="center">
+                      <TableCell align="left" sx={{textTransform:'capitalize'}}>
                         {project.userInfo
                           ? `${project.userInfo.first_name || ''} ${project.userInfo.last_name || ''}`.trim()
                           : '—'}
                       </TableCell>
-                      <TableCell align="center">{project.attire_type || '—'}</TableCell>
+                      <TableCell align="center" sx={{textTransform:'capitalize'}}>{project.attire_type || '—'}</TableCell>
                       <TableCell align="center">{formatDate(project.targeted_date)}</TableCell>
-                      <TableCell align="center">{project.process_status || '—'}</TableCell>
-                      <TableCell align="center">{project.payment_status || '—'}</TableCell>
+                      <TableCell align="center" sx={{textTransform:'capitalize'}}>{project.process_status || '—'}</TableCell>
+                      <TableCell align="center">
+                        {project.payment_status
+                          ? project.payment_status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+                          : '—'}
+                      </TableCell>
                       <TableCell align="center">{project.balance || '—'}</TableCell>
                       <TableCell align="center">
                         <button

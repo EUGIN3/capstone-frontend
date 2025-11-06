@@ -22,8 +22,10 @@ import AxiosInstance from '../../API/AxiosInstance'
 import { ToastContainer, toast, Slide } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css"
 
-function SetAppointment() {
+import useNotificationCreator from "../../notification/UseNotificationCreator";
 
+function SetAppointment() {
+  const { sendDefaultNotification } = useNotificationCreator();
   const [availabilityData, setAvailabilityData] = useState({});
   const [disabledSlots, setDisabledSlots] = useState({});
   const [fullyUnavailableDates, setFullyUnavailableDates] = useState([]);
@@ -179,12 +181,13 @@ function SetAppointment() {
             closeButton: false,
         }
     );
-      reset();
-      setSelectedTime('');
-      fetchAllUnavailableDates();
-      setDescription('');
-      setSelectedImage(null);
-      setResetUploadBox(prev => !prev);
+    reset();
+    setSelectedTime('');
+    fetchAllUnavailableDates();
+    setDescription('');
+    setSelectedImage(null);
+    setResetUploadBox(prev => !prev);
+    sendDefaultNotification("appointment_created");
     })
     .catch((error) => {
       toast.error(

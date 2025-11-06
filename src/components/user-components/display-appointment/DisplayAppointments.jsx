@@ -28,7 +28,7 @@ function DisplayAppointments() {
   const listAppointments = () => {
     AxiosInstance.get(`appointment/user_appointments/`, {})
     .then((response) => {
-      const reversedList = response.data.slice().reverse();
+      const reversedList = response.data.slice();
       setUserAppointments(reversedList);
     }) 
   }
@@ -38,25 +38,6 @@ function DisplayAppointments() {
       prevAppointments.map((appointment) =>
         appointment.id === updatedAppointment.id ? updatedAppointment : appointment
       )
-    );
-
-
-    toast.success(
-        <div style={{ padding: '8px' }}>
-          The appointment is successfully updated!
-        </div>, 
-        {
-            position: "top-center",
-            autoClose: 3000,
-            hideProgressBar: true,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-            transition: Slide,
-            closeButton: false,
-        }
     );
   };
   
@@ -68,8 +49,9 @@ function DisplayAppointments() {
       )
       
       .map((app) => (
-        (app.appointment_status === 'done'? null :
-            <Appointment
+        (app.appointment_status === 'archived' ? null :
+
+          <Appointment
             key={app.id}
             id={app.id}
             date={app.date}

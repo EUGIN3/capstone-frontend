@@ -123,7 +123,7 @@ export default function AppointmentTable() {
   const filteredRows = rows.filter((appointment) => {
     const status = appointment.appointment_status?.toLowerCase();
 
-    if (status === 'approved' || status === 'done') return false;
+    if (status === 'approved' || status === 'archived') return false;
 
     const matchesSearch = Object.values(appointment)
       .join(' ')

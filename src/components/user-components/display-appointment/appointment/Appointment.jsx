@@ -1,6 +1,6 @@
 import './Appointment.css'
 
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as yup from "yup";
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -16,19 +16,19 @@ import FixTime from '../../../forms/fixtime/FixTime';
 import CancelTwoToneIcon from '@mui/icons-material/CancelTwoTone';
 import UploadBox from '../../../forms/upload-file/ImageUpload';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import noImage from '../../../../assets/no-image.jpg'
+import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 
 import { Tooltip } from '@mui/material';
 
 function Appointment(props) {
-  const { date, time, status, id, onUpdate, facebookLink, adress, description, image} = props  
+  const { date, time, status, id, onUpdate, facebookLink, adress, description, image } = props;
   const [open, setOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [selectedTime, setSelectedTime] = useState('');
-
-  const [ availabilityData, setAvailabilityData ] = useState({})
-  const [ disabledSlots, setDisabledSlots ] = useState({});
+  const [availabilityData, setAvailabilityData] = useState({});
+  const [disabledSlots, setDisabledSlots] = useState({});
   const [resetUploadBox, setResetUploadBox] = useState(false);
 
   const getFullImageUrl = (image) => {
@@ -37,8 +37,7 @@ function Appointment(props) {
   };
 
   const handleClickOpen = () => {
-    
-    console.log(image)
+    console.log(image);
     setOpen(true);
   };
 
@@ -57,10 +56,6 @@ function Appointment(props) {
 
   const handleClose = () => {
     setOpen(false);
-
-    reset();
-    setSelectedTime('');
-    setSelectedDate(dayjs(date))
   };
 
   const getAvailability = (date) => {
@@ -91,18 +86,29 @@ function Appointment(props) {
 
   const handleCancel = () => {
     AxiosInstance.patch(`appointment/user_appointments/${id}/`, {
-      appointment_status : "cancelled"
+      appointment_status: "cancelled"
     })
-    .then((response) => {
-      if (onUpdate) onUpdate(response.data);
+      .then((response) => {
+        if (onUpdate) onUpdate(response.data);
+      })
+      .catch((error) => {
+        console.error('Failed to cancel appointment:', error);
+      });
+  };
+
+  const handleDelete = () => {
+    AxiosInstance.patch(`appointment/user_appointments/${id}/`, {
+      appointment_status: "archived"
     })
-    .catch((error) => {
-      console.error('Failed to cancel appointment:', error);
-    });
+      .then((response) => {
+        if (onUpdate) onUpdate(response.data); // trigger UI update
+      })
+      .catch((error) => {
+        console.error('Failed to delete appointment:', error);
+      });
   };
 
   const { handleSubmit, control, reset } = useForm();
-
 
   const submission = (data) => {
     const formData = new FormData();
@@ -119,145 +125,165 @@ function Appointment(props) {
         'Content-Type': 'multipart/form-data',
       }
     })
-    .then((response) => {
-      handleClose();
-      if (onUpdate) onUpdate(response.data); 
+      .then((response) => {
+        handleClose();
+        if (onUpdate) onUpdate(response.data);
 
-      reset();
-      setSelectedTime('');
-      setSelectedDate(dayjs(date))
+        reset();
+        setSelectedTime('');
+        setSelectedDate(dayjs(date));
 
-      setSelectedImage(null);
-      setResetUploadBox(prev => !prev);
-    })
+        setSelectedImage(null);
+        setResetUploadBox(prev => !prev);
+      });
   };
 
   const handleTimeSelect = (time) => {
     setSelectedTime(time);
   };
 
+  // ✅ Format the date to "October 07, 2025"
+  const formattedDate = dayjs(date).format('MMMM DD, YYYY');
+
   return (
     <div className={`appointment-box ${status}`}>
-        <Dialog 
-          open={open} onClose={handleClose}
-          PaperProps={{
-            style: {
-              width: 'auto',
-              maxWidth: '90vw',
-              maxHeight: '90vh',
-              padding: '0px',
-              backgroundColor: 'transparent',
-              boxShadow: 'none',
-            },
-          }}
-        >
-          <form onSubmit={handleSubmit(submission)} className='update-appointment-form'>
-            <div className="outerUpdateAppointment">
-              <Tooltip title='Close' arrow>
-                <button className="close-modal" onClick={handleClose}>
-                  <CloseRoundedIcon
-                    sx={{
-                      color: '#f5f5f5',
-                      fontSize: 28,
-                      padding: '2px',
-                      backgroundColor: '#0c0c0c',
-                      borderRadius: '50%',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                    }}
-                  />
-                </button>
-              </Tooltip>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        PaperProps={{
+          style: {
+            width: 'auto',
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            padding: '0px',
+            backgroundColor: 'transparent',
+            boxShadow: 'none',
+          },
+        }}
+      >
+        <form onSubmit={handleSubmit(submission)} className='update-appointment-form'>
+          <div className="outerUpdateAppointment">
+            <Tooltip title='Close' arrow>
+              <button className="close-modal" onClick={handleClose}>
+                <CloseRoundedIcon
+                  sx={{
+                    color: '#f5f5f5',
+                    fontSize: 28,
+                    padding: '2px',
+                    backgroundColor: '#0c0c0c',
+                    borderRadius: '50%',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                  }}
+                />
+              </button>
+            </Tooltip>
 
-              <div className='update-dialog-container'>
-                <div className='update-dialog-title-container'>
-                  <p>Update Appointment</p>
+            <div className='update-dialog-container'>
+              <div className='update-dialog-title-container'>
+                <p>Update Appointment</p>
+              </div>
+
+              <div className='update-dialog-input-container'>
+                <div className="update-appointment-image">
+                  <div className="current-image">
+                    <img
+                      src={
+                        image === null ? noImage :
+                          getFullImageUrl(image)
+                      }
+                      alt="Appointment"
+                    />
+                  </div>
+
+                  <UploadBox
+                    onImageSelect={(file) => setSelectedImage(file)}
+                    resetTrigger={resetUploadBox}
+                  />
                 </div>
 
-                <div className='update-dialog-input-container'>
-                  <div className="update-appointment-image">
-                    <div className="current-image">
-                      <img 
-                        src={getFullImageUrl(image)} 
-                        alt="Appointment" />
-                    </div>
+                <div className="update-dialog-time-date-container">
+                  <DatePickerComponent
+                    name='date'
+                    value={selectedDate}
+                    onChange={(newValue) => setSelectedDate(newValue)}
+                  />
 
-                    <UploadBox 
-                      onImageSelect={(file) => setSelectedImage(file)}
-                      resetTrigger={resetUploadBox}
-                    />
-                  </div>
-
-
-                  <div className="update-dialog-time-date-container">
-                    {/* New Date */}
-                    <DatePickerComponent
-                      name='date'
-                      value={selectedDate}
-                      onChange={(newValue) => setSelectedDate(newValue)}
-                    />
-
-                    <FixTime 
-                      onSelect={handleTimeSelect}
-                      disabledSlots={disabledSlots}
-                      value={selectedTime}
-                      control={control}
-                      name={'time'}
-                    />
-                  </div>
-
-                  <NormalTextField 
-                    label='Description'
-                    name={'updatedAppointmentDescription'}
+                  <FixTime
+                    onSelect={handleTimeSelect}
+                    disabledSlots={disabledSlots}
+                    value={selectedTime}
                     control={control}
-                    classes='appointment-description'
-                    placeHolder='Appointment description'
+                    name={'time'}
                   />
                 </div>
 
-                <div className="update-dialog-button-container">
-                  <ButtonElement
-                    label='Save'
-                    variant='filled-black'
-                    type={'submit'}
-                  />
-                </div>  
+                <NormalTextField
+                  label='Description'
+                  name={'updatedAppointmentDescription'}
+                  control={control}
+                  classes='appointment-description'
+                  placeHolder='Appointment description'
+                />
+              </div>
+
+              <div className="update-dialog-button-container">
+                <ButtonElement
+                  label='Save'
+                  variant='filled-black'
+                  type={'submit'}
+                />
               </div>
             </div>
-          </form>
-        </Dialog> 
-
-        <div className="information-container">
-            <div className="appointment-date">
-              <p>{date}</p>
-            </div>
-            <div className="appointment-time">
-              <p>{time}</p>
-            </div>
-        </div>
-
-        {status === 'pending' && (
-          <div className="appointment-button-container">
-            <div className="edit-icon" onClick={handleClickOpen}>
-              <EditTwoToneIcon />
-            </div>
-            <div className="cancel-icon" onClick={handleCancel}>
-              <CancelTwoToneIcon />
-            </div>
           </div>
-        )}
+        </form>
+      </Dialog>
 
-        {
-          status === 'cancelled' && <p className='status-text'>Cancelled</p> 
-          ||
-          status === 'denied' && <p className='status-text'>Denied</p>
-          ||
-          status === 'approved' && <p className='status-text'>Approved</p>
-          ||
-          status === 'pending' && <p className='status-text'>Pending</p>
-        }
+      <div className="information-container">
+        <div className="appointment-date">
+          <p>{formattedDate}</p>
+        </div>
+        <div className="appointment-time">
+          <p>{time}</p>
+        </div>
+      </div>
+
+      {status === 'pending' && (
+        <div className="appointment-button-container">
+          <div className="edit-icon" onClick={handleClickOpen}>
+            <Tooltip title='Edit' arrow placement='left'>
+              <EditTwoToneIcon />
+            </Tooltip>
+          </div>
+          <div className="cancel-icon" onClick={handleCancel}>
+            <Tooltip title='Cancel' arrow placement='left'>
+              <CancelTwoToneIcon />
+            </Tooltip>
+          </div>
+        </div>
+      )}
+
+      {status === 'cancelled' || status === 'denied' && (
+        <div className="appointment-button-container">
+          <div className="edit-icon" onClick={handleDelete}>
+            <Tooltip title='Delete' arrow placement='left'>
+              <DeleteTwoToneIcon />
+            </Tooltip>
+          </div>
+        </div>
+      )}
+
+      {
+        status === 'cancelled' && <p className='status-text'>Cancelled</p>
+        ||
+        status === 'denied' && <p className='status-text'>Denied</p>
+        ||
+        status === 'approved' && <p className='status-text'>Approved</p>
+        ||
+        status === 'pending' && <p className='status-text'>Pending</p>
+      }
     </div>
-  )
+  );
 }
 
-export default Appointment
+export default Appointment;

@@ -64,12 +64,6 @@ const useNavigation = () => {
         <div className='adminSideIcon'>
           <PeopleTwoToneIcon />
         </div> },
-
-    { segment: 'admin/manage-designs', title: 'Designs', 
-      icon: 
-        <div className='adminSideIcon'>
-          <PeopleTwoToneIcon />
-        </div> },
   ];
 };
 

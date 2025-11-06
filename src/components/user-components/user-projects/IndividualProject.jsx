@@ -3,37 +3,104 @@ import './IndividualProject.css';
 import noImage from '../../../assets/no-image.jpg';
 import KeyboardArrowDownTwoToneIcon from '@mui/icons-material/KeyboardArrowDownTwoTone';
 import KeyboardArrowUpTwoToneIcon from '@mui/icons-material/KeyboardArrowUpTwoTone';
+import InsertPhotoTwoToneIcon from '@mui/icons-material/InsertPhotoTwoTone';
+
+import { Tooltip } from '@mui/material';
 
 function IndividualProject({ project }) {
   const [openIndex, setOpenIndex] = useState(false);
   const [showUpdates, setShowUpdates] = useState(false);
-
   const toggleOpen = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
+
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL || "";
+  const [fullscreenImage, setFullscreenImage] = useState(null);
+  const handleImageClick = (imagePath) => {
+    if (imagePath) {
+      setFullscreenImage(`${BASE_URL}${imagePath}`);
+    } else {
+      setFullscreenImage(noImage);
+    }
+  };
+  const handleCloseFullscreen = () => {
+    setFullscreenImage(null);
+  };
+
+  const [fullscreenImageApp, setFullscreenImageApp] = useState(null);
+  const handleImageClickApp = (imagePathApp) => {
+    if (imagePathApp) {
+      setFullscreenImageApp(`${imagePathApp}`);
+    } else {
+      setFullscreenImageApp(noImage);
+    }
+  };
+  const handleCloseFullscreenApp = () => {
+    setFullscreenImageApp(null);
+  };
+
+  // Label Mappings
+  const processStatusLabels = {
+    designing: 'Designing',
+    materializing: 'Materializing',
+    ready: 'Ready',
+    done: 'Done',
+  };
+
+  const paymentStatusLabels = {
+    no_payment: 'No Payment',
+    partial_payment: 'Partial Payment',
+    fully_paid: 'Fully Paid',
+  };
+
+  // Helper Functions
+  const formatDate = (date) =>
+    new Date(date)
+      .toLocaleString('en-US', {
+        month: 'short',
+        day: '2-digit',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      })
+      .toUpperCase();
+
+  const formatCurrency = (value) =>
+    `₱ ${new Intl.NumberFormat('en-PH', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value)}`;
 
   return (
     <div className="IndividualProject">
       {project && project.length > 0 ? (
         project.map((item, index) => (
-          <div
-            className="indi-container-main"
-            key={index}
-          >
+          <div className="indi-container-main" key={index}>
+            {fullscreenImageApp && (
+              <div className="image-fullscreen-overlay" onClick={handleCloseFullscreenApp}>
+                <img
+                  src={fullscreenImageApp}
+                  alt="Full appointment"
+                  className="image-fullscreen"
+                />
+              </div>
+            )}
             <div className="indi-colapse-container">
               <div className="indi-left-section">
-                <div className="indi-image-container">
-                  <img src={noImage} alt={item.attire_type} />
-                </div>
-
+                <Tooltip title='View' arrow>
+                  <div className="indi-image-container">
+                    <img
+                        src={item.appointment?.image || noImage}
+                        alt={item.attire_type}
+                        onClick={() => handleImageClickApp(item.appointment.image)}
+                    />
+                  </div>
+                </Tooltip>
+              
                 <div className="indi-details-sections">
                   <div className="indi-last-update">
-                    <p className="indi-time-date">
-                      {new Date(item.updated_at).toLocaleString('en-US', {
-                        dateStyle: 'medium',
-                        timeStyle: 'short',
-                      })}
-                    </p>
+                    <p className="indi-time-date">{formatDate(item.updated_at)}</p>
                   </div>
 
                   <div className="attire-type-container">
@@ -43,10 +110,13 @@ function IndividualProject({ project }) {
               </div>
 
               <div className="view-details-container">
-                <p className="indi-view" onClick={(e) => {
-                  e.stopPropagation(); 
-                  toggleOpen(index);
-                }}>
+                <p
+                  className="indi-view"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleOpen(index);
+                  }}
+                >
                   View
                   {openIndex === index ? (
                     <KeyboardArrowUpTwoToneIcon sx={{ fontSize: 20 }} />
@@ -57,55 +127,66 @@ function IndividualProject({ project }) {
               </div>
             </div>
 
-            {openIndex === index && (
+            <div
+              className={`indi-details-wrapper ${
+                openIndex === index ? 'open' : 'closed'
+              }`}
+            >
               <div className="indi-details">
                 <div className="indi-hr-container">
                   <hr />
                 </div>
 
                 <div className="indi-informtaion">
-                  <p className='label'>Information:</p>
+                  <p className="label">Information:</p>
+
                   <div className="indi-information-top">
                     <div className="indi-sttire-type">
                       <span>Attire:</span>
-                      <p>{item.process_status}</p>
+                      <p>{item.attire_type}</p>
                     </div>
 
                     <div className="indi-status">
                       <span>Status:</span>
-                      <p>{item.process_status}</p>
+                      <p>
+                        {processStatusLabels[item.process_status] ||
+                          item.process_status}
+                      </p>
                     </div>
 
                     <div className="indi-target">
                       <span>Target Date:</span>
-                      <p>{item.targeted_date}</p>
+                      <p>{formatDate(item.targeted_date)}</p>
                     </div>
 
                     <div className="indi-started">
                       <span>Started:</span>
-                      <p>{item.created_at}</p>
+                      <p>{formatDate(item.created_at)}</p>
                     </div>
                   </div>
 
                   <div className="indi-information-bottom">
                     <div className="indi-total">
                       <span>Payment Status:</span>
-                      <p>{item.payment_status}</p>
+                      <p>
+                        {paymentStatusLabels[item.payment_status] ||
+                          item.payment_status}
+                      </p>
                     </div>
 
                     <div className="indi-price">
                       <span>Price:</span>
-                      <p>{item.total_amount}</p>
+                      <p>{formatCurrency(item.total_amount)}</p>
                     </div>
 
                     <div className="indi-paid">
                       <span>Paid:</span>
-                      <p>{item.amount_paid}</p>
+                      <p>{formatCurrency(item.amount_paid)}</p>
                     </div>
 
                     <div className="indi-balance">
                       <span>Balance:</span>
-                      <p>{item.balance}</p>
+                      <p>{formatCurrency(item.balance)}</p>
                     </div>
                   </div>
                 </div>
@@ -115,51 +196,93 @@ function IndividualProject({ project }) {
                 </div>
 
                 <div className="indi-details-container">
-                  <p className='label'>Updates:
-                      { showUpdates ? 
-                        <span 
-                          className='indi-show-update'
-                          onClick={() => setShowUpdates(!showUpdates)}>
-                          Show<KeyboardArrowDownTwoToneIcon sx={{ fontSize: 20 }}/>
-                        </span>
-                        : 
-                        <span 
-                          className='indi-show-update'
-                          onClick={() => setShowUpdates(!showUpdates)}>
-                          Hide<KeyboardArrowUpTwoToneIcon sx={{ fontSize: 20 }}/>
-                        </span>
-                      }
+                  <p className="label">
+                    Updates:
+                    {showUpdates ? (
+                      <span
+                        className="indi-show-update"
+                        onClick={() => setShowUpdates(!showUpdates)}
+                      >
+                        Hide <KeyboardArrowUpTwoToneIcon sx={{ fontSize: 20 }} />
+                      </span>
+                    ) : (
+                      <span
+                        className="indi-show-update"
+                        onClick={() => setShowUpdates(!showUpdates)}
+                      >
+                        Show <KeyboardArrowDownTwoToneIcon sx={{ fontSize: 20 }} />
+                      </span>
+                    )}
                   </p>
+                  
+                  {
+                    showUpdates ?
+                    <div className='indi-update-wrapper'>
+                      {item.updates && item.updates.length > 0 ? (
+                        [...item.updates].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                          .map((update, uIndex) => (
+                          <div className="indi-update-container" key={uIndex}>
+                            {fullscreenImage && (
+                              <div className="image-fullscreen-overlay" onClick={handleCloseFullscreen}>
+                                <img
+                                  src={fullscreenImage}
+                                  alt="Full appointment"
+                                  className="image-fullscreen"
+                                />
+                              </div>
+                            )}
+                            <div className="indi-update-top">
+                              <p className="inid-date-time">
+                                {formatDate(update.timestamp)}
+                              </p>
 
-                  { showUpdates ?
-                    <>
-                      <div className="indi-update-container">
-                        <div className="indi-update-top">
-                          <p className='inid-date-time'>Oct 26, 2025, 11:39 AM</p>
+                              <div className="indi-paid-update">
+                                <p className="indi-paid-label">Amount Paid:</p>
+                                <p className="indi-paid-amount">
+                                  {formatCurrency(update.added_payment)}
+                                </p>
+                              </div>
 
-                          <div className="indi-paid">
-                            <p className="indi-paid-label">Amount Paid:</p>
-                            <p className="indi-paid-amount">₱500.00</p>
+                              <div className="indi-status-update">
+                                <p className="indi-status-label">Status:</p>
+                                <p className="indi-status-note">
+                                  {processStatusLabels[update.process_status] ||
+                                    update.process_status}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="indi-note">
+                              <Tooltip title='View' arrow>
+                                <InsertPhotoTwoToneIcon 
+                                  sx={{
+                                    opacity: .5,
+                                    transition: 'opacity 0.3s ease',
+                                    cursor: 'pointer',
+                                    '&:hover' : {
+                                      opacity: 1,
+                                    }
+                                  }}
+                                  onClick={() => handleImageClick(update.image)}
+                                />
+                                  
+                              </Tooltip>
+                              <span>|</span>
+                              <p className="indi-update-note">{update.message}</p>
+                            </div>
                           </div>
-
-                          <div className="indi-status">
-                            <p className="indi-status-label">Status:</p>
-                            <p className="indi-status-note">designing</p>
-                          </div>
-                        </div>
-
-                        <div className="indi-note">
-                          <p className="indi-update-note">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Velit id commodi nulla. Iste accusantium omnis beatae itaque modi suscipit odio neque corrupti, illum officiis cupiditate, fuga totam, quas eveniet cum.</p>
-                        </div>
-
-                      </div> 
-                    </> 
-                    : 
+                        ))
+                      ) : (
+                        <p className="indi-no-update">No updates yet.</p>
+                      )}
+                    </div> : 
                     null
                   }
+
+
                 </div>
               </div>
-            )}
+            </div>
           </div>
         ))
       ) : (

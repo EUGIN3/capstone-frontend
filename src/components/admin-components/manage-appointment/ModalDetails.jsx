@@ -9,14 +9,15 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import noImage from '../../../assets/no-image.jpg'
 
 import { Tooltip } from '@mui/material';
-
+import useNotificationCreator from '../../notification/UseNotificationCreator';
 
 const ModalDetails = (props) => {
   const {
     firstName, lastName, date, time, description, facebook_link,
     phone_number, email, image, appointment_status, address, created_at,
-    id, onUpdate, onClose, control, updated_at
+    id, onUpdate, onClose, control, updated_at, user
   } = props;
+  const { sendDefaultNotification } = useNotificationCreator();
 
   const [selectedStatus, setSelectedStatus] = useState(appointment_status || '');
   const [isImageFullscreen, setIsImageFullscreen] = useState(false);
@@ -42,9 +43,8 @@ const ModalDetails = (props) => {
   const handleSave = async () => {
     try {
       const newStatus = selectedStatus;
-      const oldStatus = appointment_status; // original status from props
+      const oldStatus = appointment_status;
 
-      // Map display time -> Unavailability slot key (robust to whitespace)
       const slotMap = {
         '7:00 - 8:30 AM': 'slot_one',
         '8:30 - 10:00 AM': 'slot_two',
@@ -53,14 +53,12 @@ const ModalDetails = (props) => {
         '2:30 - 4:00 PM': 'slot_five',
       };
 
-      // helper to find the slot key using normalization
       const findSlotKey = (timeStr) => {
         if (!timeStr) return null;
         const normalized = timeStr.toString().trim().replace(/\s+/g, ' ');
         for (const [label, key] of Object.entries(slotMap)) {
           if (label.replace(/\s+/g, ' ') === normalized) return key;
         }
-        // fallback: try includes (looser match)
         for (const [label, key] of Object.entries(slotMap)) {
           if (normalized.includes(label.split(' ')[0])) return key;
         }
@@ -69,37 +67,57 @@ const ModalDetails = (props) => {
 
       const matchedSlotKey = findSlotKey(time);
 
-      // 1) Update the appointment status on the server first
+      // 1️⃣ Update the appointment status
       const patchRes = await AxiosInstance.patch(`appointment/appointments/${id}/`, {
         appointment_status: newStatus,
       });
-      console.log('Appointment status updated:', patchRes.data);
 
-      // 2) If new status is 'approved' -> deny other same-slot appointments and mark slot unavailable
+      // 2️⃣ Handle notifications per status
+      switch (newStatus) {
+        case 'approved':
+          await sendDefaultNotification('appointment_approved', user);
+          break;
+        case 'denied':
+          await sendDefaultNotification('appointment_denied', user);
+          break;
+        // case 'cancelled':
+        //   await sendDefaultNotification('appointment_cancelled', user);
+        //   break;
+        case 'pending':
+          await sendDefaultNotification('appointment_pending', user);
+          break;
+        default:
+          console.log(`No default notification for status: ${newStatus}`);
+      }
+
+      // 3️⃣ Handle slot and conflicting appointments
       if (newStatus === 'approved') {
-        // Deny other appointments that share same date/time
         try {
           const allAppointmentsRes = await AxiosInstance.get('appointment/appointments/');
+
           const sameSlotAppointments = allAppointmentsRes.data.filter(app =>
-            app.date === date && app.time === time && app.id !== id
+            app.id !== id && 
+            app.appointment_status === 'pending' &&
+            app.date === date &&
+            app.time === time
           );
 
           await Promise.all(
-            sameSlotAppointments.map(app =>
-              AxiosInstance.patch(`appointment/appointments/${app.id}/`, {
+            sameSlotAppointments.map(async (app) => {
+              await AxiosInstance.patch(`appointment/appointments/${app.id}/`, {
                 appointment_status: 'denied',
-              })
-            )
+              });
+              await sendDefaultNotification('appointment_denied', app.user);
+            })
           );
-          console.log(`Denied ${sameSlotAppointments.length} conflicting appointment(s).`);
+
+          // console.log(`Denied ${sameSlotAppointments.length} conflicting appointment(s).`);
         } catch (err) {
           console.error('Error denying conflicting appointments:', err);
         }
 
-        // Mark slot unavailable in Unavailability
         if (matchedSlotKey) {
           try {
-            // GET existing unavailability entry for this date (expect array)
             const availabilityRes = await AxiosInstance.get(`availability/display_unavailability/?date=${date}`);
             const existing = availabilityRes.data && availabilityRes.data[0] ? availabilityRes.data[0] : null;
 
@@ -109,21 +127,16 @@ const ModalDetails = (props) => {
               [matchedSlotKey]: true,
             };
 
-            // Use POST if your backend upserts. If there's a PATCH endpoint for that record, prefer PATCH.
             await AxiosInstance.post('availability/set_unavailability/', updatedUnavailability);
-            console.log(`Marked ${matchedSlotKey} = true for ${date}`);
+            // console.log(`Marked ${matchedSlotKey} = true for ${date}`);
           } catch (err) {
             console.error('Error marking slot unavailable:', err);
           }
-        } else {
-          console.warn('Could not match time to slot key:', time);
         }
       } else {
-        // 3) If status changed from APPROVED -> to something else: free the slot, but only if no other approved appointment occupies it
+        // 4️⃣ Free the slot if status changed from approved to something else
         try {
-          // Only do availability change if the appointment was previously approved
           if ((oldStatus || '').toLowerCase() === 'approved' && matchedSlotKey) {
-            // Check if any other appointment is already approved for this date/time
             const allAppointmentsRes = await AxiosInstance.get('appointment/appointments/');
             const otherApproved = allAppointmentsRes.data.some(app =>
               app.id !== id &&
@@ -132,10 +145,7 @@ const ModalDetails = (props) => {
               app.time === time
             );
 
-            if (otherApproved) {
-              console.log('Slot remains unavailable because another appointment is approved for the same slot.');
-            } else {
-              // No other approved appointment — set unavailability slot to false (available)
+            if (!otherApproved) {
               const availabilityRes = await AxiosInstance.get(`availability/display_unavailability/?date=${date}`);
               const existing = availabilityRes.data && availabilityRes.data[0] ? availabilityRes.data[0] : null;
 
@@ -147,28 +157,24 @@ const ModalDetails = (props) => {
 
               await AxiosInstance.post('availability/set_unavailability/', updatedUnavailability);
               console.log(`Marked ${matchedSlotKey} = false for ${date}`);
+            } else {
+              console.log('Slot remains unavailable because another appointment is approved.');
             }
-          } else {
-            // If oldStatus wasn't approved, no need to change availability
-            console.log('Old status was not approved; no availability changes required.');
           }
         } catch (err) {
           console.error('Error while reverting slot availability:', err);
         }
       }
 
-      // 4) Refresh parent and close modal
+      // 5️⃣ Refresh UI
       if (onUpdate) onUpdate();
       if (onClose) onClose();
-
       alert('Status updated successfully!');
     } catch (error) {
       console.error('Error updating appointment:', error);
       alert('Failed to update status. Please try again.');
     }
   };
-
-
 
   return (
 

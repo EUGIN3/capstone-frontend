@@ -39,7 +39,6 @@ import UserDashboard from '../user-dashboard/UserDashboard';
 import SetAppointment from '../set-appointment/SetAppointment';
 import DisplayAppointments from '../display-appointment/DisplayAppointments';
 import ImageGeneratorComponent from '../../ImageGenerator/ImageGeneratorComponent';
-import Notification from '../../Notification/Notification';
 import UserGallery from '../user-gallery/UserGallery';
 import UserMessages from '../user-messages/UserMessages';
 import ButtonElement from '../../forms/button/ButtonElement';
@@ -47,6 +46,8 @@ import MailTwoToneIcon from '@mui/icons-material/MailTwoTone';
 import NotificationsTwoToneIcon from '@mui/icons-material/NotificationsTwoTone';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import UserProjects from '../user-projects/UserProjects';
+
+import NotificationPanel from '../../notification/Notification';
 
 // Drawer width
 const drawerWidth = 240;
@@ -102,6 +103,7 @@ function Navbar({ window }) {
   const navigate = useNavigate();
   const navigation = useNavigation();
   const [open, setOpen] = useState(false);
+  const isAdmin = sessionStorage.getItem('IsAdmin') === 'true';
 
   const [session, setSession] = useState({
     user: { name: '', email: '', image: '' },
@@ -121,10 +123,10 @@ function Navbar({ window }) {
   const userInformation = () => {
     AxiosInstance.get('auth/profile/').then((response) => {
       const { first_name, last_name, email, image } = response.data;
-      const fullName = [first_name, last_name].filter(Boolean).join(' ').trim();
+      // const fullName = [first_name, last_name].filter(Boolean).join(' ').trim();
       setSession({
         user: {
-          name: fullName || '',
+          name: `${first_name} ${last_name === null ? '' : last_name}`,
           email: email || '',
           image: image || '',
         },
@@ -194,13 +196,7 @@ function Navbar({ window }) {
                 </IconButton>
               </Tooltip>
 
-              <Tooltip title="Notifications" arrow>
-                <IconButton color="inherit">
-                  <Badge badgeContent={17} color="error">
-                    <NotificationsTwoToneIcon sx={{ color: '#f5f5f5' }} />
-                  </Badge>
-                </IconButton>
-              </Tooltip>
+              <NotificationPanel />
 
               <Box sx={{ ml: 1 }}>
                 <Account
@@ -312,11 +308,18 @@ function Navbar({ window }) {
               ))}
             </List>
 
-            {/* ✅ Footer (same spacing as Admin) */}
-
-            <Box sx={{ mt: 'auto',marginBottom: '10px', marginLeft: '20px', marginRight: '20px', height:'40px', }}> 
-              <ButtonElement label='ADMIN PANEL' variant='outlined-black admin-user' type='button' onClick={() => navigate('/admin')} /> 
-            </Box> 
+            
+            {/* Edit this as it should only display if the user is the admin */}
+            {isAdmin && (
+              <Box sx={{ mt: 'auto', mb: '10px', mx: '20px', height:'40px' }}>
+                <ButtonElement
+                  label='ADMIN PANEL'
+                  variant='outlined-black admin-user'
+                  type='button'
+                  onClick={() => navigate('/admin')}
+                />
+              </Box>
+            )}
           </MuiDrawer>
 
           {/* ✅ Main Content */}

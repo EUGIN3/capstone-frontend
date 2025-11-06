@@ -12,6 +12,7 @@ import TableRow from '@mui/material/TableRow';
 import AxiosInstance from '../../API/AxiosInstance';
 import SearchIcon from '@mui/icons-material/Search';
 import TextField from '@mui/material/TextField';
+import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
 
 export default function UserTable() {
   const [page, setPage] = useState(0);
@@ -157,7 +158,7 @@ export default function UserTable() {
                       <TableCell align="center">
                         <button
                           style={{
-                            background: '#1976d2',
+                            background: 'transparent',
                             color: 'white',
                             border: 'none',
                             borderRadius: '5px',
@@ -166,8 +167,17 @@ export default function UserTable() {
                           }}
                           onClick={() => alert(`Viewing user ${user.email}`)}
                         >
-                          View
+                          <VisibilityTwoToneIcon
+                            sx={{
+                              color: 'rgba(56, 56, 56, 0.72)',
+                              fontSize: 26,
+                              cursor: 'pointer',
+                              '&:hover': { color: '#000000ff' },
+                              transition: 'all 0.3s ease',
+                            }}
+                          />
                         </button>
+                        
                       </TableCell>
                     </TableRow>
                   ))

@@ -39,7 +39,7 @@ import AdminDashboard from '../admin-dashboard/AdminDashboard';
 import ManageAppointment from '../manage-appointment/ManageAppointment';
 import ManageSchedule from '../manage-schedule/ManageSchedule';
 import ManageUser from '../manage-user/ManageUser';
-import Notification from '../../Notification/Notification';
+import NotificationPanel from '../../notification/Notification'
 import AdminGallery from '../admin-gallery/AdminGallery';
 import AdminMessages from '../admin-messages/AdminMessages';
 import Designs from '../manage-designs/Designs';
@@ -126,7 +126,7 @@ export default function AdminNavbar() {
       const { first_name, last_name, email, image } = response.data;
       setSession({
         user: {
-          name: `${first_name} ${last_name}`,
+          name: `${first_name} ${last_name === null ? '' : last_name}`,
           email,
           image,
         },
@@ -189,13 +189,8 @@ export default function AdminNavbar() {
                 </IconButton>
               </Tooltip>
 
-              <Tooltip title="Notifications" arrow>
-                <IconButton color="inherit">
-                  <Badge badgeContent={17} color="error">
-                    <NotificationsTwoToneIcon sx={{ color: '#f5f5f5' }} />
-                  </Badge>
-                </IconButton>
-              </Tooltip>
+              
+              <NotificationPanel />
 
               <Box sx={{ ml: 1 }}>
                 <Account
@@ -326,7 +321,6 @@ export default function AdminNavbar() {
               <Route path="/manage-gallery" element={<AdminGallery />} />
               <Route path="/approved-appointment" element={<ManageApproveAppointment />} />
               <Route path="/message" element={<AdminMessages />} />
-              <Route path="/manage-designs" element={<Designs />} />
               <Route path="/on-going-project" element={<OnGoingProjectsTable />} />
               <Route path="/on-going-project/:projectId" element={<ManageOngoingUpdates />} />
             </Routes>

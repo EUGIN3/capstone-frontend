@@ -9,14 +9,20 @@ import { useForm } from 'react-hook-form';
 import AxiosInstance from '../../../API/AxiosInstance';
 import { ToastContainer, toast, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import useNotificationCreator from '../../../notification/UseNotificationCreator';
 
 import { Tooltip } from '@mui/material';
 
 function AddUpdateModal({ onClose, projectId, onSuccess }) {
-  const { control, handleSubmit, reset } = useForm();
+  const { control, handleSubmit, reset } = useForm({
+    defaultValues: {
+      process_status: 'designing',
+    },
+  });
   const [selectedImage, setSelectedImage] = useState(null);
   const [resetUploadBox, setResetUploadBox] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { sendDefaultNotification } = useNotificationCreator();
 
   const processStatusItems = [
     { value: 'designing', label: 'Designing' },
@@ -40,7 +46,7 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
       if (data.payment) formData.append('amount_paid', data.payment);
       if (selectedImage) formData.append('image_file', selectedImage);
 
-      const response = await AxiosInstance.post(
+      await AxiosInstance.post(
         `design/designs/${projectId}/add_update/`,
         formData,
         {
@@ -61,6 +67,9 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
       );
 
       reset();
+      const response = await  AxiosInstance.get(`design/designs/${projectId}/`)
+      await sendDefaultNotification('update_posted', response.data.user)
+
       setSelectedImage(null);
       setResetUploadBox((prev) => !prev); // ✅ Reset upload box
       if (onSuccess) onSuccess();
