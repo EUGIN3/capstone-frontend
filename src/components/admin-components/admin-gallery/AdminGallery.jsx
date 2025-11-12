@@ -3,26 +3,19 @@ import './AdminGallery.css';
 
 const AdminGallery = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [images, setImages] = useState([
-    { id: 1, name: 'Design 1' },
-    { id: 2, name: 'Design 2' },
-    { id: 3, name: 'Design 3' },
-    { id: 4, name: 'Design 4' }
-  ]);
+  const [images, setImages] = useState([]);
 
   const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-    // Implement search logic here
+    alert('Searching')
   };
 
   const handleUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Handle file upload logic here
-      const imageUrl = URL.createObjectURL(file);
-      setImages([...images, { id: Date.now(), url: imageUrl }]);
-    }
+    alert('Upload Design')
   };
+
+  const fetchDesigns = async () => {
+    await alert('Getting the data')
+  }
 
   return (
     <div className="gallery-container">

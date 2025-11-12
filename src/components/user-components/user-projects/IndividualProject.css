@@ -153,21 +153,20 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 20px;
 }
 
 .indi-informtaion .label,
 .indi-details-container .label {
   text-align: left;
   width: 90%;
-  margin-bottom: 15px;
+  /* margin-bottom: 15px; */
 }
 
-.indi-information-top {
-  margin-bottom: 10px;
-}
 
 .indi-information-top,
-.indi-information-bottom {
+.indi-information-bottom,
+.indi-information-middle {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   gap: 10px;
@@ -176,7 +175,8 @@
 }
 
 .indi-information-top span,
-.indi-information-bottom span {
+.indi-information-bottom span,
+.indi-information-middle span {
   font-weight: 600;
   font-size: 12px;
   color: #757575;
@@ -186,6 +186,7 @@
 
 .indi-information-top p,
 .indi-information-bottom p,
+.indi-information-middle p,
 .indi-details .label {
   line-height: 15px;
   font-size: 14px;
@@ -285,4 +286,10 @@ span.indi-show-update:hover {
   align-items: center;
   flex-direction: column;
   gap: 10px;
+}
+
+.indi-info-text.done-fitting {
+  color: #757575;
+  text-decoration: line-through;
+  font-style: italic;
 }

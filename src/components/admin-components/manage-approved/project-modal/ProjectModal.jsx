@@ -1,5 +1,5 @@
 import './ProjectModal.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import NormalTextField from '../../../forms/text-fields/NormalTextField';
 import ButtonElement from '../../../forms/button/ButtonElement';
@@ -10,6 +10,8 @@ import AxiosInstance from '../../../API/AxiosInstance';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import useNotificationCreator from '../../../notification/UseNotificationCreator';
+
+import MultiSelectTimeSlots from '../../../forms/multiple-time/MultipleTime'
 
 import { Tooltip } from '@mui/material';
 
@@ -22,8 +24,10 @@ function ProjectModal({ onClose, appointment }) {
   });
 
   const [targetDate, setTargetDate] = useState(null);
+  const [fittingDate, setFittingDate] = useState(null);
   const [referenceImage, setReferenceImage] = useState(null);
   const { sendDefaultNotification } = useNotificationCreator();
+  const [selectedTimes, setSelectedTimes] = useState([]);
 
   // Dropdown options
   const processStatusItems = [
@@ -32,6 +36,23 @@ function ProjectModal({ onClose, appointment }) {
     { value: 'ready', label: 'Ready' },
     { value: 'done', label: 'Done' },
   ];
+
+  const slotMap = {
+    '7:00 - 8:30 AM': 'slot_one',
+    '8:30 - 10:00 AM': 'slot_two',
+    '10:00 - 11:30 AM': 'slot_three',
+    '1:00 - 2:30 PM': 'slot_four',
+    '2:30 - 4:00 PM': 'slot_five',
+  };
+
+  const findSlotKey = (timeStr) => {
+    if (!timeStr) return null;
+    const normalized = timeStr.toString().trim().replace(/\s+/g, ' ');
+    for (const [label, key] of Object.entries(slotMap)) {
+      if (label.replace(/\s+/g, ' ') === normalized) return key;
+    }
+    return null;
+  };
 
   // Handle image change
   const handleImageChange = (e) => {
@@ -44,6 +65,8 @@ function ProjectModal({ onClose, appointment }) {
     });
   };
 
+  
+
   const handleSave = async (data) => {
     if (!targetDate) {
       alert('Please select a target date.');
@@ -54,9 +77,11 @@ function ProjectModal({ onClose, appointment }) {
       const formData = new FormData();
       formData.append('attire_type', data.attire_type || '');
       formData.append('targeted_date', targetDate.toISOString().split('T')[0]);
-      formData.append('process_status', data.process_status || 'designing'); // ✅ default fallback
+      formData.append('fitting_date', fittingDate.toISOString().split('T')[0]);
+      formData.append('fitting_time', JSON.stringify(selectedTimes));
+      formData.append('process_status', data.process_status || 'designing');
       formData.append('total_amount', data.total_amount || '');
-      formData.append('payment_status', data.payment_status || 'no_payment'); // ✅ default fallback
+      formData.append('payment_status', data.payment_status || 'no_payment');
       formData.append('amount_paid', data.amount_paid || '');
       formData.append('description', data.description || '');
       formData.append('user', appointment.user);
@@ -80,6 +105,31 @@ function ProjectModal({ onClose, appointment }) {
     } catch (error) {
       console.error('Failed to create project:', error);
       alert('❌ Failed to create project. Please try again.');
+    }
+
+    // Mark selected fitting time slots as unavailable
+    if (fittingDate && selectedTimes.length > 0) {
+      try {
+        const dateStr = fittingDate.toISOString().split('T')[0];
+
+        // Fetch existing unavailability for that date
+        const availabilityRes = await AxiosInstance.get(
+          `availability/display_unavailability/?date=${dateStr}`
+        );
+        const existing = availabilityRes.data && availabilityRes.data[0] ? availabilityRes.data[0] : {};
+
+        const updatedUnavailability = { ...existing, date: dateStr };
+
+        // Mark each selected time slot as unavailable
+        selectedTimes.forEach(time => {
+          const key = findSlotKey(time);
+          if (key) updatedUnavailability[key] = true;
+        });
+
+        await AxiosInstance.post('availability/set_unavailability/', updatedUnavailability);
+      } catch (err) {
+        console.error('Error marking fitting slots unavailable:', err);
+      }
     }
   };
 
@@ -125,11 +175,11 @@ function ProjectModal({ onClose, appointment }) {
               <NormalDatePickerComponent
                 value={targetDate}
                 onChange={(newDate) => setTargetDate(newDate)}
+                label={'Target Date'}
               />
             </div>
 
             <div className="progress-status-container project-container">
-              {/* ✅ Default process_status = designing */}
               <DropdownComponentTime
                 items={processStatusItems}
                 dropDownLabel="Process Status"
@@ -140,24 +190,34 @@ function ProjectModal({ onClose, appointment }) {
           </div>
 
           <div className="total-container project-container">
-            <NormalTextField
-              label="Attire Total Cost"
-              name="total_amount"
-              control={control}
-              placeHolder="Enter Total Cost"
+            <NormalDatePickerComponent
+              value={fittingDate}
+              onChange={(nDate) => setFittingDate(nDate)}
+              label={'Fitting Date'}
+            />
+          </div>
+
+          <div className="total-container project-container">
+            <MultiSelectTimeSlots
+              value={selectedTimes}
+              onChange={(newTimes) => setSelectedTimes(newTimes)}
             />
           </div>
 
           {/* Payment Section */}
           <div className="payment-container">
-            <div className="amount-paid-container project-container">
               <NormalTextField
-                label="Amount Paid"
-                name="amount_paid"
-                control={control}
-                placeHolder="Enter amount"
-              />
-            </div>
+              label="Attire Total Cost"
+              name="total_amount"
+              control={control}
+              placeHolder="Enter Total Cost"
+            />
+            <NormalTextField
+              label="Amount Paid"
+              name="amount_paid"
+              control={control}
+              placeHolder="Enter amount"
+            />
           </div>
 
           {/* Optional Description */}

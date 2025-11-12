@@ -22,7 +22,7 @@ import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import { Tooltip } from '@mui/material';
 
 function Appointment(props) {
-  const { date, time, status, id, onUpdate, facebookLink, adress, description, image } = props;
+  const { date, time, status, id, onUpdate, facebookLink, adress, description, image, appointment_type } = props;
   const [open, setOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedDate, setSelectedDate] = useState(dayjs());
@@ -85,6 +85,7 @@ function Appointment(props) {
   }, [selectedDate]);
 
   const handleCancel = () => {
+    
     AxiosInstance.patch(`appointment/user_appointments/${id}/`, {
       appointment_status: "cancelled"
     })
@@ -94,6 +95,7 @@ function Appointment(props) {
       .catch((error) => {
         console.error('Failed to cancel appointment:', error);
       });
+    
   };
 
   const handleDelete = () => {
@@ -263,15 +265,25 @@ function Appointment(props) {
         </div>
       )}
 
-      {status === 'cancelled' || status === 'denied' && (
+      {status === 'approved' && (
+        <div className="appointment-button-container">
+          <div className="cancel-icon" onClick={handleCancel}>
+            <Tooltip title='Cancel' arrow placement='left'>
+              <CancelTwoToneIcon />
+            </Tooltip>
+          </div>
+        </div>
+      )}
+
+      {status === 'cancelled' || status === 'denied' ? (
         <div className="appointment-button-container">
           <div className="edit-icon" onClick={handleDelete}>
             <Tooltip title='Delete' arrow placement='left'>
               <DeleteTwoToneIcon />
             </Tooltip>
           </div>
-        </div>
-      )}
+        </div> 
+      ) : null}
 
       {
         status === 'cancelled' && <p className='status-text'>Cancelled</p>

@@ -10,9 +10,11 @@ import curlyArrowLogRes from '../../../../assets/curly-arrow.png';
 import AddCircleOutlinedIcon from '@mui/icons-material/AddCircleOutlined';
 import Dialog from '@mui/material/Dialog';
 
-import { Tooltip } from '@mui/material';
+import { Fab, Tooltip } from '@mui/material';
 import AddUpdateModal from './AddUpdateModal';
 import ButtonElement from '../../../forms/button/ButtonElement'
+
+import ChangeFitting from './ChangeFitting';
 
 function ManageOngoingUpdates() {
   const { projectId } = useParams();
@@ -22,11 +24,18 @@ function ManageOngoingUpdates() {
   const [loading, setLoading] = useState(true); // ✅ Loading state
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false)
+  const [changeFittingOpen, setChangeFittingOpen] = useState(false)
+
+  const handleOpenFitting = () => {
+    setChangeFittingOpen(true)
+  }
+  const handleCloseFitting = () => {
+    setChangeFittingOpen(false)
+  }
 
   const handleOpenAdd = () => {
     setOpen(true)
   }
-
   const handleCloseAdd = () => {
     setOpen(false)
   }
@@ -82,17 +91,20 @@ function ManageOngoingUpdates() {
 
         <div className="add-update-btn">
           <ButtonElement
-            label='Add update'
+            label='Fitting'
             variant='outlined-black'
+            onClick={handleOpenFitting}
+          />
+
+          <ButtonElement
+            label='Add update'
+            variant='filled-black'
             onClick={handleOpenAdd}
           />
         </div>
       </div>
 
       <div className="update-body">
-        <div className="update-text">
-          <p>Project Details:</p>
-        </div>
         <ProjectDetails project={project} />
         <div className="update-text">
           <p>Updates:</p>
@@ -118,6 +130,28 @@ function ManageOngoingUpdates() {
           <AddUpdateModal 
             onClose={handleCloseAdd}
             projectId={projectId}
+            onSuccess={fetchProject}
+          />
+        </Dialog>
+
+        <Dialog
+          open={changeFittingOpen}
+          onClose={handleCloseFitting}
+          fullWidth
+          maxWidth={false}
+          PaperProps={{
+            style: {
+              width: 'auto',
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              padding: '0px',
+              backgroundColor: 'transparent',
+              boxShadow: 'none',
+            },
+          }}>
+          <ChangeFitting 
+            onClose={handleCloseFitting}
+            project={project}
             onSuccess={fetchProject}
           />
         </Dialog>

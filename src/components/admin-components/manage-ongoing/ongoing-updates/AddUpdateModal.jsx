@@ -12,6 +12,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import useNotificationCreator from '../../../notification/UseNotificationCreator';
 
 import { Tooltip } from '@mui/material';
+import AppHeader from '../../../user-components/user-header/userHeader';
 
 function AddUpdateModal({ onClose, projectId, onSuccess }) {
   const { control, handleSubmit, reset } = useForm({
@@ -71,7 +72,7 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
       await sendDefaultNotification('update_posted', response.data.user)
 
       setSelectedImage(null);
-      setResetUploadBox((prev) => !prev); // ✅ Reset upload box
+      setResetUploadBox((prev) => !prev);
       if (onSuccess) onSuccess();
       onClose();
     } catch (error) {
@@ -112,6 +113,10 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
      
 
       <div className="AddUpdateModal">
+        <div className="add-new-update-header">
+          <p>Add New Update</p>
+        </div>
+
         <div className="image-container">
           <p>* image for update:</p>
           <SmallImageUpload 

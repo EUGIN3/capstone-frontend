@@ -46,12 +46,15 @@
   font-style: italic;
 }
 
-.add-update-btn {
+.add-update-btn {   
   height: 40px;
-  align-self: right;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
-.add-update-btn .outlined-black {
-  padding: 10px 16px;
+.add-update-btn .outlined-black,
+.add-update-btn .filled-black {
+  width: 150px;
 }
 

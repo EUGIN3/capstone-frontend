@@ -90,7 +90,7 @@ const ImageGeneratorComponent = () => {
 
     try {
       const response = await AxiosInstance.post(
-        'yourmodel/generate-image/',
+        'image/',
         { prompt },
         { timeout: 30000 }
       );

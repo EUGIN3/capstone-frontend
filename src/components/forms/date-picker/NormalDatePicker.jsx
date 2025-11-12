@@ -4,17 +4,17 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
-export default function NormalDatePickerComponent({ value, onChange }) {
+export default function NormalDatePickerComponent({ value, onChange, label }) {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DatePicker
         value={value}
         onChange={onChange}
+        label={label}
         disablePast
         slotProps={{
           textField: {
             fullWidth: true,
-            InputLabelProps: { shrink: false }, 
             InputProps: {
               sx: {
                 fontSize: '14px',
@@ -37,6 +37,12 @@ export default function NormalDatePickerComponent({ value, onChange }) {
               },
               '& fieldset': {
                 borderColor: '#2d2d2db6',
+              },
+              '&.Mui-focused .MuiFormLabel-root': {
+                color: '#0C0C0C',
+              },
+              '&.Mui-focused': {
+                borderColor: '#0C0C0C',
               },
             },
           },

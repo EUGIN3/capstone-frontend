@@ -13,6 +13,13 @@
     width: 600px;
 }
 
+.projectOuterModal .total-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
 .close-modal {
   position: absolute;
   top: 0px;

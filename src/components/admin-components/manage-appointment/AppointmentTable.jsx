@@ -17,8 +17,10 @@ import ModalDetails from './ModalDetails';
 import AppHeader from '../../user-components/user-header/userHeader';
 import StatusDropdown from './StatusDropDown';
 import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
-import noImage from '../../../assets/no-image.jpg'
+import noImage from '../../../assets/no-image.jpg';
 
+import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
+import { Tooltip } from '@mui/material';
 
 export default function AppointmentTable() {
   const [page, setPage] = useState(0);
@@ -26,24 +28,17 @@ export default function AppointmentTable() {
   const [rows, setRows] = useState([]);
   const [totalAppointments, setTotalAppointments] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all'); // 👈 active dropdown filter
+  const [filterStatus, setFilterStatus] = useState('all');
   const [open, setOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
 
-  // -------------------------------
-  // Dropdown options
-  // -------------------------------
   const statusOptions = [
     { label: 'All', value: 'all' },
-    // { label: 'Approved', value: 'approved' },
     { label: 'Pending', value: 'pending' },
     { label: 'Denied', value: 'denied' },
     { label: 'Cancelled', value: 'cancelled' },
   ];
 
-  // -------------------------------
-  // Table Columns
-  // -------------------------------
   const columns = [
     { id: 'image', label: 'Image', minWidth: 60, align: 'left' },
     { id: 'firstName', label: 'First Name', minWidth: 150, align: 'center'},
@@ -54,9 +49,6 @@ export default function AppointmentTable() {
     { id: 'actions', label: 'Actions', minWidth: 100, align: 'center' },
   ];
 
-  // -------------------------------
-  // Fetch appointments
-  // -------------------------------
   const fetchAppointments = async () => {
     try {
       const response = await AxiosInstance.get('appointment/appointments/');
@@ -74,9 +66,6 @@ export default function AppointmentTable() {
     fetchAppointments();
   }, []);
 
-  // -------------------------------
-  // Helpers
-  // -------------------------------
   const handleOpen = (appointment) => {
     setSelectedAppointment(appointment);
     setOpen(true);
@@ -101,6 +90,20 @@ export default function AppointmentTable() {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
+
+  const handleArchived = async (id) => {
+    try {
+      await AxiosInstance.patch(`appointment/appointments/${id}/`, {
+        appointment_status: "archived"
+      });
+
+      // ✅ Automatically refresh the table after archiving
+      fetchAppointments();
+    } catch (error) {
+      console.error("❌ Failed to archive appointment:", error);
+    }
+  };
+
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
@@ -142,9 +145,6 @@ export default function AppointmentTable() {
     setTotalAppointments(filteredRows.length);
   }, [filteredRows]);
 
-  // -------------------------------
-  // Render
-  // -------------------------------
   return (
     <>
       <div className="manage-appointment-header">
@@ -228,7 +228,6 @@ export default function AppointmentTable() {
                       hover
                       key={appointment.id}
                       className="appointment-row"
-                      onClick={() => handleOpen(appointment)}
                     >
                       <TableCell align="left">
                           <img
@@ -259,35 +258,76 @@ export default function AppointmentTable() {
                           {appointment.appointment_status || '—'}
                         </span>
                       </TableCell>
-                      <TableCell align="center">
-                        <button
-                          style={{
-                            background: 'transparent',
-                            border: 'none',
-                            display: 'flex',
-                            alignItems:'center',
-                            justifyContent: 'center',
-                            width:'100%',
-                          }}
-                          className="view-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOpen(appointment);
-                          }}
-                        >
-                          <VisibilityTwoToneIcon 
-                             sx={{
-                              color: '#383838ff',      // blue color
-                              fontSize: 26,          // make it bigger
-                              cursor: 'pointer',     // show pointer on hover
-                              '&:hover': {
-                                color: '#0c0c0c',    // darker on hover
-                              },
-                              margin: '0',
-                              padding: '0'
-                            }}                      
-                          />
-                        </button>
+                      <TableCell align="center" sx={{
+                        display: 'flex',
+                        justifyContent:'center',
+                        alignItems:'center',
+                        gap:'5px',
+                      }}>
+
+                        <Tooltip title='view' arrow>
+                          <button
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              display: 'flex',
+                              alignItems:'center',
+                              justifyContent: 'center',
+                            }}
+                            className="view-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpen(appointment);
+                            }}
+                          >
+                            <VisibilityTwoToneIcon 
+                              sx={{
+                                color: '#383838ff', 
+                                fontSize: 26,     
+                                cursor: 'pointer',     
+                                '&:hover': {
+                                  color: '#0c0c0c',    
+                                },
+                                margin: '0',
+                                padding: '0'
+                              }}                      
+                            />
+                          </button>
+                        </Tooltip>
+                        
+                        {
+                          appointment.appointment_status === 'cancelled' && (
+                          <Tooltip title='delete' arrow>
+                            <button
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                display: 'flex',
+                                alignItems:'center',
+                                justifyContent: 'center',
+                              }}
+                              className="view-btn"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleArchived(appointment.id);
+                              }}
+                            >
+                              <DeleteTwoToneIcon 
+                                sx={{
+                                  color: '#383838ff', 
+                                  fontSize: 26,     
+                                  cursor: 'pointer',     
+                                  '&:hover': {
+                                    color: '#0c0c0c',    
+                                  },
+                                  margin: '0',
+                                  padding: '0'
+                                }}                      
+                              />
+                            </button>
+                          </Tooltip>
+                        )}
+                        
                       </TableCell>
                     </TableRow>
                   ))

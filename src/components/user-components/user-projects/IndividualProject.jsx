@@ -72,6 +72,34 @@ function IndividualProject({ project }) {
       maximumFractionDigits: 2,
     }).format(value)}`;
 
+
+  const formatDateNotime = (dateStr) => {
+    const date = dateStr ? new Date(dateStr) : new Date();
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
+  const formatFittingTime = (timeData) => {
+    if (!timeData) return 'N/A';
+
+    try {
+      // Convert JSON string to array if needed
+      const times = typeof timeData === 'string' ? JSON.parse(timeData) : timeData;
+
+      // Ensure it’s an array and join with commas
+      if (Array.isArray(times)) {
+        return times.join(', ');
+      }
+      return timeData;
+    } catch {
+      // If parsing fails, return the raw value
+      return timeData;
+    }
+  };
+
   return (
     <div className="IndividualProject">
       {project && project.length > 0 ? (
@@ -156,7 +184,7 @@ function IndividualProject({ project }) {
 
                     <div className="indi-target">
                       <span>Target Date:</span>
-                      <p>{formatDate(item.targeted_date)}</p>
+                      <p>{formatDateNotime(item.targeted_date)}</p>
                     </div>
 
                     <div className="indi-started">
@@ -165,7 +193,7 @@ function IndividualProject({ project }) {
                     </div>
                   </div>
 
-                  <div className="indi-information-bottom">
+                  <div className="indi-information-middle">
                     <div className="indi-total">
                       <span>Payment Status:</span>
                       <p>
@@ -187,6 +215,20 @@ function IndividualProject({ project }) {
                     <div className="indi-balance">
                       <span>Balance:</span>
                       <p>{formatCurrency(item.balance)}</p>
+                    </div>
+                  </div>
+
+                  <div className="indi-information-bottom">
+                    <div className="indi-total">
+                      <span>Fitting Date:</span>
+                      <p className={`indi-info-text ${item.fitting_successful ? 'done-fitting' : ''}`}>
+                        {formatDateNotime(item.fitting_date)}
+                      </p>
+                    </div>
+
+                    <div className="indi-price">
+                      <span>Fitting Time:</span>
+                      <p className={`indi-info-text ${item.fitting_successful ? 'done-fitting' : ''}`}>{formatFittingTime(item.fitting_time)}</p>
                     </div>
                   </div>
                 </div>

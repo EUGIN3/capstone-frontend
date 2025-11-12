@@ -35,10 +35,7 @@
     font-weight: 600;
     text-transform: uppercase;
     text-align: center;
-
-    background-color: #ffffff;
     border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 8px;
 }
 
@@ -50,10 +47,7 @@
 
 .image-section {
   user-select: none;
-  background-color: #ffffff;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -96,10 +90,6 @@
 }
 
 .info-section {
-    background-color: #ffffff;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 10px;
 
     display: flex;
     flex-direction: column;
@@ -156,6 +146,10 @@
   transform: translateX(5px);
 }
 
+.modalDetails-name {
+  text-transform: capitalize;
+}
+
 
 .modalDetails-fblink {
     font-style: italic;
@@ -177,12 +171,12 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: #0c0c0c;
+    background-color: #9595953a;
     padding: 6px 12px;
-    border-radius: 2px;
+    border-radius: 50px;
     letter-spacing: 1px;
     text-transform: uppercase;
-    color: #f5f5f5;
+    color: #0c0c0c;
 }
 
 .modalDetailsBottom {
@@ -196,13 +190,9 @@
 }
 
 .modalDetails-description {
-    background-color: #ffffff;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 10px 20px;
     width: 700px;
     max-width: 700px;
-    height: 140px;
+    height: 120px;
     max-height: 140px;
     overflow: auto;
     /* height: 100px; */
@@ -210,10 +200,7 @@
 
 
 .modalDetails-update-status {
-    background-color: #ffffff;
     border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 10px;
 }
 
 .modalDetails-save-button {

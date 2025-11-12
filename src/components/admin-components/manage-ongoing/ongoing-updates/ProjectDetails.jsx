@@ -22,6 +22,25 @@ function ProjectDetails({ project }) {
     fully_paid: 'Fully Paid',
   };
 
+  // 🕒 Format fitting times like "7:00 - 8:30 AM, 8:30 - 10:00 AM"
+  const formatFittingTime = (timeData) => {
+    if (!timeData) return 'N/A';
+
+    try {
+      // Convert JSON string to array if needed
+      const times = typeof timeData === 'string' ? JSON.parse(timeData) : timeData;
+
+      // Ensure it’s an array and join with commas
+      if (Array.isArray(times)) {
+        return times.join(', ');
+      }
+      return timeData;
+    } catch {
+      // If parsing fails, return the raw value
+      return timeData;
+    }
+  };
+
   const fetchAppointment = async () => {
     try {
       const response = await AxiosInstance.get(`appointment/appointments/`);
@@ -71,7 +90,7 @@ function ProjectDetails({ project }) {
       fetchAppointment();
     }
   }, [project]);
-
+ 
   if (loading) {
     return (
       <div className="ProjectDetails loading">
@@ -141,7 +160,7 @@ function ProjectDetails({ project }) {
           </div>
 
           <div className="info">
-            <p className="label">Last Updated:</p>
+            <p className="label">Last Update:</p>
             <p className="info-text">{formatDate(project.updated_at)}</p>
           </div>
 
@@ -172,6 +191,20 @@ function ProjectDetails({ project }) {
           <div className="info">
             <p className="label">Remaining Balance:</p>
             <p className="info-text balance-text">{formatCurrency(project.balance)}</p>
+          </div>
+        </div>
+
+        <div className="payment-details fitting-details">
+          <div className="info">
+            <p className="label">Fitting Date:</p>
+            <p className={`info-text ${project.fitting_successful ? 'done-fitting' : ''}`}>{formatDate(project.fitting_date)}</p>
+          </div>
+
+          <div className="info">
+            <p className="label">Fitting Time:</p>
+            <p className={`info-text ${project.fitting_successful ? 'done-fitting' : ''}`}>
+              {formatFittingTime(project.fitting_time)}
+            </p>
           </div>
         </div>
       </div>

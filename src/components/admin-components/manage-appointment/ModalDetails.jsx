@@ -13,9 +13,9 @@ import useNotificationCreator from '../../notification/UseNotificationCreator';
 
 const ModalDetails = (props) => {
   const {
-    firstName, lastName, date, time, description, facebook_link,
+    first_name, last_name, date, time, description, facebook_link,
     phone_number, email, image, appointment_status, address, created_at,
-    id, onUpdate, onClose, control, updated_at, user
+    id, onUpdate, onClose, control, user
   } = props;
   const { sendDefaultNotification } = useNotificationCreator();
 
@@ -32,7 +32,6 @@ const ModalDetails = (props) => {
   const dropdownItems = [
     { value: 'pending', label: 'Pending' },
     { value: 'approved', label: 'Approve' },
-    { value: 'cancelled', label: 'Cancel' },
     { value: 'denied', label: 'Denied' }
   ];
 
@@ -231,12 +230,12 @@ const ModalDetails = (props) => {
             </div>
 
             <div className="modalDetails-personal-info">
-              <p className="modalDetails-name">{firstName} {lastName}</p>
+              <p className="modalDetails-name">{first_name} {last_name}</p>
               <p className="modalDetails-address">{address}</p>
-              <p className="modalDetails-email">{email}</p>
               <p className="modalDetails-fblink">
-                <a href={facebook_link} target='_blank' rel="noreferrer">{facebook_link}</a>
+                <a href={facebook_link} target='_blank' rel="noreferrer">profile</a>
               </p>
+              <p className="modalDetails-email">{email}</p>
               <p className="modalDetails-number">{phone_number}</p>
             </div>
 
