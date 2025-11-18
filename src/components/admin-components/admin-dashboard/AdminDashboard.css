@@ -3,49 +3,6 @@
   flex-direction: column;
   gap: 20px;
   padding: 20px;
-  min-height: 100vh;
-}
-
-.dashboard-panel {
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  transition: box-shadow 0.3s ease;
-}
-
-.dashboard-panel:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.main-panel {
-  width: 100%;
-}
-
-.lower-dashboard-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  width: 100%;
-}
-
-.right-panels-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-  gap: 20px;
-}
-
-.dashboard-panel h2 {
-  margin-bottom: 15px;
-  color: #333;
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
-.panel-content {
-  height: calc(100% - 50px);
-  overflow: auto;
 }
 
 .header-left h1 {
@@ -53,4 +10,82 @@
     font-size: 32px;
     text-transform: uppercase;
     font-weight: 600;
+}
+
+.small-data {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  gap: 20px;
+}
+
+.small-data-item {
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  flex-direction: column;
+  background-color: #ffffff;
+  height: 120px;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-left: 5px solid;
+  font-size: 32px;
+  padding: 20px;
+  transition: all .3s;
+  cursor: pointer;
+}
+
+.small-data-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.number-user {
+  border-color: #F79009;
+}
+.number-of-peding-appointment {
+  border-color: #2287E7;
+}
+.number-ongoing-project {
+  border-color: #F04438;
+}
+.number-approve-appointment {
+  border-color: #11B364;
+}
+
+.small-data-item-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #929292;
+}
+
+.big-graph {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  height: 460px;
+}
+
+.graph {
+  box-sizing: border-box;
+  height: 100%;
+  min-width: 0;
+  min-height: 0; 
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all .3s;
+}
+
+.graph:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.total-amount-monthly {
+  position: relative;
+}
+
+.date-select-container {
+  position: absolute;
+  bottom: 0;
 }

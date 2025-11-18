@@ -3,7 +3,7 @@ import TextField from '@mui/material/TextField';
 import { Controller } from 'react-hook-form';
 
 export default function NormalTextField(props) {
-  const { label, classes, placeHolder, name, control } = props;
+  const { label, classes, placeHolder, name, control, autocomplete } = props;
 
   return (
     <>
@@ -21,6 +21,7 @@ export default function NormalTextField(props) {
             label={label}
             type="text"
             error={!!error}
+            autoComplete={autocomplete}
             helperText={error?.message}
             placeholder={placeHolder}
             fullWidth // ✅ Makes the TextField adopt container width

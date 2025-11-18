@@ -1,0 +1,42 @@
+/* Solid black background */
+.black-background {
+  height: 100%;
+  width: 100%;
+  background-color: #0c0c0c;
+  position: relative;
+  overflow: hidden; /* Still needed to clip extra-large elements if necessary */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+/* Smooth, soft-edged gradient circle */
+.gradient-circle {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #f5f5f54b 0%,     /* near-white center */
+    #dcdcdc4b 15%,
+    #b5b5b54b 30%,
+    #8d8d8d4b 45%,
+    #6565654b 60%,
+    #3d3d3d4b 75%,
+    #0c0c0c4b 100%    /* near-black edges */
+  );
+  filter: blur(25px);
+  pointer-events: none;
+  animation: drift 30s linear infinite;
+}
+
+/* Drifting animation: circle moves beyond the div */
+@keyframes drift {
+  0%   { transform: translate(-300px, -200px); }
+  25%  { transform: translate(400px, 150px); }
+  50%  { transform: translate(-500px, 300px); }
+  75%  { transform: translate(300px, -250px); }
+  100% { transform: translate(-300px, -200px); }
+}

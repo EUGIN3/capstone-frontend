@@ -39,7 +39,7 @@ import UserDashboard from '../user-dashboard/UserDashboard';
 import SetAppointment from '../set-appointment/SetAppointment';
 import DisplayAppointments from '../display-appointment/DisplayAppointments';
 import ImageGeneratorComponent from '../../ImageGenerator/ImageGeneratorComponent';
-import UserGallery from '../user-gallery/UserGallery';
+import UserGallery from '../display-gallery/UserGallery';
 import UserMessages from '../user-messages/UserMessages';
 import ButtonElement from '../../forms/button/ButtonElement';
 import MailTwoToneIcon from '@mui/icons-material/MailTwoTone';

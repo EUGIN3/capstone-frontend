@@ -42,7 +42,6 @@ import ManageUser from '../manage-user/ManageUser';
 import NotificationPanel from '../../notification/Notification'
 import AdminGallery from '../admin-gallery/AdminGallery';
 import AdminMessages from '../admin-messages/AdminMessages';
-import Designs from '../manage-designs/Designs';
 import ManageApproveAppointment from '../manage-approved/ManageApproved';
 import OnGoingProjectsTable from '../manage-ongoing/ongoing-table/OnGoingProjectsTable';
 import ManageOngoingUpdates from '../manage-ongoing/ongoing-updates/ManageOngoingUpdates';
