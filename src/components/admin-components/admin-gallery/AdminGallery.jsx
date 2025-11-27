@@ -9,6 +9,7 @@ import AddItemModal from './add-item/AddItemModal';
 import ToDisplayModal from './select-to-display/ToDisplayModal';
 import ButtonElement from '../../forms/button/ButtonElement';
 import AxiosInstance from '../../API/AxiosInstance';
+import ViewEditModal from './viewing-item/ViewEditModal'
 
 const AdminGallery = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -24,6 +25,14 @@ const AdminGallery = () => {
 
   const handleCloseAdd = () => {
     setIsAdd(false)
+  }
+
+  const handleOpenViewing = () => {
+    setIsView(true)
+  }
+
+  const handleCloseViewing = () => {
+    setIsView(false)
   }
 
   const handleOpenSelecting = () => {
@@ -117,6 +126,11 @@ const AdminGallery = () => {
                   src={attire.image1 ? attire.image1 : noImage}
                   alt={attire.attire_name}
                 />
+
+                {/* Button overlay */}
+                <button className="overlay-button" onClick={handleOpenViewing}>
+                  Edit
+                </button>
               </div>
             ))
         )}
@@ -125,6 +139,7 @@ const AdminGallery = () => {
           <span>+</span>
         </div>
       </div>
+
       
       {/* Add */}
       <Dialog
@@ -164,6 +179,26 @@ const AdminGallery = () => {
         }}>
         <ToDisplayModal
           onClose={handleCloseSelecting}
+        />
+      </Dialog>
+      {/* Viewing */}
+      <Dialog
+        open={isView}
+        onClose={handleCloseViewing}
+        fullWidth
+        maxWidth={false}
+        PaperProps={{
+          style: {
+            width: 'auto',
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            padding: '0px',
+            backgroundColor: 'transparent',
+            boxShadow: 'none',
+          },
+        }}>
+        <ViewEditModal
+          onClose={handleCloseViewing}
         />
       </Dialog>
 

@@ -83,10 +83,6 @@ function DisplayAppointments() {
       (app) => app.fitting_date && app.fitting_time
     );
 
-    if (fittingAppointments.length === 0) {
-      return <div className="no-fitting">No fitting schedules found.</div>;
-    }
-
     return fittingAppointments.map((fit) => (
       <FittingAppointment
         key={fit.id}

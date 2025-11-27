@@ -5,22 +5,62 @@
   padding: 20px;
   min-height: 100vh;
   color: #f5f5f5;
+  display: grid;
+  grid-template-rows: 60% 30%;
 }
 
 .main-panel {
   width: 100%;
 }
 
-.main-panel .content {
-  height: 300px;
+.panel-content {
+  height: 100%;
 }
 
-.lowerdashboard-container {
-  display: grid;
-  grid-template-columns: 1fr 500px;
-  gap: 20px;
-  width: 100%;
+.main-panel .content {
+  height: 100%;
 }
+
+
+
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  font-size: 120px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.slider-text {
+  font-weight: 800;
+  text-transform: uppercase;
+  text-align: center;
+  transition: opacity 0.3s ease-in-out;
+  opacity: 1;
+  letter-spacing: 8px;
+
+  color: #f5f5f521;                     /* fix 1 */
+  -webkit-text-stroke-width: 2px;
+  -webkit-text-stroke-color: #ffffff;
+
+  text-shadow: 0 0 18px #ffffff55;
+  font-family: "BBH Sans Hegarty";
+}
+
+
+.fade-in {
+  opacity: 1;
+}
+
+.fade-out {
+  opacity: 0;
+}
+
+
 
 .dashboard-panel {
   background-color: #ffffff;
@@ -41,45 +81,73 @@
 }
 
 
+.lowerdashboard-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+  width: 100%;
+  color: #0c0c0c;
+}
 
-
-
-.content {
+.lowerdashboard-container .dashboard-panel {
+  height: 100%;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
   position: relative;
-  font-size: 120px;
-  cursor: pointer;
-  transition: all 0.3s;
 }
 
-.slider-text {
-  font-weight: 700;
+.lower-panels-content {
+  font-size: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+
+.lower-dashboard-label span {
+  font-size: 12px;
   text-transform: uppercase;
-  text-align: center;
-  transition: opacity 0.3s ease-in-out;
-  opacity: 1;
-  color: #f5f5f52e;
-  letter-spacing: 5px;
-  -webkit-text-stroke-width: 2px;
-  -webkit-text-stroke-color: #f5f5f5;
+  font-weight: 700;
+  color: #929292;
+  transition: all .3s;
+  letter-spacing: .5px;
 }
 
-.fade-in {
-  opacity: 1;
+.dashboard-panel:hover .lower-dashboard-label span {
+  color: #0c0c0c;
 }
 
-.fade-out {
-  opacity: 0;
+.number-of-upcoming-appointment {
+  position: relative;
+  flex-direction: column;
 }
 
+.dashboard-panel .number-of-upcoming-appointment .date {
+  font-size: 16px;
+  font-weight: 700;
+  color: #929292;
+  text-transform: uppercase;
+  transition: all .3s;
+}
 
+.dashboard-panel:hover .number-of-upcoming-appointment .date {
+  color: #0c0c0c;
+}
 
+.dashboard-panel.appointment {
+  border-left: 5px solid #2287E7;
+  cursor: pointer;
+}
 
+.dashboard-panel.progress {
+  border-left: 5px solid #F79009;
+  cursor: pointer;
+}
 
-
-
-
-
+.dashboard-panel.amount {
+  border-left: 5px solid #11B364;
+  cursor: pointer;
+}

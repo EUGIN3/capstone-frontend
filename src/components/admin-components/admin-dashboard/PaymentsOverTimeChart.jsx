@@ -78,7 +78,7 @@ export default function PaymentsOverTimeChart() {
           backgroundColor: "#0c0c0c25",
           tension: 0.3,
           fill: true,
-          pointRadius: 5,
+          pointRadius: 3,
         },
       ],
     });

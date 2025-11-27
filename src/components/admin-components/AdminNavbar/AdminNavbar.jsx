@@ -180,13 +180,13 @@ export default function AdminNavbar() {
               <Box sx={{ flex: 1 }} />
 
               {/* Icons */}
-              <Tooltip title="Messages" arrow>
+              {/* <Tooltip title="Messages" arrow>
                 <IconButton color="inherit">
                   <Badge badgeContent={4} color="error">
                     <MailTwoToneIcon sx={{ color: '#f5f5f5' }} />
                   </Badge>
                 </IconButton>
-              </Tooltip>
+              </Tooltip> */}
 
               
               <NotificationPanel />

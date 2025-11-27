@@ -241,6 +241,16 @@ function Appointment(props) {
         </form>
       </Dialog>
 
+      {
+        status === 'cancelled' && <p className='status-text cancelled'>Cancelled</p>
+        ||
+        status === 'denied' && <p className='status-text denied'>Denied</p>
+        ||
+        status === 'approved' && <p className='status-text approved'>Approved</p>
+        ||
+        status === 'pending' && <p className='status-text pending'>Pending</p>
+      }
+
       <div className="information-container">
         <div className="appointment-date">
           <p>{formattedDate}</p>
@@ -284,16 +294,6 @@ function Appointment(props) {
           </div>
         </div> 
       ) : null}
-
-      {
-        status === 'cancelled' && <p className='status-text'>Cancelled</p>
-        ||
-        status === 'denied' && <p className='status-text'>Denied</p>
-        ||
-        status === 'approved' && <p className='status-text'>Approved</p>
-        ||
-        status === 'pending' && <p className='status-text'>Pending</p>
-      }
     </div>
   );
 }

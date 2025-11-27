@@ -7,7 +7,7 @@
   margin-bottom: 30px;
 }
 
-#userGallery .gallery-items-container {
+/* #userGallery .gallery-items-container {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   gap: 20px;
@@ -71,4 +71,4 @@
 
 #userGallery .gallery-item.notShowing {
   opacity: 0.6;
-}
+} */

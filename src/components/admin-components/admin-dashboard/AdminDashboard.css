@@ -56,6 +56,12 @@
   text-transform: uppercase;
   font-weight: 600;
   color: #929292;
+  transition: all .3s;
+}
+
+
+.small-data-item:hover .small-data-item-label {
+  color: #0c0c0c;
 }
 
 .big-graph {

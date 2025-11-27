@@ -293,3 +293,19 @@ span.indi-show-update:hover {
   text-decoration: line-through;
   font-style: italic;
 }
+
+.IndividualProject .indi-container-main.done {
+  background-color: #11b36521;
+  border: 2px solid #11b36548;
+}
+
+.IndividualProject .indi-container-main.done:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: #11b36549;
+  border: 2px solid #11b365;
+}
+
+
+.IndividualProject .indi-container-main.done:hover .indi-view {
+  color: #0c0c0c;
+}

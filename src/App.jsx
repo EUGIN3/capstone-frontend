@@ -37,13 +37,13 @@ function App() {
         </Route> */}
 
         {/* For development purposes */}
-        <Route path="/" element={<Navigate to={'/user'} />} />
-        <Route path="/user/*" element={<Navbar />} />
+          <Route path="/" element={<Navigate to={'/user'} />} />
+          <Route path="/user/*" element={<Navbar />} />
 
-        <Route element={<AdminRoute />}>
+        {/* <Route element={<AdminRoute />}> */}
           <Route path="/admin" element={<Navigate to="/admin/dashboard" />} />
           <Route path="/admin/*" element={<AdminNavbar />} />
-        </Route>
+        {/* </Route> */}
 
         {/* 404 */}
         <Route path="*" element={<NotFound />} />

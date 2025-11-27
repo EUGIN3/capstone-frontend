@@ -2,35 +2,53 @@
     color: #0C0C0C;
     display: grid;
     grid-template-columns: 1fr 50px;
-    padding: 10px;
+    padding: 20px;
     position: relative;
     border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all .3s;
+}
+
+.appointment-box:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .appointment-box.pending {
-    background-color: rgba(19, 98, 255, 0.055);
-    border: 2px solid #1362ff;
+    border-left: 5px solid #1362ff;
 }
 
 .appointment-box.cancelled {
-    background-color: rgba(240, 68, 56, 0.055);
-    border: 2px solid #F04438;
+    border-left: 5px solid #F04438;
 }
 
 .appointment-box.denied {
-    background-color: rgba(247, 144, 9, 0.055);
-    border: 2px solid #F79009;
+    border-left: 5px solid #F79009;
 }
 
 .appointment-box.approved {
-    background-color: rgba(17, 179, 101, 0.055);
-    border: 2px solid #11B364;
+    border-left: 4px solid #11B364;
 }
 
 .appointment-box.fitting {
-  background-color: #6d6d6d28;
-  border: 2px solid #0c0c0c;
+  border-left: 5px solid #0c0c0c;
 }
+
+/* .status-text.pending {
+    color: #1362ff;
+}
+
+.status-text.cancelled {
+    color: #F04438;
+}
+
+.status-text.denied {
+    color: #F79009;
+}
+
+.status-text.approved {
+    color: #11B364;
+} */
 
 
 
@@ -57,9 +75,12 @@
     opacity: .1;
     position: absolute;
     height: 100%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 1;
 }
 
 .appointment-button-container {
@@ -71,7 +92,6 @@
 }
 
 .cancel-icon {
-
     color: #F04438;
 }
 
@@ -86,6 +106,8 @@
     padding: 5px;
     border-radius: 50%;
     transition: all .3s;
+    
+    z-index: 3;
 }
 
 .cancel-icon:hover {
