@@ -1,5 +1,5 @@
 import './ProjectModal.css';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import NormalTextField from '../../../forms/text-fields/NormalTextField';
 import ButtonElement from '../../../forms/button/ButtonElement';
@@ -7,16 +7,13 @@ import DropdownComponentTime from '../../../forms/time-dropdown/DropDownForTime'
 import NormalDatePickerComponent from '../../../forms/date-picker/NormalDatePicker';
 import { useForm } from 'react-hook-form';
 import AxiosInstance from '../../../API/AxiosInstance';
-import CircularProgress from '@mui/material/CircularProgress';
 
 import useNotificationCreator from '../../../notification/UseNotificationCreator';
-
-import MultiSelectTimeSlots from '../../../forms/multiple-time/MultipleTime'
+import MultiSelectTimeSlots from '../../../forms/multiple-time/MultipleTime';
 
 import { Tooltip } from '@mui/material';
 
 function ProjectModal({ onClose, appointment }) {
-  // ✅ Set default form values here
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       process_status: 'designing',
@@ -29,7 +26,7 @@ function ProjectModal({ onClose, appointment }) {
   const { sendDefaultNotification } = useNotificationCreator();
   const [selectedTimes, setSelectedTimes] = useState([]);
 
-  // Dropdown options
+  // Dropdown items
   const processStatusItems = [
     { value: 'designing', label: 'Designing' },
     { value: 'materializing', label: 'Materializing' },
@@ -37,6 +34,7 @@ function ProjectModal({ onClose, appointment }) {
     { value: 'done', label: 'Done' },
   ];
 
+  // Time slot → model field mapping
   const slotMap = {
     '7:00 - 8:30 AM': 'slot_one',
     '8:30 - 10:00 AM': 'slot_two',
@@ -54,7 +52,6 @@ function ProjectModal({ onClose, appointment }) {
     return null;
   };
 
-  // Handle image change
   const handleImageChange = (e) => {
     setReferenceImage(e.target.files[0]);
   };
@@ -65,8 +62,7 @@ function ProjectModal({ onClose, appointment }) {
     });
   };
 
-  
-
+  // MAIN SAVE FUNCTION
   const handleSave = async (data) => {
     if (!targetDate) {
       alert('Please select a target date.');
@@ -74,10 +70,19 @@ function ProjectModal({ onClose, appointment }) {
     }
 
     try {
+      // FORM DATA FOR PROJECT
       const formData = new FormData();
       formData.append('attire_type', data.attire_type || '');
-      formData.append('targeted_date', targetDate.toISOString().split('T')[0]);
-      formData.append('fitting_date', fittingDate.toISOString().split('T')[0]);
+      formData.append(
+        'targeted_date',
+        targetDate.toISOString().split('T')[0]
+      );
+
+      formData.append(
+        'fitting_date',
+        fittingDate ? fittingDate.toISOString().split('T')[0] : ''
+      );
+
       formData.append('fitting_time', JSON.stringify(selectedTimes));
       formData.append('process_status', data.process_status || 'designing');
       formData.append('total_amount', data.total_amount || '');
@@ -91,42 +96,55 @@ function ProjectModal({ onClose, appointment }) {
         formData.append('reference_image', referenceImage);
       }
 
+      // CREATE PROJECT
       await AxiosInstance.post('design/designs/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
       await handleUpdateStatus(appointment.id);
+      sendDefaultNotification('project_created', appointment.user);
 
       alert('✅ Project created successfully!');
-
-      reset(); // resets with defaults again
-      sendDefaultNotification('project_created', appointment.user)
+      reset();
       onClose();
     } catch (error) {
       console.error('Failed to create project:', error);
       alert('❌ Failed to create project. Please try again.');
     }
 
-    // Mark selected fitting time slots as unavailable
+    // HANDLE FITTING TIME UNAVAILABILITY
     if (fittingDate && selectedTimes.length > 0) {
       try {
         const dateStr = fittingDate.toISOString().split('T')[0];
 
-        // Fetch existing unavailability for that date
+        // Check existing unavailability
         const availabilityRes = await AxiosInstance.get(
           `availability/display_unavailability/?date=${dateStr}`
         );
-        const existing = availabilityRes.data && availabilityRes.data[0] ? availabilityRes.data[0] : {};
+
+        const existing =
+          availabilityRes.data && availabilityRes.data[0]
+            ? availabilityRes.data[0]
+            : {};
 
         const updatedUnavailability = { ...existing, date: dateStr };
 
-        // Mark each selected time slot as unavailable
-        selectedTimes.forEach(time => {
+        // Mark each selected fitting slot as unavailable
+        selectedTimes.forEach((time) => {
           const key = findSlotKey(time);
-          if (key) updatedUnavailability[key] = true;
+          if (key) {
+            updatedUnavailability[key] = true;
+
+            // 🔥 AUTO-SET MATCHING REASON FIELD
+            updatedUnavailability[key.replace('slot', 'reason')] =
+              'Scheduled Fitting';
+          }
         });
 
-        await AxiosInstance.post('availability/set_unavailability/', updatedUnavailability);
+        await AxiosInstance.post(
+          'availability/set_unavailability/',
+          updatedUnavailability
+        );
       } catch (err) {
         console.error('Error marking fitting slots unavailable:', err);
       }
@@ -137,7 +155,7 @@ function ProjectModal({ onClose, appointment }) {
     <div className="projectOuterModal">
       <div className="createProjectModal">
         {/* Close Button */}
-        <Tooltip title='Close' arrow>
+        <Tooltip title="Close" arrow>
           <button className="close-modal" onClick={onClose}>
             <CloseRoundedIcon
               sx={{
@@ -147,7 +165,6 @@ function ProjectModal({ onClose, appointment }) {
                 backgroundColor: '#0c0c0c',
                 borderRadius: '50%',
                 cursor: 'pointer',
-                transition: 'all 0.3s ease',
               }}
             />
           </button>
@@ -155,8 +172,10 @@ function ProjectModal({ onClose, appointment }) {
 
         <div className="project-modal-body">
           <div className="project-title">Create Project</div>
+
           <div className="project-user">
-            <span>Name: </span>{appointment.first_name} {appointment.last_name}
+            <span>Name: </span>
+            {appointment.first_name} {appointment.last_name}
           </div>
 
           {/* Attire Type */}
@@ -169,13 +188,13 @@ function ProjectModal({ onClose, appointment }) {
             />
           </div>
 
-          {/* Targeted Date + Process Status */}
+          {/* Target Date + Process */}
           <div className="date-status-container">
             <div className="targeted-date-container project-container">
               <NormalDatePickerComponent
                 value={targetDate}
-                onChange={(newDate) => setTargetDate(newDate)}
-                label={'Target Date'}
+                onChange={setTargetDate}
+                label="Target Date"
               />
             </div>
 
@@ -189,38 +208,41 @@ function ProjectModal({ onClose, appointment }) {
             </div>
           </div>
 
+          {/* Fitting Date */}
           <div className="total-container project-container">
             <NormalDatePickerComponent
               value={fittingDate}
-              onChange={(nDate) => setFittingDate(nDate)}
-              label={'Fitting Date'}
+              onChange={setFittingDate}
+              label="Fitting Date"
             />
           </div>
 
+          {/* Fitting Time Slots */}
           <div className="total-container project-container">
             <MultiSelectTimeSlots
               value={selectedTimes}
-              onChange={(newTimes) => setSelectedTimes(newTimes)}
+              onChange={setSelectedTimes}
             />
           </div>
 
-          {/* Payment Section */}
+          {/* Payments */}
           <div className="payment-container">
-              <NormalTextField
+            <NormalTextField
               label="Attire Total Cost"
               name="total_amount"
               control={control}
               placeHolder="Enter Total Cost"
             />
+
             <NormalTextField
               label="Amount Paid"
               name="amount_paid"
               control={control}
-              placeHolder="Enter amount"
+              placeHolder="Enter Amount"
             />
           </div>
 
-          {/* Optional Description */}
+          {/* Description */}
           <div className="description-container project-container">
             <NormalTextField
               label="Description"
@@ -232,7 +254,7 @@ function ProjectModal({ onClose, appointment }) {
             />
           </div>
 
-          {/* Save Button */}
+          {/* Save */}
           <div className="save-container">
             <ButtonElement
               label="Save"

@@ -3,9 +3,19 @@ import React, { useState, useEffect } from 'react';
 import ButtonElement from '../../forms/button/ButtonElement';
 import AxiosInstance from '../../API/AxiosInstance';
 import dayjs from 'dayjs';
-import { Switch } from '@mui/material'; // ✅ Import MUI Switch
 
-const SetUnavailability = ({ selectedDate, unavailableSlots, onClose, onAlert }) => {
+const SetUnavailability = ({ selectedDate, onClose }) => {
+  const [slots, setSlots] = useState([
+    { slot: false, reason: "Designer not available" },
+    { slot: false, reason: "Designer not available" },
+    { slot: false, reason: "Designer not available" },
+    { slot: false, reason: "Designer not available" },
+    { slot: false, reason: "Designer not available" },
+  ]);
+
+  const [wholeDay, setWholeDay] = useState(false);
+  const [loading, setLoading] = useState(true);
+
   const timeSlots = [
     '7:00 - 8:30 AM',
     '8:30 - 10:00 AM',
@@ -14,155 +24,175 @@ const SetUnavailability = ({ selectedDate, unavailableSlots, onClose, onAlert })
     '2:30 - 4:00 PM',
   ];
 
-  const [slots, setSlots] = useState({});
-  const [wholeDay, setWholeDay] = useState(false);
-  const [approvedTimes, setApprovedTimes] = useState([]);
+  // ------------------------- FETCH UNAVAILABILITY -------------------------
+  const fetchUnavailability = async () => {
+    try {
+      const response = await AxiosInstance.get(
+        `/availability/display_unavailability/`,
+        { params: { date: selectedDate } }
+      );
 
-  const formattedDate = dayjs(selectedDate).format('YYYY-MM-DD');
+      if (response.data.length > 0) {
+        const data = response.data[0];
+
+        setSlots([
+          { slot: data.slot_one, reason: data.reason_one },
+          { slot: data.slot_two, reason: data.reason_two },
+          { slot: data.slot_three, reason: data.reason_three },
+          { slot: data.slot_four, reason: data.reason_four },
+          { slot: data.slot_five, reason: data.reason_five },
+        ]);
+      } else {
+        setSlots([
+          { slot: false, reason: "Designer not available" },
+          { slot: false, reason: "Designer not available" },
+          { slot: false, reason: "Designer not available" },
+          { slot: false, reason: "Designer not available" },
+          { slot: false, reason: "Designer not available" },
+        ]);
+      }
+    } catch (error) {
+      console.error("Error fetching schedule:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const initialSlots = {
-      '7:00 - 8:30 AM': unavailableSlots ? !unavailableSlots.slot_one : true,
-      '8:30 - 10:00 AM': unavailableSlots ? !unavailableSlots.slot_two : true,
-      '10:00 - 11:30 AM': unavailableSlots ? !unavailableSlots.slot_three : true,
-      '1:00 - 2:30 PM': unavailableSlots ? !unavailableSlots.slot_four : true,
-      '2:30 - 4:00 PM': unavailableSlots ? !unavailableSlots.slot_five : true,
-    };
-    setSlots(initialSlots);
+    fetchUnavailability();
+  }, [selectedDate]);
 
-    const allUnavailable = timeSlots.every(slot => !initialSlots[slot]);
-    setWholeDay(allUnavailable);
-  }, [unavailableSlots]);
-
+  // ------------------------- CALCULATE WHOLE DAY BASED ON SLOT STATUS -------------------------
   useEffect(() => {
-    const allUnavailable = timeSlots.every(slot => !slots[slot]);
-    setWholeDay(allUnavailable);
+    const availableCount = slots.filter(
+      s => s.reason !== "Scheduled Appointment" && s.reason !== "Scheduled Fitting" && !s.slot
+    ).length;
+
+    const unavailableCount = slots.filter(
+      s => s.reason !== "Scheduled Appointment" && s.reason !== "Scheduled Fitting" && s.slot
+    ).length;
+
+    // Majority decides the wholeDay status
+    if (availableCount > unavailableCount) setWholeDay(false); // more available → whole day available
+    else if (unavailableCount > availableCount) setWholeDay(true); // more unavailable → whole day unavailable
+    else setWholeDay(false); // tie → available
   }, [slots]);
 
-  useEffect(() => {
-    const fetchApprovedAppointments = async () => {
-      try {
-        const response = await AxiosInstance.get('appointment/user_appointments/');
+  // ------------------------- TOGGLE SLOT -------------------------
+  const toggleSlot = (index) => {
+    const newSlots = [...slots];
+    const current = newSlots[index];
 
-        // 🟩 Logs all data fetched from API
-        console.log("✅ API Response Data:", response.data);
-
-        const times = response.data
-          .filter(app =>
-            app.appointment_status === 'approved' &&
-            dayjs(app.date).format('YYYY-MM-DD') === formattedDate
-          )
-          .map(app => app.time);
-
-        // 🟩 Logs which slots are approved for the selected date
-        console.log("✅ Approved Times for", formattedDate, ":", times);
-
-        setApprovedTimes(times);
-      } catch (error) {
-        console.error('❌ Failed to fetch approved appointments', error);
-        setApprovedTimes([]);
-      }
-    };
-
-    fetchApprovedAppointments();
-  }, [formattedDate]);
-
-  const toggleSlot = (slot) => {
-    setSlots((prev) => ({
-      ...prev,
-      [slot]: !prev[slot],
-    }));
-  };
-
-  const toggleWholeDay = () => {
-    const newWholeDay = !wholeDay;
-    const updatedSlots = timeSlots.reduce((acc, slot) => {
-      acc[slot] = !newWholeDay;
-      return acc;
-    }, {});
-    setSlots(updatedSlots);
-    setWholeDay(newWholeDay);
-  };
-
-  const handleSave = () => {
-    const isAllUnavailable = timeSlots.every((slot) => !slots[slot]);
-
-    if (isAllUnavailable) {
-      AxiosInstance.post('availability/set_unavailability/', {
-        date: formattedDate,
-        slot_one: true,
-        slot_two: true,
-        slot_three: true,
-        slot_four: true,
-        slot_five: true,
-      })
-        .then(() => {
-          if (onClose) onClose();
-          if (onAlert) onAlert("All slots set to unavailable. Schedule updated.", "success");
-        })
-        .catch(() => {
-          if (onAlert) onAlert("Failed to update availability.", "error");
-        });
-      return;
+    // Only toggle free slots
+    if (current.reason !== "Scheduled Appointment" && current.reason !== "Scheduled Fitting") {
+      current.slot = !current.slot;
+      current.reason = current.slot ? "Designer not available" : "Available";
+      setSlots(newSlots);
     }
+  };
 
+  // ------------------------- WHOLE DAY TOGGLE -------------------------
+  const toggleWholeDay = () => {
+    const newVal = !wholeDay;
+
+    setSlots(
+      slots.map((s) => {
+        if (s.reason !== "Scheduled Appointment" && s.reason !== "Scheduled Fitting") {
+          return {
+            ...s,
+            slot: newVal,
+            reason: newVal ? "Designer not available" : "Available",
+          };
+        }
+        return s;
+      })
+    );
+
+    setWholeDay(newVal);
+  };
+
+  // ------------------------- SAVE SCHEDULE -------------------------
+  const handleSave = async () => {
     const payload = {
-      date: formattedDate,
-      slot_one: !slots['7:00 - 8:30 AM'],
-      slot_two: !slots['8:30 - 10:00 AM'],
-      slot_three: !slots['10:00 - 11:30 AM'],
-      slot_four: !slots['1:00 - 2:30 PM'],
-      slot_five: !slots['2:30 - 4:00 PM'],
+      date: selectedDate,
+      slot_one: slots[0].slot,
+      reason_one: slots[0].slot ? slots[0].reason : "Available",
+      slot_two: slots[1].slot,
+      reason_two: slots[1].slot ? slots[1].reason : "Available",
+      slot_three: slots[2].slot,
+      reason_three: slots[2].slot ? slots[2].reason : "Available",
+      slot_four: slots[3].slot,
+      reason_four: slots[3].slot ? slots[3].reason : "Available",
+      slot_five: slots[4].slot,
+      reason_five: slots[4].slot ? slots[4].reason : "Available",
     };
 
-    // 🟩 Log payload before sending it
-    console.log("🟦 Payload being sent:", payload);
-
-    AxiosInstance.post('availability/set_unavailability/', payload)
-      .then(() => {
-        if (onClose) onClose();
-        if (onAlert) onAlert("Schedule updated successfully!", "success");
-      })
-      .catch(() => {
-        if (onAlert) onAlert("Failed to update schedule.", "error");
-      });
+    try {
+      await AxiosInstance.post(`/availability/set_unavailability/`, payload);
+      alert("Saved successfully");
+      onClose();
+    } catch (error) {
+      console.error("Save failed:", error);
+    }
   };
+
+  if (loading) return <p>Loading...</p>;
 
   return (
     <div className='setAppointmentAvailability'>
       <p className='setAppointmentAvailability-header'>
-        {dayjs(selectedDate).format('MMMM DD, YYYY')} · Schedule
+        {dayjs(selectedDate).format('MMMM DD, YYYY')}
       </p>
 
       <hr />
 
       <div className="wholeDaySwitch">
-        <span>Whole Day</span>
-        <Switch
-          checked={wholeDay}
-          onChange={toggleWholeDay}
-          color="error"
-        />
+        <span
+          className="reason-text available"
+          style={{ cursor: "pointer" }}
+          onClick={toggleWholeDay}
+        >
+          {wholeDay ? "Unavailable" : "Available"}
+        </span>
       </div>
 
       <hr />
 
       <div className="availability-container">
-        {timeSlots.map((slot) => {
-          const isDisabled = approvedTimes.includes(slot);
-
-          return (
+        {slots.map((item, index) => (
+          <div key={index} className="slot-row">
+            {/* Slot time */}
             <div
-              key={slot}
-              className={`timeSlot ${slots[slot] ? 'available' : 'unavailable'} ${isDisabled ? 'disabled-slot' : ''}`}
-              onClick={() => !isDisabled && toggleSlot(slot)}
-              style={{ pointerEvents: isDisabled ? 'none' : 'auto', opacity: isDisabled ? 0.5 : 1 }}
-              title={isDisabled ? 'Slot has an approved appointment' : ''}
+              className={`slot-time ${
+                !item.slot
+                  ? "available"
+                  : item.reason === "Designer not available"
+                    ? "unavailable"
+                    : "fixed-reason"
+              }`}
+              onClick={() => toggleSlot(index)}
             >
-              {slot} — {slots[slot] ? 'Available' : 'Unavailable'}
+              {timeSlots[index]}
             </div>
-          );
-        })}
+
+            {/* Separator */}
+            <div className="slot-separator">:</div>
+
+            {/* Reason text */}
+            <span
+              className={`reason-text ${
+                !item.slot
+                  ? "available"
+                  : item.reason === "Designer not available"
+                    ? "unavailable"
+                    : "fixed-reason"
+              }`}
+              onClick={() => toggleSlot(index)}
+            >
+              {item.slot ? item.reason : "Available"}
+            </span>
+          </div>
+        ))}
       </div>
 
       <ButtonElement

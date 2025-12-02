@@ -66,12 +66,12 @@ const ModalDetails = (props) => {
 
       const matchedSlotKey = findSlotKey(time);
 
-      // 1️⃣ Update the appointment status
+      // 1️⃣ Update appointment status
       const patchRes = await AxiosInstance.patch(`appointment/appointments/${id}/`, {
         appointment_status: newStatus,
       });
 
-      // 2️⃣ Handle notifications per status
+      // 2️⃣ Notifications
       switch (newStatus) {
         case 'approved':
           await sendDefaultNotification('appointment_approved', user);
@@ -79,23 +79,18 @@ const ModalDetails = (props) => {
         case 'denied':
           await sendDefaultNotification('appointment_denied', user);
           break;
-        // case 'cancelled':
-        //   await sendDefaultNotification('appointment_cancelled', user);
-        //   break;
         case 'pending':
           await sendDefaultNotification('appointment_pending', user);
           break;
-        default:
-          console.log(`No default notification for status: ${newStatus}`);
       }
 
-      // 3️⃣ Handle slot and conflicting appointments
+      // 3️⃣ If approved → deny conflicting + update availability with reason = Scheduled Appointment
       if (newStatus === 'approved') {
         try {
           const allAppointmentsRes = await AxiosInstance.get('appointment/appointments/');
 
           const sameSlotAppointments = allAppointmentsRes.data.filter(app =>
-            app.id !== id && 
+            app.id !== id &&
             app.appointment_status === 'pending' &&
             app.date === date &&
             app.time === time
@@ -109,8 +104,6 @@ const ModalDetails = (props) => {
               await sendDefaultNotification('appointment_denied', app.user);
             })
           );
-
-          // console.log(`Denied ${sameSlotAppointments.length} conflicting appointment(s).`);
         } catch (err) {
           console.error('Error denying conflicting appointments:', err);
         }
@@ -118,22 +111,23 @@ const ModalDetails = (props) => {
         if (matchedSlotKey) {
           try {
             const availabilityRes = await AxiosInstance.get(`availability/display_unavailability/?date=${date}`);
-            const existing = availabilityRes.data && availabilityRes.data[0] ? availabilityRes.data[0] : null;
+            const existing = availabilityRes.data?.[0] || null;
 
             const updatedUnavailability = {
               ...existing,
               date,
               [matchedSlotKey]: true,
+              [`reason_${matchedSlotKey.split('_')[1]}`]: "Scheduled Appointment"
             };
 
             await AxiosInstance.post('availability/set_unavailability/', updatedUnavailability);
-            // console.log(`Marked ${matchedSlotKey} = true for ${date}`);
           } catch (err) {
             console.error('Error marking slot unavailable:', err);
           }
         }
-      } else {
-        // 4️⃣ Free the slot if status changed from approved to something else
+      } 
+      else {
+        // 4️⃣ If removing approval → free slot if no other approved appointment exists
         try {
           if ((oldStatus || '').toLowerCase() === 'approved' && matchedSlotKey) {
             const allAppointmentsRes = await AxiosInstance.get('appointment/appointments/');
@@ -146,26 +140,24 @@ const ModalDetails = (props) => {
 
             if (!otherApproved) {
               const availabilityRes = await AxiosInstance.get(`availability/display_unavailability/?date=${date}`);
-              const existing = availabilityRes.data && availabilityRes.data[0] ? availabilityRes.data[0] : null;
+              const existing = availabilityRes.data?.[0] || null;
 
               const updatedUnavailability = {
                 ...existing,
                 date,
                 [matchedSlotKey]: false,
+                [`reason_${matchedSlotKey.split('_')[1]}`]: "available"
               };
 
               await AxiosInstance.post('availability/set_unavailability/', updatedUnavailability);
-              console.log(`Marked ${matchedSlotKey} = false for ${date}`);
-            } else {
-              console.log('Slot remains unavailable because another appointment is approved.');
             }
           }
         } catch (err) {
-          console.error('Error while reverting slot availability:', err);
+          console.error('Error reverting slot availability:', err);
         }
       }
 
-      // 5️⃣ Refresh UI
+      // Refresh
       if (onUpdate) onUpdate();
       if (onClose) onClose();
       alert('Status updated successfully!');
@@ -176,7 +168,6 @@ const ModalDetails = (props) => {
   };
 
   return (
-
     <div className="outerModal">
       <div className='modalDetails'>
         
@@ -192,7 +183,7 @@ const ModalDetails = (props) => {
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
               }}
-              />
+            />
           </button>
         </Tooltip>
 
@@ -239,14 +230,12 @@ const ModalDetails = (props) => {
               <p className="modalDetails-number">{phone_number}</p>
             </div>
 
-
           </div>
         </div>
 
         <div className="modalDetailsBottom">
           <div className="modalDetails-description">
             <p className='description-title'>Description:</p>
-
             <p>{description}</p>
           </div>
 

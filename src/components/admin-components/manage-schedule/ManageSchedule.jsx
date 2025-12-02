@@ -41,54 +41,23 @@ const ManageSchedule = () => {
   const handleClose = () => {
       setOpen(false);
   };
-
-  const slots = unavailabilityData ? {
-    slot_one: unavailabilityData.slot_one,
-    slot_two: unavailabilityData.slot_two,
-    slot_three: unavailabilityData.slot_three,
-    slot_four: unavailabilityData.slot_four,
-    slot_five: unavailabilityData.slot_five,
-  } : null;
-
-  const showToast = (message, type = "success") => {
-    toast[type](
-      <div style={{ padding: '8px' }}>{message}</div>,
-      {
-        position: "top-center",
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-        transition: Slide,
-        closeButton: false,
-      }
-    );
-  };
-
   
   return (
     <div className='adminAppContainer manageSchedule'>
 
       <Dialog open={open} onClose={handleClose}>
         <SetUnavailability
-          unavailableSlots={slots}
           selectedDate={selectedDate}
 
           onClose={handleClose}
-          onAlert={showToast}
         />
       </Dialog>
 
       <div className="manageSchedule-calendar">
-        <BigCalendar 
-          onCLickDate={handleDateClick}
+        <BigCalendar
+            onCLickDate={handleDateClick} 
         />
       </div>
-
-      <ToastContainer />
     </div>
   )
 }
