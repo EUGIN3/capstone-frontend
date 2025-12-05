@@ -5,7 +5,7 @@
 
   border-radius: 6px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 16px;
+  padding: 30px;
 
   display: flex;
   flex-direction: column;
@@ -21,7 +21,7 @@
   padding: 12px;
   background-color: transparent;
   overflow: hidden;
-  max-height: 600px;
+  max-height: 700px;
 }
 
 .close-display-modal {
@@ -49,6 +49,7 @@
   max-height: 400px;
   min-height: 400px;
   padding-right: 5px;
+  padding: 5px;
 }
 
 .top-to-display {
@@ -60,7 +61,6 @@
 
 .to-display-item {
   width: 100%;
-  height: 60px;
   display: grid;
   grid-template-columns: 1fr 60px;
   align-items: center;
@@ -82,14 +82,14 @@
 }
 
 .to-display-img-container {
-  object-fit: contain;
   width: 60px;
-  height: 60px;
+  height: 80px;
 }
 
 .to-display-img-container img {
   width: 100%;
   height: 100%;
+  object-fit: cover;
 }
 
 .to-display-toggle {
@@ -97,4 +97,9 @@
   justify-content: center;
   align-items: center;
   height: 100%;
+}
+
+
+.to-display-search-input {
+  border: 1px solid #0c0c0c;
 }

@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import './ToDisplayModal.css';
 import noImage from '../../../../assets/no-image.jpg';
-import { Tooltip } from '@mui/material';
+import { Tooltip, TextField } from '@mui/material';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import Switches from '../../../forms/switches/Switches';
 import AxiosInstance from '../../../API/AxiosInstance';
 
 function ToDisplayModal({ onClose }) {
   const [attires, setAttires] = useState([]);
+  const [filteredAttires, setFilteredAttires] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const fetchAttires = async () => {
     try {
       const response = await AxiosInstance.get('/gallery/admin/attire/');
       setAttires(response.data);
+      setFilteredAttires(response.data);
     } catch (error) {
       console.error(error);
       alert('Failed to fetch attires');
@@ -23,24 +26,28 @@ function ToDisplayModal({ onClose }) {
     fetchAttires();
   }, []);
 
+  // Filter attires in real-time
+  useEffect(() => {
+    const filtered = attires.filter((attire) =>
+      attire.attire_name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredAttires(filtered);
+  }, [searchTerm, attires]);
+
   const handleToggle = async (id, currentValue) => {
-    // Optimistic update: update local state first
     const updatedAttires = attires.map((attire) =>
       attire.id === id ? { ...attire, to_show: !currentValue } : attire
     );
     setAttires(updatedAttires);
+    setFilteredAttires(updatedAttires);
 
-    // Send PATCH request to backend immediately
     try {
-      await AxiosInstance.patch(`/gallery/admin/attire/${id}/`, {
-        to_show: !currentValue,
-      });
+      await AxiosInstance.patch(`/gallery/admin/attire/${id}/`, { to_show: !currentValue });
     } catch (error) {
       console.error(error);
       alert('Failed to update display setting.');
-
-      // Revert change if PATCH fails
       setAttires(attires);
+      setFilteredAttires(attires);
     }
   };
 
@@ -68,9 +75,48 @@ function ToDisplayModal({ onClose }) {
             <p>Display Options</p>
           </div>
 
+          {/* Search Field */}
+          <TextField
+            variant="outlined"
+            placeholder="Search Attire Name"
+            fullWidth
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{
+              width: '100%', 
+              '& .MuiOutlinedInput-root': {
+                fontSize: '14px',
+                '&::placeholder': {
+                  fontSize: '14px',
+                },
+                '& input': {
+                  fontSize: '14px',
+                },
+                '& fieldset': {
+                  borderColor: '#2d2d2db6',
+                },
+                '&:hover fieldset': {
+                  borderColor: '#0C0C0C',
+                  borderWidth: '2px',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#0C0C0C',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: '#2d2d2db6',
+                fontSize: '14px',
+              },
+              '& .MuiInputLabel-root.Mui-focused': {
+                color: '#0C0C0C',
+                fontSize: '14px',
+              },
+            }}
+          />
+
           <div className="to-display-items-container">
-            {attires.length > 0 ? (
-              attires.map((attire) => (
+            {filteredAttires.length > 0 ? (
+              filteredAttires.map((attire) => (
                 <div key={attire.id} className="to-display-item">
                   <div className="to-display-info">
                     <div className="to-display-img-container">
@@ -104,4 +150,3 @@ function ToDisplayModal({ onClose }) {
 }
 
 export default ToDisplayModal;
-

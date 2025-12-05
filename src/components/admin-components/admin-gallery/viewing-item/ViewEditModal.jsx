@@ -3,16 +3,18 @@ import './ViewEditModal.css';
 import { Tooltip } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import DropdownComponentTime from '../../../forms/time-dropdown/DropDownForTime';
+import MultilineTextFields from '../../../forms/multilines-textfield/MultilineTextFields';
 import NormalTextField from '../../../forms/text-fields/NormalTextField';
 import GalleryImageDropdown from '../../../forms/upload-file/GalleryImageDropdown';
 import ButtonElement from '../../../forms/button/ButtonElement';
 import AxiosInstance from '../../../API/AxiosInstance';
 
 function ViewEditModal({ onClose, attire }) {
-  const { control, handleSubmit, reset, setValue } = useForm({});
+  const { control, handleSubmit, reset, setValue, watch } = useForm({});
   const [images, setImages] = useState([null, null, null, null, null]);
   const [resetTrigger, setResetTrigger] = useState(false);
+
+  const descriptionValue = watch('description') || '';
 
   const attireTypeOptions = [
     { value: 'ball gown', label: 'Ball Gown' },
@@ -29,9 +31,8 @@ function ViewEditModal({ onClose, attire }) {
     if (attire) {
       setValue('attire_name', attire.attire_name);
       setValue('attire_type', attire.attire_type);
-      setValue('description', attire.attire_description);
+      setValue('description', attire.attire_description || '');
 
-      // Preload existing images
       const preloadedImages = [
         attire.image1 || null,
         attire.image2 || null,
@@ -44,9 +45,9 @@ function ViewEditModal({ onClose, attire }) {
   }, [attire, setValue]);
 
   const handleImageChange = (file, index) => {
-    const newImages = [...images];
-    newImages[index] = file;
-    setImages(newImages);
+    const updated = [...images];
+    updated[index] = file;
+    setImages(updated);
   };
 
   const onSubmit = async (data) => {
@@ -78,7 +79,7 @@ function ViewEditModal({ onClose, attire }) {
   return (
     <div className="outerEditItemModal">
       <Tooltip title='Close' arrow>
-         <button className="close-editItem-modal" onClick={onClose}>
+        <button className="close-editItem-modal" onClick={onClose}>
           <CloseRoundedIcon
             sx={{
               color: '#f5f5f5',
@@ -104,38 +105,32 @@ function ViewEditModal({ onClose, attire }) {
           </div>
 
           <div className="type-edit-item-container">
-            <DropdownComponentTime
-              items={attireTypeOptions}
-              dropDownLabel="Attire Type"
-              name="attire_type"
-              control={control}
-            />
+            <NormalTextField control={control} name="attire_type" label="Attire Type" />
+            {/* Replace with dropdown if needed */}
           </div>
         </div>
 
-        <div className="description-edit-item-container">
-          <NormalTextField control={control} name="description" label="Description" />
-        </div>
-
         <div className="images-edit-item-container">
+          {/* MAIN IMAGE */}
           <Tooltip title='Main Image' arrow>
             <div className="edit-item-main-image">
-              <GalleryImageDropdown 
+              <GalleryImageDropdown
                 resetTrigger={resetTrigger}
                 existingImage={images[0]}
-                onImageSelect={(file) => handleImageChange(file, 0)} 
+                onImageSelect={(file) => handleImageChange(file, 0)}
               />
             </div>
           </Tooltip>
 
+          {/* SUB IMAGES */}
           <div className="edit-item-sub-images">
             {[1, 2, 3, 4].map((idx) => (
               <Tooltip key={idx} title='Image' arrow>
                 <div className="edit-images">
-                  <GalleryImageDropdown 
+                  <GalleryImageDropdown
                     resetTrigger={resetTrigger}
                     existingImage={images[idx]}
-                    onImageSelect={(file) => handleImageChange(file, idx)} 
+                    onImageSelect={(file) => handleImageChange(file, idx)}
                   />
                 </div>
               </Tooltip>
@@ -143,8 +138,17 @@ function ViewEditModal({ onClose, attire }) {
           </div>
         </div>
 
+        <div className="description-edit-item-container">
+          <MultilineTextFields
+            value={descriptionValue}
+            onChange={(e) => setValue('description', e.target.value)}
+            placeholder="Description"
+            className="custom-description-input"
+          />
+        </div>
+
         <div className="save-edit-item-container">
-          <ButtonElement 
+          <ButtonElement
             label='Update'
             variant='filled-black'
             type='button'

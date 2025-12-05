@@ -8,7 +8,7 @@ export default function MultilineTextFields({ value, onChange, placeholder, clas
       className={className}
       placeholder={placeholder}
       multiline
-      rows={4}
+      rows={3}
       fullWidth
       value={value}
       onChange={onChange}

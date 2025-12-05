@@ -17,7 +17,7 @@ function Switches({ title, checked, onChange }) {
               backgroundColor: '#000000ff', // color of the circle when checked
             },
             '& .MuiSwitch-track': {
-              backgroundColor: '#bdbdbdff', // background track color when unchecked
+              backgroundColor: '#0c0c0c', // background track color when unchecked
             },
             '& .Mui-checked + .MuiSwitch-track': {
               backgroundColor: '#0c0c0c', // background track color when checked

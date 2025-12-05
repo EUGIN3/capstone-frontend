@@ -1,0 +1,57 @@
+.outerEditItemModal {
+    background-color: transparent;
+    position: relative;
+    padding: 10px;
+}
+
+.close-editItem-modal {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: transparent;
+}
+
+.edit-item-header {
+    font-size: 24px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.EditItemModal {
+    background-color: #f5f5f5;
+    padding: 20px;
+    border-radius: 12px;
+    width: 600px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.name-type-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    gap: 10px;
+}
+
+.images-edit-item-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    height: 250px;
+    gap: 10px;
+}
+
+.edit-item-main-image {
+    height: 250px;
+}
+
+.edit-item-sub-images {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 120px 120px;
+    gap: 10px;
+}
+
+.save-edit-item-container {
+    height: 50px;
+}

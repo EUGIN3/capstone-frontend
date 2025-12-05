@@ -2,150 +2,166 @@ import './Appointment.css'
 
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import * as yup from "yup";
-import { yupResolver } from '@hookform/resolvers/yup';
-import dayjs from 'dayjs';
+import dayjs from 'dayjs'
 
-import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
-import Dialog from '@mui/material/Dialog';
-import ButtonElement from '../../../forms/button/ButtonElement';
-import NormalTextField from '../../../forms/text-fields/NormalTextField';
-import AxiosInstance from '../../../API/AxiosInstance';
-import DatePickerComponent from '../../../forms/date-picker/DatePicker';
-import FixTime from '../../../forms/fixtime/FixTime';
-import CancelTwoToneIcon from '@mui/icons-material/CancelTwoTone';
-import UploadBox from '../../../forms/upload-file/ImageUpload';
-import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import EditTwoToneIcon from '@mui/icons-material/EditTwoTone'
+import Dialog from '@mui/material/Dialog'
+import ButtonElement from '../../../forms/button/ButtonElement'
+import NormalTextField from '../../../forms/text-fields/NormalTextField'
+import AxiosInstance from '../../../API/AxiosInstance'
+import DatePickerComponent from '../../../forms/date-picker/DatePicker'
+import FixTime from '../../../forms/fixtime/FixTime'
+import CancelTwoToneIcon from '@mui/icons-material/CancelTwoTone'
+import UploadBox from '../../../forms/upload-file/ImageUpload'
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import noImage from '../../../../assets/no-image.jpg'
-import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
-
-import { Tooltip } from '@mui/material';
+import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone'
+import { Tooltip } from '@mui/material'
 
 function Appointment(props) {
-  const { date, time, status, id, onUpdate, facebookLink, adress, description, image, appointment_type } = props;
-  const [open, setOpen] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(dayjs());
-  const [selectedTime, setSelectedTime] = useState('');
-  const [availabilityData, setAvailabilityData] = useState({});
-  const [disabledSlots, setDisabledSlots] = useState({});
-  const [resetUploadBox, setResetUploadBox] = useState(false);
+  const {
+    date,
+    time,
+    status,
+    id,
+    onUpdate,
+    description,
+    image
+  } = props
 
-  const getFullImageUrl = (image) => {
-    if (!image) return '/placeholder.png';
-    return image.startsWith('http') ? image : `http://127.0.0.1:8000${image}`;
-  };
+  const [open, setOpen] = useState(false)
+  const [selectedImage, setSelectedImage] = useState(null)
+  const [selectedDate, setSelectedDate] = useState(dayjs())
+  const [selectedTime, setSelectedTime] = useState('')
+  const [availabilityData, setAvailabilityData] = useState({})
+  const [disabledSlots, setDisabledSlots] = useState({})
+  const [resetUploadBox, setResetUploadBox] = useState(false)
 
-  const handleClickOpen = () => {
-    console.log(image);
-    setOpen(true);
-  };
+  const { handleSubmit, control, reset } = useForm()
 
-  useEffect(() => {
-    if (open) {
-      const formattedDate = dayjs(date);
-      setSelectedDate(formattedDate);
-      setSelectedTime(time);
+  const getFullImageUrl = (img) => {
+    if (!img) return '/placeholder.png'
+    return img.startsWith('http') ? img : `http://127.0.0.1:8000${img}`
+  }
 
-      reset({
-        time: time || '',
-        updatedAppointmentDescription: description && description !== 'undefined' ? description : '',
-      });
-    }
-  }, [open]);
+  const handleClickOpen = () => setOpen(true)
+  const handleClose = () => setOpen(false)
 
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const getAvailability = (date) => {
-    AxiosInstance.get(`availability/display_unavailability/`)
+  const getAvailability = (dateStr) => {
+    AxiosInstance.get(`availability/display_unavailability/?date=${dateStr}`)
       .then((response) => {
-        const data = response.data.find(item => item.date === date);
+        const data = response.data[0]
         if (data) {
-          setAvailabilityData(data);
+          setAvailabilityData(data)
           const unavailableSlots = {
             '7:00 - 8:30 AM': data.slot_one,
             '8:30 - 10:00 AM': data.slot_two,
             '10:00 - 11:30 AM': data.slot_three,
             '1:00 - 2:30 PM': data.slot_four,
-            '2:30 - 4:00 PM': data.slot_five,
-          };
-          setDisabledSlots(unavailableSlots);
+            '2:30 - 4:00 PM': data.slot_five
+          }
+          setDisabledSlots(unavailableSlots)
         } else {
-          setAvailabilityData({});
-          setDisabledSlots({});
+          setAvailabilityData({})
+          setDisabledSlots({})
         }
-      });
-  };
+      })
+  }
 
   useEffect(() => {
-    const formattedDate = selectedDate.format('YYYY-MM-DD');
-    getAvailability(formattedDate);
-  }, [selectedDate]);
-
-  const handleCancel = () => {
-    
-    AxiosInstance.patch(`appointment/user_appointments/${id}/`, {
-      appointment_status: "cancelled"
-    })
-      .then((response) => {
-        if (onUpdate) onUpdate(response.data);
+    if (open) {
+      const formattedDate = dayjs(date)
+      setSelectedDate(formattedDate)
+      setSelectedTime(time)
+      reset({
+        time: time || '',
+        updatedAppointmentDescription:
+          description && description !== 'undefined' ? description : ''
       })
-      .catch((error) => {
-        console.error('Failed to cancel appointment:', error);
-      });
-    
-  };
+    }
+  }, [open])
+
+  useEffect(() => {
+    const formattedDate = selectedDate.format('YYYY-MM-DD')
+    getAvailability(formattedDate)
+  }, [selectedDate])
+
+  const timeToSlotMap = {
+    '7:00 - 8:30 AM': 'slot_one',
+    '8:30 - 10:00 AM': 'slot_two',
+    '10:00 - 11:30 AM': 'slot_three',
+    '1:00 - 2:30 PM': 'slot_four',
+    '2:30 - 4:00 PM': 'slot_five'
+  }
+
+  const handleCancel = async () => {
+    try {
+      // 1️⃣ Cancel the appointment
+      const appointmentResponse = await AxiosInstance.patch(
+        `appointment/user_appointments/${id}/`,
+        { appointment_status: 'cancelled' }
+      )
+
+      if (onUpdate) onUpdate(appointmentResponse.data)
+
+      // 2️⃣ If appointment was approved, free up the slot
+      if (status === 'approved') {
+        const formattedDate = dayjs(date).format('YYYY-MM-DD')
+        const slotField = timeToSlotMap[time]
+
+        if (slotField) {
+          const res = await AxiosInstance.get(
+            `availability/display_unavailability/?date=${formattedDate}`
+          )
+          const unavailability = res.data[0]
+
+          if (unavailability) {
+            await AxiosInstance.patch(
+              `availability/set_unavailability/${unavailability.id}/`,
+              { [slotField]: false }
+            )
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to cancel appointment:', error)
+    }
+  }
 
   const handleDelete = () => {
     AxiosInstance.patch(`appointment/user_appointments/${id}/`, {
-      appointment_status: "archived"
+      appointment_status: 'archived'
     })
       .then((response) => {
-        if (onUpdate) onUpdate(response.data); // trigger UI update
+        if (onUpdate) onUpdate(response.data)
       })
-      .catch((error) => {
-        console.error('Failed to delete appointment:', error);
-      });
-  };
-
-  const { handleSubmit, control, reset } = useForm();
+      .catch((error) => console.error('Failed to delete appointment:', error))
+  }
 
   const submission = (data) => {
-    const formData = new FormData();
-    formData.append('date', selectedDate.format('YYYY-MM-DD'));
-    formData.append('time', selectedTime);
-    formData.append('description', data.updatedAppointmentDescription);
+    const formData = new FormData()
+    formData.append('date', selectedDate.format('YYYY-MM-DD'))
+    formData.append('time', selectedTime)
+    formData.append('description', data.updatedAppointmentDescription)
 
-    if (selectedImage) {
-      formData.append('image', selectedImage);
-    }
+    if (selectedImage) formData.append('image', selectedImage)
 
     AxiosInstance.patch(`appointment/user_appointments/${id}/`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      }
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }).then((response) => {
+      handleClose()
+      if (onUpdate) onUpdate(response.data)
+      reset()
+      setSelectedTime('')
+      setSelectedDate(dayjs(date))
+      setSelectedImage(null)
+      setResetUploadBox((prev) => !prev)
     })
-      .then((response) => {
-        handleClose();
-        if (onUpdate) onUpdate(response.data);
+  }
 
-        reset();
-        setSelectedTime('');
-        setSelectedDate(dayjs(date));
+  const handleTimeSelect = (time) => setSelectedTime(time)
 
-        setSelectedImage(null);
-        setResetUploadBox(prev => !prev);
-      });
-  };
-
-  const handleTimeSelect = (time) => {
-    setSelectedTime(time);
-  };
-
-  // ✅ Format the date to "October 07, 2025"
-  const formattedDate = dayjs(date).format('MMMM DD, YYYY');
+  const formattedDate = dayjs(date).format('MMMM DD, YYYY')
 
   return (
     <div className={`appointment-box ${status}`}>
@@ -159,13 +175,13 @@ function Appointment(props) {
             maxHeight: '90vh',
             padding: '0px',
             backgroundColor: 'transparent',
-            boxShadow: 'none',
-          },
+            boxShadow: 'none'
+          }
         }}
       >
-        <form onSubmit={handleSubmit(submission)} className='update-appointment-form'>
+        <form onSubmit={handleSubmit(submission)} className="update-appointment-form">
           <div className="outerUpdateAppointment">
-            <Tooltip title='Close' arrow>
+            <Tooltip title="Close" arrow>
               <button className="close-modal" onClick={handleClose}>
                 <CloseRoundedIcon
                   sx={{
@@ -175,27 +191,21 @@ function Appointment(props) {
                     backgroundColor: '#0c0c0c',
                     borderRadius: '50%',
                     cursor: 'pointer',
-                    transition: 'all 0.3s ease',
+                    transition: 'all 0.3s ease'
                   }}
                 />
               </button>
             </Tooltip>
 
-            <div className='update-dialog-container'>
-              <div className='update-dialog-title-container'>
+            <div className="update-dialog-container">
+              <div className="update-dialog-title-container">
                 <p>Update Appointment</p>
               </div>
 
-              <div className='update-dialog-input-container'>
+              <div className="update-dialog-input-container">
                 <div className="update-appointment-image">
                   <div className="current-image">
-                    <img
-                      src={
-                        image === null ? noImage :
-                          getFullImageUrl(image)
-                      }
-                      alt="Appointment"
-                    />
+                    <img src={image === null ? noImage : getFullImageUrl(image)} alt="Appointment" />
                   </div>
 
                   <UploadBox
@@ -206,7 +216,7 @@ function Appointment(props) {
 
                 <div className="update-dialog-time-date-container">
                   <DatePickerComponent
-                    name='date'
+                    name="date"
                     value={selectedDate}
                     onChange={(newValue) => setSelectedDate(newValue)}
                   />
@@ -221,35 +231,26 @@ function Appointment(props) {
                 </div>
 
                 <NormalTextField
-                  label='Description'
+                  label="Description"
                   name={'updatedAppointmentDescription'}
                   control={control}
-                  classes='appointment-description'
-                  placeHolder='Appointment description'
+                  classes="appointment-description"
+                  placeHolder="Appointment description"
                 />
               </div>
 
               <div className="update-dialog-button-container">
-                <ButtonElement
-                  label='Save'
-                  variant='filled-black'
-                  type={'submit'}
-                />
+                <ButtonElement label="Save" variant="filled-black" type={'submit'} />
               </div>
             </div>
           </div>
         </form>
       </Dialog>
 
-      {
-        status === 'cancelled' && <p className='status-text cancelled'>Cancelled</p>
-        ||
-        status === 'denied' && <p className='status-text denied'>Denied</p>
-        ||
-        status === 'approved' && <p className='status-text approved'>Approved</p>
-        ||
-        status === 'pending' && <p className='status-text pending'>Pending</p>
-      }
+      {status === 'cancelled' && <p className="status-text cancelled">Cancelled</p>}
+      {status === 'denied' && <p className="status-text denied">Denied</p>}
+      {status === 'approved' && <p className="status-text approved">Approved</p>}
+      {status === 'pending' && <p className="status-text pending">Pending</p>}
 
       <div className="information-container">
         <div className="appointment-date">
@@ -263,12 +264,12 @@ function Appointment(props) {
       {status === 'pending' && (
         <div className="appointment-button-container">
           <div className="edit-icon" onClick={handleClickOpen}>
-            <Tooltip title='Edit' arrow placement='left'>
+            <Tooltip title="Edit" arrow placement="left">
               <EditTwoToneIcon />
             </Tooltip>
           </div>
           <div className="cancel-icon" onClick={handleCancel}>
-            <Tooltip title='Cancel' arrow placement='left'>
+            <Tooltip title="Cancel" arrow placement="left">
               <CancelTwoToneIcon />
             </Tooltip>
           </div>
@@ -278,24 +279,24 @@ function Appointment(props) {
       {status === 'approved' && (
         <div className="appointment-button-container">
           <div className="cancel-icon" onClick={handleCancel}>
-            <Tooltip title='Cancel' arrow placement='left'>
+            <Tooltip title="Cancel" arrow placement="left">
               <CancelTwoToneIcon />
             </Tooltip>
           </div>
         </div>
       )}
 
-      {status === 'cancelled' || status === 'denied' ? (
+      {(status === 'cancelled' || status === 'denied') && (
         <div className="appointment-button-container">
           <div className="edit-icon" onClick={handleDelete}>
-            <Tooltip title='Delete' arrow placement='left'>
+            <Tooltip title="Delete" arrow placement="left">
               <DeleteTwoToneIcon />
             </Tooltip>
           </div>
-        </div> 
-      ) : null}
+        </div>
+      )}
     </div>
-  );
+  )
 }
 
-export default Appointment;
+export default Appointment
