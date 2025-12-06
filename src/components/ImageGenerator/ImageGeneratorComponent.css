@@ -8,6 +8,7 @@
     text-transform: uppercase;
     font-weight: 600;
     margin-bottom: 14px;
+    margin-top: 0;
 }
 
 .imageGenerator-bottomPart {
@@ -74,8 +75,6 @@
   border-color: #0c0c0c !important; 
 }
 
-
-/* Selected */
 .css-1rwwkew-MuiSvgIcon-root {
     text-decoration-color: #0c0c0c !important;
     border-bottom-color: #0c0c0c !important;
