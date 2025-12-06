@@ -13,25 +13,16 @@ function ViewEditModal({ onClose, attire }) {
   const { control, handleSubmit, reset, setValue, watch } = useForm({});
   const [images, setImages] = useState([null, null, null, null, null]);
   const [resetTrigger, setResetTrigger] = useState(false);
+  const [toShow, setToShow] = useState(false);
 
   const descriptionValue = watch('description') || '';
-
-  const attireTypeOptions = [
-    { value: 'ball gown', label: 'Ball Gown' },
-    { value: 'mermaid', label: 'Mermaid' },
-    { value: 'a line', label: 'A-Line' },
-    { value: 'trumpet', label: 'Trumpet' },
-    { value: 'empire waist', label: 'Empire Waist' },
-    { value: 'tea length', label: 'Tea Length' },
-    { value: 'high low', label: 'High-Low' },
-    { value: 'sheath', label: 'Sheath' },
-  ];
 
   useEffect(() => {
     if (attire) {
       setValue('attire_name', attire.attire_name);
       setValue('attire_type', attire.attire_type);
       setValue('description', attire.attire_description || '');
+      setToShow(attire.to_show);
 
       const preloadedImages = [
         attire.image1 || null,
@@ -44,9 +35,17 @@ function ViewEditModal({ onClose, attire }) {
     }
   }, [attire, setValue]);
 
+  // Handle image selection
   const handleImageChange = (file, index) => {
     const updated = [...images];
     updated[index] = file;
+    setImages(updated);
+  };
+
+  // Handle image removal
+  const handleImageRemove = (index) => {
+    const updated = [...images];
+    updated[index] = "REMOVE"; // Mark this image as removed
     setImages(updated);
   };
 
@@ -56,11 +55,19 @@ function ViewEditModal({ onClose, attire }) {
       formData.append('attire_name', data.attire_name);
       formData.append('attire_type', data.attire_type);
       formData.append('attire_description', data.description);
+      formData.append('to_show', toShow);
 
       images.forEach((img, idx) => {
+        const field = `image${idx + 1}`;
+
         if (img instanceof File) {
-          formData.append(`image${idx + 1}`, img);
+          // When user uploads a new image
+          formData.append(field, img);
+        } else if (img === "REMOVE") {
+          // When user removes an image → send null
+          formData.append(field, "");
         }
+        // If img is a string, it's the old image → do nothing
       });
 
       await AxiosInstance.patch(`/gallery/admin/attire/${attire.id}/`, formData, {
@@ -99,6 +106,17 @@ function ViewEditModal({ onClose, attire }) {
           <p>Edit Attire</p>
         </div>
 
+        {/* DISPLAY TOGGLE */}
+        <div className="to-display-toggle-container">
+          <p>Display on Gallery:</p>
+          <div
+            className={`to-display-text ${toShow ? 'display' : 'not-display'}`}
+            onClick={() => setToShow(!toShow)}
+          >
+            {toShow ? 'Display' : 'Not Display'}
+          </div>
+        </div>
+
         <div className="name-type-container">
           <div className="name-edit-item-container">
             <NormalTextField control={control} name="attire_name" label="Name" />
@@ -106,7 +124,6 @@ function ViewEditModal({ onClose, attire }) {
 
           <div className="type-edit-item-container">
             <NormalTextField control={control} name="attire_type" label="Attire Type" />
-            {/* Replace with dropdown if needed */}
           </div>
         </div>
 
@@ -116,8 +133,9 @@ function ViewEditModal({ onClose, attire }) {
             <div className="edit-item-main-image">
               <GalleryImageDropdown
                 resetTrigger={resetTrigger}
-                existingImage={images[0]}
+                existingImage={images[0] !== "REMOVE" ? images[0] : null}
                 onImageSelect={(file) => handleImageChange(file, 0)}
+                onRemoveImage={() => handleImageRemove(0)}
               />
             </div>
           </Tooltip>
@@ -129,8 +147,9 @@ function ViewEditModal({ onClose, attire }) {
                 <div className="edit-images">
                   <GalleryImageDropdown
                     resetTrigger={resetTrigger}
-                    existingImage={images[idx]}
+                    existingImage={images[idx] !== "REMOVE" ? images[idx] : null}
                     onImageSelect={(file) => handleImageChange(file, idx)}
+                    onRemoveImage={() => handleImageRemove(idx)}
                   />
                 </div>
               </Tooltip>

@@ -3,56 +3,55 @@ import React, { useState, useRef, useEffect } from "react";
 
 export default function GalleryImageDropdown({
   onImageSelect,
+  onRemoveImage,   // <-- NEW callback to tell parent to delete from backend
   resetTrigger,
-  existingImage   // <-- add this
+  existingImage
 }) {
   const [preview, setPreview] = useState(null);
   const dropAreaRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  // Load existing saved image
   useEffect(() => {
     if (existingImage && typeof existingImage === "string") {
-      setPreview(existingImage);   // load saved image from backend
+      setPreview(existingImage);
     }
   }, [existingImage]);
 
   const handleFile = (file) => {
     if (!file) return;
-    const validExtensions = ["image/jpeg", "image/jpg", "image/png"];
 
-    if (validExtensions.includes(file.type)) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setPreview(reader.result);
-        if (onImageSelect) onImageSelect(file);
-      };
-      reader.readAsDataURL(file);
-    } else {
+    const validExtensions = ["image/jpeg", "image/jpg", "image/png"];
+    if (!validExtensions.includes(file.type)) {
       alert("This is not an image file!");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setPreview(reader.result);
+      onImageSelect && onImageSelect(file);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeImage = (e) => {
+    e.stopPropagation(); // prevent triggering file browser
+    setPreview(null);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+
+    // Tell parent to delete the saved backend image
+    if (onRemoveImage) {
+      onRemoveImage();
     }
   };
 
-  const onBrowse = () => fileInputRef.current.click();
-  const onFileChange = (e) => handleFile(e.target.files[0]);
-
-  const onDragOver = (e) => {
-    e.preventDefault();
-    dropAreaRef.current.classList.add("active");
-  };
-
-  const onDragLeave = () => dropAreaRef.current.classList.remove("active");
-
-  const onDrop = (e) => {
-    e.preventDefault();
-    dropAreaRef.current.classList.remove("active");
-    handleFile(e.dataTransfer.files[0]);
-  };
-
-  // Reset preview on trigger (after update)
+  // Reset handler
   useEffect(() => {
     if (resetTrigger) {
-      setPreview(existingImage || null); // fallback to saved image
+      setPreview(existingImage || null);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   }, [resetTrigger, existingImage]);
@@ -61,22 +60,25 @@ export default function GalleryImageDropdown({
     <div
       className="drag-area-gallery"
       ref={dropAreaRef}
-      onDragOver={onDragOver}
-      onDragLeave={onDragLeave}
-      onDrop={onDrop}
-      onClick={onBrowse}
+      onDragOver={(e) => { e.preventDefault(); dropAreaRef.current.classList.add("active"); }}
+      onDragLeave={() => dropAreaRef.current.classList.remove("active")}
+      onDrop={(e) => { e.preventDefault(); dropAreaRef.current.classList.remove("active"); handleFile(e.dataTransfer.files[0]); }}
+      onClick={() => fileInputRef.current.click()}
     >
       {preview ? (
-        <img src={preview} alt="preview" />
+        <>
+          <img src={preview} alt="preview" />
+          <button className="remove-image-btn" onClick={removeImage}>×</button>
+        </>
       ) : (
         <>
           <p>+</p>
           <input
             type="file"
             ref={fileInputRef}
-            onChange={onFileChange}
             hidden
             accept="image/*"
+            onChange={(e) => handleFile(e.target.files[0])}
           />
         </>
       )}

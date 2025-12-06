@@ -10,10 +10,12 @@ import ToDisplayModal from './select-to-display/ToDisplayModal';
 import ButtonElement from '../../forms/button/ButtonElement';
 import AxiosInstance from '../../API/AxiosInstance';
 import ViewEditModal from './viewing-item/ViewEditModal';
+import ViewModalItem from './viewing-item/ViewModalItem';
 
 const AdminGallery = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [attires, setAttires] = useState([]);
+  const [filteredAttires, setFilteredAttires] = useState([]);
   const [selectedAttire, setSelectedAttire] = useState(null);
 
   const [isAdd, setIsAdd] = useState(false);
@@ -21,12 +23,13 @@ const AdminGallery = () => {
   const [isView, setIsView] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
 
-  const handleSearchChange = (event) => setSearchTerm(event.target.value.toLowerCase());
+  const handleSearchChange = (event) => setSearchTerm(event.target.value);
 
   const fetchAttires = async () => {
     try {
       const response = await AxiosInstance.get('/gallery/admin/attire/?show_archived=true');
       setAttires(response.data);
+      setFilteredAttires(response.data);
     } catch (error) {
       console.error(error);
       alert('Failed to fetch attires');
@@ -34,6 +37,14 @@ const AdminGallery = () => {
   };
 
   useEffect(() => { fetchAttires(); }, []);
+
+  // Filter attires whenever searchTerm or attires change
+  useEffect(() => {
+    const filtered = attires.filter(attire =>
+      attire.attire_name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredAttires(filtered);
+  }, [searchTerm, attires]);
 
   const handleOpenAdd = () => setIsAdd(true);
   const handleCloseAdd = () => setIsAdd(false);
@@ -53,9 +64,6 @@ const AdminGallery = () => {
         <h2 className="gallery-header-title">GALLERY</h2>
 
         <div className="left-side-search">
-          <div className="select-what-see">
-            <ButtonElement label='Select attire' variant='filled-black' type='button' onClick={handleOpenSelecting} />
-          </div>
           <div className="search-user-container">
             <SearchIcon />
             <TextField
@@ -72,38 +80,47 @@ const AdminGallery = () => {
               value={searchTerm}
             />
           </div>
+          
+          <div className="select-what-see">
+            <ButtonElement label='Select attire' variant='filled-black' type='button' onClick={handleOpenSelecting} />
+          </div>
         </div>
       </div>
 
       <div className="gallery-items-container">
-        {attires.length > 0 &&
-          [...attires]
+        {filteredAttires.length > 0 ? (
+          [...filteredAttires]
             .sort((a, b) => (b.to_show === true) - (a.to_show === true))
             .map((attire) => (
               <div
                 key={attire.id}
-                className={`gallery-item ${attire.to_show === false && 'notShowing'}`}
+                className={`gallery-item ${attire.to_show === false ? 'notShowing' : ''}`}
               >
-                <img src={attire.image1 || noImage} alt={attire.attire_name} />
+                <img className='gallery-main-image' src={attire.image1 || noImage} alt={attire.attire_name} />
                 
-                {/* View Button */}
-                <button
-                  className="overlay-button view-btn"
-                  onClick={() => handleOpenView(attire)}
-                >
-                  View
-                </button>
+                <div className="gallery-buttons-con">
+                  {/* View Button */}
+                  <button
+                    className="overlay-button view-btn"
+                    onClick={() => handleOpenView(attire)}
+                  >
+                    View
+                  </button>
 
-                {/* Edit Button */}
-                <button
-                  className="overlay-button edit-btn"
-                  onClick={() => handleOpenEdit(attire)}
-                >
-                  Edit
-                </button>
-
+                  {/* Edit Button */}
+                  <button
+                    className="overlay-button edit-btn"
+                    onClick={() => handleOpenEdit(attire)}
+                  >
+                    Edit
+                  </button>
+                </div>
+                
               </div>
-            ))}
+            ))
+        ) : (
+          <p>No attires found.</p>
+        )}
 
         <div className="gallery-item gallery-add-item" onClick={handleOpenAdd}>
           <span>+</span>
@@ -125,13 +142,17 @@ const AdminGallery = () => {
       </Dialog>
 
       {/* View Modal */}
-      {/* <Dialog open={isView} onClose={handleCloseView} fullWidth maxWidth={false} PaperProps={{
+      <Dialog open={isView} onClose={handleCloseView} fullWidth maxWidth={false} PaperProps={{
         style: { width: 'auto', maxWidth: '90vw', maxHeight: '90vh', padding: '0px', backgroundColor: 'transparent', boxShadow: 'none' }
       }}>
-        <ViewEditModal onClose={handleCloseView} attire={selectedAttire} />
-      </Dialog> */}
+        <ViewModalItem 
+          onClose={handleCloseView} 
+          attire={selectedAttire}
+          onOpenEdit={handleOpenEdit}
+        />
+      </Dialog>
 
-      {/* Edit Modal (reuse ViewEditModal for editing) */}
+      {/* Edit Modal */}
       <Dialog open={isEdit} onClose={handleCloseEdit} fullWidth maxWidth={false} PaperProps={{
         style: { width: 'auto', maxWidth: '90vw', maxHeight: '90vh', padding: '0px', backgroundColor: 'transparent', boxShadow: 'none' }
       }}>

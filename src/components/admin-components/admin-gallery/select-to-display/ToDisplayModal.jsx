@@ -3,8 +3,8 @@ import './ToDisplayModal.css';
 import noImage from '../../../../assets/no-image.jpg';
 import { Tooltip, TextField } from '@mui/material';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import Switches from '../../../forms/switches/Switches';
 import AxiosInstance from '../../../API/AxiosInstance';
+import ButtonElement from '../../../forms/button/ButtonElement';
 
 function ToDisplayModal({ onClose }) {
   const [attires, setAttires] = useState([]);
@@ -34,20 +34,28 @@ function ToDisplayModal({ onClose }) {
     setFilteredAttires(filtered);
   }, [searchTerm, attires]);
 
-  const handleToggle = async (id, currentValue) => {
+  // Toggle display text
+  const handleToggle = (id) => {
     const updatedAttires = attires.map((attire) =>
-      attire.id === id ? { ...attire, to_show: !currentValue } : attire
+      attire.id === id ? { ...attire, to_show: !attire.to_show } : attire
     );
     setAttires(updatedAttires);
     setFilteredAttires(updatedAttires);
+  };
 
+  // Batch save when Update button is clicked
+  const handleUpdate = async () => {
     try {
-      await AxiosInstance.patch(`/gallery/admin/attire/${id}/`, { to_show: !currentValue });
+      const updatePromises = attires.map((attire) =>
+        AxiosInstance.patch(`/gallery/admin/attire/${attire.id}/`, { to_show: attire.to_show })
+      );
+      await Promise.all(updatePromises);
+      alert('Display settings updated successfully.');
+      onClose();
     } catch (error) {
       console.error(error);
-      alert('Failed to update display setting.');
-      setAttires(attires);
-      setFilteredAttires(attires);
+      alert('Failed to update display settings.');
+      fetchAttires(); // rollback local changes
     }
   };
 
@@ -75,7 +83,6 @@ function ToDisplayModal({ onClose }) {
             <p>Display Options</p>
           </div>
 
-          {/* Search Field */}
           <TextField
             variant="outlined"
             placeholder="Search Attire Name"
@@ -83,34 +90,17 @@ function ToDisplayModal({ onClose }) {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             sx={{
-              width: '100%', 
+              width: '100%',
               '& .MuiOutlinedInput-root': {
                 fontSize: '14px',
-                '&::placeholder': {
-                  fontSize: '14px',
-                },
-                '& input': {
-                  fontSize: '14px',
-                },
-                '& fieldset': {
-                  borderColor: '#2d2d2db6',
-                },
-                '&:hover fieldset': {
-                  borderColor: '#0C0C0C',
-                  borderWidth: '2px',
-                },
-                '&.Mui-focused fieldset': {
-                  borderColor: '#0C0C0C',
-                },
+                '&::placeholder': { fontSize: '14px' },
+                '& input': { fontSize: '14px' },
+                '& fieldset': { borderColor: '#2d2d2db6' },
+                '&:hover fieldset': { borderColor: '#0C0C0C', borderWidth: '2px' },
+                '&.Mui-focused fieldset': { borderColor: '#0C0C0C' },
               },
-              '& .MuiInputLabel-root': {
-                color: '#2d2d2db6',
-                fontSize: '14px',
-              },
-              '& .MuiInputLabel-root.Mui-focused': {
-                color: '#0C0C0C',
-                fontSize: '14px',
-              },
+              '& .MuiInputLabel-root': { color: '#2d2d2db6', fontSize: '14px' },
+              '& .MuiInputLabel-root.Mui-focused': { color: '#0C0C0C', fontSize: '14px' },
             }}
           />
 
@@ -120,28 +110,38 @@ function ToDisplayModal({ onClose }) {
                 <div key={attire.id} className="to-display-item">
                   <div className="to-display-info">
                     <div className="to-display-img-container">
-                      <img
-                        src={attire.image1 ? attire.image1 : noImage}
-                        alt={attire.attire_name}
-                      />
+                      <img src={attire.image1 || noImage} alt={attire.attire_name} />
                     </div>
                     <div className="to-display-name">
                       <p>{attire.attire_name}</p>
                     </div>
                   </div>
 
-                  <div className="to-display-toggle">
-                    <Switches
-                      title="display"
-                      checked={attire.to_show}
-                      onChange={() => handleToggle(attire.id, attire.to_show)}
-                    />
+                  <div
+                    className={`to-display-text ${attire.to_show ? 'display' : 'not-display'}`}
+                    onClick={() => handleToggle(attire.id)}
+                    style={{
+                      cursor: 'pointer',
+                      color: attire.to_show ? 'green' : 'red',
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    {attire.to_show ? 'Display' : 'Not Display'}
                   </div>
                 </div>
               ))
             ) : (
               <p>No attires available.</p>
             )}
+          </div>
+
+          <div className="save-edit-item-container">
+            <ButtonElement
+              label="Update"
+              variant="filled-black"
+              type="button"
+              onClick={handleUpdate}
+            />
           </div>
         </div>
       </div>

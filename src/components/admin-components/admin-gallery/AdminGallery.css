@@ -14,13 +14,13 @@
 
 #gallery .gallery-items-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* auto-adjusting columns */
+  grid-template-columns: repeat(5, 1fr); /* 5 columns */
   gap: 20px;
-  grid-auto-rows: auto; /* rows adjust to content height */
+  grid-auto-rows: auto;
 }
 
 #gallery .gallery-item {
-  position: relative; /* important for overlay button */
+  position: relative; /* important for overlay */
   border-radius: 8px;
   background-color: #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -36,8 +36,8 @@
 }
 
 #gallery .gallery-item img {
-  height: 100%;
   width: 100%;
+  height: 100%;
   object-fit: contain;
   border-radius: 8px;
 }
@@ -45,6 +45,9 @@
 #gallery .gallery-add-item {
   font-size: 80px;
   border: 2px dashed #0c0c0c76;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #gallery .gallery-add-item span {
@@ -71,53 +74,48 @@
   height: 50px;
 }
 
-#gallery .gallery-item.notShowing {
+#gallery .gallery-item.notShowing 
+.gallery-main-image {
   opacity: 0.6;
 }
 
-/* Overlay Button */
-#gallery .overlay-button {
-  width: 100px;
-  height: 50px;
-  border-radius: 4px;
-  font-size: 14px;
+/* Overlay Buttons Container */
+#gallery .gallery-buttons-con {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) scale(0.5);
-  opacity: 0;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  opacity: 0;             /* hidden initially */
+  pointer-events: none;   /* not clickable when hidden */
+  transition: opacity 0.3s ease;
+  z-index: 1000;
+}
+
+/* Show overlay buttons on hover */
+#gallery .gallery-item:hover .gallery-buttons-con {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Individual Overlay Buttons */
+#gallery .overlay-button {
+  width: 100px;
+  height: 40px;
+  border-radius: 4px;
+  font-size: 14px;
   background-color: #0c0c0c;
   color: #f5f5f5;
   border: none;
   cursor: pointer;
   letter-spacing: 1px;
-  transition: all 0.3s ease; 
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
+/* Button hover effect */
 #gallery .overlay-button:hover {
   background-color: rgba(0, 0, 0, 0.7);
-}
-
-#gallery .gallery-item:hover .overlay-button {
-  opacity: 1; /* fade in */
-  transform: translate(-50%, -50%) scale(1); 
-}
-
-/* Edit and View buttons positioning */
-#gallery .overlay-button.edit-btn {
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.5);
-}
-
-#gallery .overlay-button.view-btn {
-  top: 60%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.5);
-}
-
-/* Show buttons on hover */
-#gallery .gallery-item:hover .overlay-button {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
+  transform: scale(1.05);
 }

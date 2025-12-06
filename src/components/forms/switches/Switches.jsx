@@ -7,20 +7,20 @@ function Switches({ title, checked, onChange }) {
     <div>
       <Tooltip title={title} arrow>
         <Switch
-          checked={checked}           // <-- make sure checked is set
-          onChange={onChange}         // <-- forward the onChange!
+          checked={checked} 
+          onChange={onChange}         
           sx={{
             '& .MuiSwitch-thumb': {
-              backgroundColor: '#6e6e6eff', // color of the circle toggle
+              backgroundColor: '#6e6e6eff', 
             },
             '& .Mui-checked .MuiSwitch-thumb': {
-              backgroundColor: '#000000ff', // color of the circle when checked
+              backgroundColor: '#000000ff', 
             },
             '& .MuiSwitch-track': {
-              backgroundColor: '#0c0c0c', // background track color when unchecked
+              backgroundColor: '#202020ff', 
             },
             '& .Mui-checked + .MuiSwitch-track': {
-              backgroundColor: '#0c0c0c', // background track color when checked
+              backgroundColor: '#0c0c0c', 
             },
           }}
         />
