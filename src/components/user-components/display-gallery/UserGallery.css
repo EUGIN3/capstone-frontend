@@ -7,68 +7,56 @@
   margin-bottom: 30px;
 }
 
-/* #userGallery .gallery-items-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-  gap: 20px;
-}
-
-#userGallery .gallery-item {
-  aspect-ratio: 2 / 2;
-}
-
-#userGallery .gallery-item {
-  border-radius: 8px;
-  background-color: #ffffff;
-  
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  
-  display: flex;
-  justify-content: center;
+/* FIXED ANIMATION — removed display:none */
+.user-gallery-view-button-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;               /* stays flex so opacity can animate */
   align-items: center;
-  cursor: pointer;
-  object-fit: contain;
-  transition: all 0.3s;
-}
-
-#userGallery .gallery-item:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-#userGallery .gallery-item img {
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
   height: 100%;
   width: 100%;
+  background-color: rgba(0, 0, 0, 0.438);
+  opacity: 0;                   /* hidden visually */
+  pointer-events: none;         /* not clickable when hidden */
+  border-radius: 8px;
+  transition: opacity .3s ease; /* smooth fade */
+}
+
+/* Fade-in animation */
+.image-item:hover .user-gallery-view-button-container {
+  opacity: 1;
+  pointer-events: auto;         /* now clickable */
+}
+
+button.view-button {
+  width: 100px;
+  height: 40px;
+  border-radius: 4px;
+  font-size: 14px;
+  display: block;
+  color: #0c0c0c;
+  background-color: #f5f5f5d0;
+  cursor: pointer;
+  transition: all .3s;
+}
+
+.view-button:hover {
+  transform: scale(1.05);
+  background-color: #f5f5f5;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#userGallery .image-item img {
   border-radius: 8px;
 }
 
-#userGallery .gallery-add-item {
-  font-size: 80px;
-  border: 2px dashed #0c0c0c76;
+.user-gallery-attire-name {
+  color: #f5f5f5;
+  text-transform: uppercase;
+  font-family: var(--fancy-font);
+  font-size: 20px;
 }
-
-#userGallery .gallery-add-item span {
-  color: #0c0c0c76;
-  transition: all 0.3s;
-}
-
-#userGallery .gallery-add-item:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  border: 2px dashed #0c0c0c;
-}
-
-#userGallery .gallery-add-item:hover span {
-  color: #0c0c0c;
-}
-
-#userGallery .left-side-search {
-  display: flex;
-  gap: 10px;
-}
-
-#userGallery .select-what-see .filled-black {
-  padding: 10px 20px;
-}
-
-#userGallery .gallery-item.notShowing {
-  opacity: 0.6;
-} */

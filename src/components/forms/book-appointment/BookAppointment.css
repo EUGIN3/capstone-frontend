@@ -1,0 +1,80 @@
+.outerBookAppointment {
+  padding: 12px;
+  position: relative;
+  background-color: transparent;
+}
+
+.close-bookAppointment-modal {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: transparent;
+}
+
+.BookAppointment {
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 12px;
+  width: 600px;
+  height: 520px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.BookAppointment::-webkit-scrollbar {
+  display: none;
+}
+
+/* SHARED BLOCK */
+.info-block {
+  background-color: #ffffff;
+  padding: 18px;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.book-step-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.book-step-number {
+  height: 30px;
+  width: 30px;
+  background-color: #0c0c0c;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 15px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.book-complete .book-step-number {
+  background-color: #11b364;
+}
+
+.book-submit-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  height: 40px;
+}
+
+.book-auto-image-preview {
+  width: 100%;
+  height: 300px;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #000;
+}
+
+.book-auto-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}

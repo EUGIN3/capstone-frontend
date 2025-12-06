@@ -99,6 +99,7 @@ const AdminGallery = () => {
                 <img className='gallery-main-image' src={attire.image1 || noImage} alt={attire.attire_name} />
                 
                 <div className="gallery-buttons-con">
+                  <p className='user-gallery-attire-name'>{attire.attire_name}</p>
                   {/* View Button */}
                   <button
                     className="overlay-button view-btn"
