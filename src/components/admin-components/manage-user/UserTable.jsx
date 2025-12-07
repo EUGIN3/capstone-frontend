@@ -19,7 +19,21 @@ export default function UserTable() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [rows, setRows] = useState([]);
   const [totalUsers, setTotalUsers] = useState(0);
-  const [searchTerm, setSearchTerm] = useState('')
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  // Loading wrapper function
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  const withLoading = async (cb) => {
+    try {
+      setLoading(true);
+      await delay(400); // visible delay
+      await cb();
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value.toLowerCase());
@@ -32,13 +46,17 @@ export default function UserTable() {
       .includes(searchTerm)
   );
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+  const handleChangePage = async (event, newPage) => {
+    await withLoading(async () => {
+      setPage(newPage);
+    });
   };
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
+  const handleChangeRowsPerPage = async (event) => {
+    await withLoading(async () => {
+      setRowsPerPage(+event.target.value);
+      setPage(0);
+    });
   };
 
   const columns = [
@@ -51,13 +69,15 @@ export default function UserTable() {
   ];
 
   const fetchUsers = async () => {
-    try {
-      const response = await AxiosInstance.get('auth/users/');
-      setRows(response.data.reverse());
-      setTotalUsers(response.data.length);
-    } catch (error) {
-      console.error('Failed to fetch users:', error);
-    }
+    await withLoading(async () => {
+      try {
+        const response = await AxiosInstance.get('auth/users/');
+        setRows(response.data.reverse());
+        setTotalUsers(response.data.length);
+      } catch (error) {
+        console.error('Failed to fetch users:', error);
+      }
+    });
   };
 
   useEffect(() => {
@@ -66,6 +86,12 @@ export default function UserTable() {
 
   return (
     <>
+      {loading && (
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+        </div>
+      )}
+
       <div className="table-header">
         <div className="search-user-container">
           <SearchIcon />

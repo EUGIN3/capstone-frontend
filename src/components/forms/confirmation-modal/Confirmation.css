@@ -1,0 +1,95 @@
+.confirmation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.confirmation-modal {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  padding: 40px;
+  width: 100%;
+  max-width: 28rem;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.confirmation-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+}
+
+
+.confirmation-title {
+  font-size: 26px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.confirmation-message {
+  color: #374151;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.confirmation-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.confirmation-btn {
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border: none;
+  outline: none;
+}
+
+.confirmation-btn.cancel {
+  background-color: #e5e7eb;
+  color: #1f2937;
+}
+
+.confirmation-btn.cancel:hover {
+  background-color: #d1d5db;
+}
+
+/* Confirm button styles by severity */
+.confirmation-btn.confirm {
+  background-color: #2287E7;
+  color: white;
+}
+.confirmation-btn.confirm:hover {
+  background-color: #1d4ed8;
+}
+
+
+.confirmation-btn.confirm.warning {
+  background-color: #F79009;
+  color: #1f2937;
+}
+.confirmation-btn.confirm.warning:hover {
+  background-color: #ca8a04;
+}
+
+.confirmation-btn.confirm.alert {
+  background-color: #F04438;
+  color: white;
+}
+.confirmation-btn.confirm.alert:hover {
+  background-color: #b91c1c;
+}

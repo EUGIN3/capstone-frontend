@@ -3,24 +3,27 @@ import dayjs from 'dayjs';
 import './ModalAppointment.css';
 
 import ButtonElement from '../../forms/button/ButtonElement';
-import StatusDropdown from './StatusDropDown';
+import StatusDropdown from './StatusDropdown';
 import AxiosInstance from '../../API/AxiosInstance';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import noImage from '../../../assets/no-image.jpg'
+import noImage from '../../../assets/no-image.jpg';
 
 import { Tooltip } from '@mui/material';
 import useNotificationCreator from '../../notification/UseNotificationCreator';
+import Confirmation from '../../forms/confirmation-modal/Confirmation';
 
 const ModalDetails = (props) => {
   const {
     first_name, last_name, date, time, description, facebook_link,
     phone_number, email, image, appointment_status, address, created_at,
-    id, onUpdate, onClose, control, user
+    id, onUpdate, onClose, control, user, attire
   } = props;
   const { sendDefaultNotification } = useNotificationCreator();
 
   const [selectedStatus, setSelectedStatus] = useState(appointment_status || '');
   const [isImageFullscreen, setIsImageFullscreen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(null); // null = hidden
 
   useEffect(() => {
     setSelectedStatus(appointment_status || '');
@@ -39,9 +42,54 @@ const ModalDetails = (props) => {
     setSelectedStatus(value);
   };
 
-  const handleSave = async () => {
+  // ✅ Returns config object if confirmation needed, else null
+  const getConfirmationConfig = (newStatus, oldStatus) => {
+    if (newStatus === oldStatus) return null;
+
+    if (newStatus === 'approved') {
+      return {
+        severity: 'warning',
+        message: `Approve appointment for ${first_name} ${last_name} on ${dayjs(date).format('MMM DD')} at ${time}? This will block the time slot and deny other pending requests for the same slot.`
+      };
+    }
+
+    if (newStatus === 'denied') {
+      return {
+        severity: 'alert',
+        message: `Deny appointment for ${first_name} ${last_name}? They will be notified immediately.`
+      };
+    }
+
+    if (newStatus === 'archived') {
+      return {
+        severity: 'warning',
+        message: `Archive appointment for ${first_name} ${last_name}? This will hide it from the main list.`
+      };
+    }
+
+    return null; // e.g., pending → pending
+  };
+
+  // ✅ Main save handler — shows confirmation OR saves directly
+  const handleSave = () => {
+    if (saving) return; // prevent double-click
+
+    const config = getConfirmationConfig(selectedStatus, appointment_status);
+    
+    if (config) {
+      // ✅ Show confirmation — DO NOT save yet
+      setShowConfirm({ ...config, newStatus: selectedStatus });
+    } else {
+      // ✅ Safe to save directly (e.g., no change or pending → pending)
+      doSave(selectedStatus);
+    }
+  };
+
+  // ✅ Actual save logic — called ONLY after confirmation or safe change
+  const doSave = async (newStatus) => {
+    setSaving(true); // ✅ Must be first — blocks UI & shows spinner
+
     try {
-      const newStatus = selectedStatus;
       const oldStatus = appointment_status;
 
       const slotMap = {
@@ -67,28 +115,29 @@ const ModalDetails = (props) => {
       const matchedSlotKey = findSlotKey(time);
 
       // 1️⃣ Update appointment status
-      const patchRes = await AxiosInstance.patch(`appointment/appointments/${id}/`, {
+      await AxiosInstance.patch(`appointment/appointments/${id}/`, {
         appointment_status: newStatus,
       });
 
-      // 2️⃣ Notifications
-      switch (newStatus) {
-        case 'approved':
-          await sendDefaultNotification('appointment_approved', user);
-          break;
-        case 'denied':
-          await sendDefaultNotification('appointment_denied', user);
-          break;
-        case 'pending':
-          await sendDefaultNotification('appointment_pending', user);
-          break;
+      // 2️⃣ Send notifications (skip for 'archived')
+      if (newStatus !== 'archived') {
+        switch (newStatus) {
+          case 'approved':
+            await sendDefaultNotification('appointment_approved', user);
+            break;
+          case 'denied':
+            await sendDefaultNotification('appointment_denied', user);
+            break;
+          case 'pending':
+            await sendDefaultNotification('appointment_pending', user);
+            break;
+        }
       }
 
-      // 3️⃣ If approved → deny conflicting + update availability with reason = Scheduled Appointment
+      // 3️⃣ If approved → deny conflicting + update availability
       if (newStatus === 'approved') {
         try {
           const allAppointmentsRes = await AxiosInstance.get('appointment/appointments/');
-
           const sameSlotAppointments = allAppointmentsRes.data.filter(app =>
             app.id !== id &&
             app.appointment_status === 'pending' &&
@@ -111,11 +160,20 @@ const ModalDetails = (props) => {
         if (matchedSlotKey) {
           try {
             const availabilityRes = await AxiosInstance.get(`availability/display_unavailability/?date=${date}`);
-            const existing = availabilityRes.data?.[0] || null;
+            const existing = availabilityRes.data?.[0] || {};
 
             const updatedUnavailability = {
-              ...existing,
               date,
+              slot_one: existing.slot_one || false,
+              slot_two: existing.slot_two || false,
+              slot_three: existing.slot_three || false,
+              slot_four: existing.slot_four || false,
+              slot_five: existing.slot_five || false,
+              reason_one: existing.reason_one || "Available",
+              reason_two: existing.reason_two || "Available",
+              reason_three: existing.reason_three || "Available",
+              reason_four: existing.reason_four || "Available",
+              reason_five: existing.reason_five || "Available",
               [matchedSlotKey]: true,
               [`reason_${matchedSlotKey.split('_')[1]}`]: "Scheduled Appointment"
             };
@@ -126,10 +184,10 @@ const ModalDetails = (props) => {
           }
         }
       } 
-      else {
-        // 4️⃣ If removing approval → free slot if no other approved appointment exists
+      // 4️⃣ If reverting from approved → free slot if no other approved
+      else if (oldStatus?.toLowerCase() === 'approved' && newStatus !== 'approved') {
         try {
-          if ((oldStatus || '').toLowerCase() === 'approved' && matchedSlotKey) {
+          if (matchedSlotKey) {
             const allAppointmentsRes = await AxiosInstance.get('appointment/appointments/');
             const otherApproved = allAppointmentsRes.data.some(app =>
               app.id !== id &&
@@ -140,13 +198,22 @@ const ModalDetails = (props) => {
 
             if (!otherApproved) {
               const availabilityRes = await AxiosInstance.get(`availability/display_unavailability/?date=${date}`);
-              const existing = availabilityRes.data?.[0] || null;
+              const existing = availabilityRes.data?.[0] || {};
 
               const updatedUnavailability = {
-                ...existing,
                 date,
+                slot_one: existing.slot_one || false,
+                slot_two: existing.slot_two || false,
+                slot_three: existing.slot_three || false,
+                slot_four: existing.slot_four || false,
+                slot_five: existing.slot_five || false,
+                reason_one: existing.reason_one || "Available",
+                reason_two: existing.reason_two || "Available",
+                reason_three: existing.reason_three || "Available",
+                reason_four: existing.reason_four || "Available",
+                reason_five: existing.reason_five || "Available",
                 [matchedSlotKey]: false,
-                [`reason_${matchedSlotKey.split('_')[1]}`]: "available"
+                [`reason_${matchedSlotKey.split('_')[1]}`]: "Available"
               };
 
               await AxiosInstance.post('availability/set_unavailability/', updatedUnavailability);
@@ -157,18 +224,50 @@ const ModalDetails = (props) => {
         }
       }
 
-      // Refresh
+      // ✅ Notify parent to refresh — but do NOT close yet
       if (onUpdate) onUpdate();
-      if (onClose) onClose();
-      alert('Status updated successfully!');
+
     } catch (error) {
       console.error('Error updating appointment:', error);
-      alert('Failed to update status. Please try again.');
+    } finally {
+      setSaving(false);
+      // ✅ Close AFTER save completes (success or fail)
+      if (onClose) onClose();
+    }
+  };
+
+  // ✅ Handles confirmation response
+  const handleConfirm = (confirmed) => {
+    // Hide confirmation first
+    setShowConfirm(null);
+
+    // Only proceed if confirmed AND newStatus exists
+    if (confirmed && showConfirm?.newStatus) {
+      doSave(showConfirm.newStatus);
+    }
+  };
+
+  // ✅ Archive button now uses confirmation (no separate handler)
+  const handleArchiveClick = () => {
+    if (saving) return;
+    const config = getConfirmationConfig('archived', appointment_status);
+    if (config) {
+      setShowConfirm({ ...config, newStatus: 'archived' });
+    } else {
+      doSave('archived');
     }
   };
 
   return (
-    <div className="outerModal">
+    <div className="outerModal" style={{ position: 'relative' }}>
+
+      {/* ✅ Loading Overlay — exact copy from BigCalendar */}
+      {saving && (
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+        </div>
+      )}
+
       <div className='modalDetails'>
         
         <Tooltip title='Close' arrow>
@@ -195,7 +294,13 @@ const ModalDetails = (props) => {
           <div className="image-section">
             <div className="modalDetails-image">
               <img
-                src={image ? image : noImage }
+                src={
+                  image
+                    ? image
+                    : (attire && attire.image1)
+                      ? attire.image1
+                      : noImage
+                }
                 alt="Appointment"
                 className="modalDetails-preview"
                 onClick={handleImageClick}
@@ -229,25 +334,40 @@ const ModalDetails = (props) => {
               <p className="modalDetails-email">{email}</p>
               <p className="modalDetails-number">{phone_number}</p>
             </div>
-
           </div>
         </div>
 
         <div className="modalDetailsBottom">
           <div className="modalDetails-description">
             <p className='description-title'>Description:</p>
-            <p>{description}</p>
+            <p>
+              {
+                attire?.attire_name && (
+                  <span>I want the <strong>{attire.attire_name}</strong>.</span>
+                )
+              }
+              {description}
+            </p>
           </div>
 
           <div className="modalDetails-update-status">
-            <StatusDropdown
-              items={dropdownItems}
-              onChange={handleDropdownChange}
-              value={selectedStatus}
-              dropDownLabel="Update Status"
-              name="status"
-              control={control}
-            />
+            {appointment_status.toLowerCase() === 'denied' ? (
+              <ButtonElement
+                label="Archive"
+                variant="filled-black"
+                type="button"
+                onClick={handleArchiveClick} // ✅ Now uses confirmation
+              />
+            ) : (
+              <StatusDropdown
+                items={dropdownItems}
+                onChange={handleDropdownChange}
+                value={selectedStatus}
+                dropDownLabel="Update Status"
+                name="status"
+                control={control}
+              />
+            )}
           </div>
 
           <div className="modalDetails-save-button">
@@ -256,17 +376,34 @@ const ModalDetails = (props) => {
               variant='filled-black'
               type='button'
               onClick={handleSave}
+              disabled={saving} // ✅ prevent double-click
             />
           </div>
 
           {isImageFullscreen && (
             <div className="image-fullscreen-overlay" onClick={handleCloseImage}>
               <img
-                src={image}
+                src={
+                  image
+                    ? image
+                    : (attire && attire.image1)
+                      ? attire.image1
+                      : noImage
+                }
                 alt="Full appointment"
                 className="image-fullscreen"
               />
             </div>
+          )}
+
+          {/* ✅ Confirmation Modal */}
+          {showConfirm && (
+            <Confirmation
+              message={showConfirm.message}
+              severity={showConfirm.severity}
+              onConfirm={handleConfirm}
+              isOpen={true}
+            />
           )}
         </div>
       </div>

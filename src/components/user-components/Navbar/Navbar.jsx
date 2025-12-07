@@ -26,14 +26,11 @@ import Logout from '@mui/icons-material/Logout';
 import { Account } from '@toolpad/core/Account';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import './Navbar.css'
-import ArrowBackIosNewTwoToneIcon from '@mui/icons-material/ArrowBackIosNewTwoTone';
 // Custom imports
 import AxiosInstance from '../../API/AxiosInstance';
 import useNavigation from './navigation';
 import mainTheme from './theme';
-import SidebarFooterAccount from './SidebarFooterAccount';
 import logo from '../../../assets/logo v2.png';
-
 // Pages
 import UserDashboard from '../user-dashboard/UserDashboard';
 import SetAppointment from '../set-appointment/SetAppointment';
@@ -42,11 +39,8 @@ import ImageGeneratorComponent from '../../ImageGenerator/ImageGeneratorComponen
 import UserGallery from '../display-gallery/UserGallery';
 import UserMessages from '../user-messages/UserMessages';
 import ButtonElement from '../../forms/button/ButtonElement';
-import MailTwoToneIcon from '@mui/icons-material/MailTwoTone';
-import NotificationsTwoToneIcon from '@mui/icons-material/NotificationsTwoTone';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import UserProjects from '../user-projects/UserProjects';
-
 import NotificationPanel from '../../notification/Notification';
 
 // Drawer width

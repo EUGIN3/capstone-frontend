@@ -198,11 +198,16 @@
     /* height: 100px; */
 }
 
-
 .modalDetails-update-status {
     border-radius: 4px;
 }
 
 .modalDetails-save-button {
     height: 50px;
+}
+
+.modalDetails-update-status .filled-black {
+    height: 40px;
+    background-color: #F04438;
+    border: 1px solid #F04438;
 }

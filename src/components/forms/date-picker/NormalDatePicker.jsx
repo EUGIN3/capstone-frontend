@@ -4,7 +4,17 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
-export default function NormalDatePickerComponent({ value, onChange, label }) {
+export default function NormalDatePickerComponent({ value, onChange, label, shouldDisableDate }) {
+  
+  // ✅ Wrap shouldDisableDate to ensure it receives dayjs objects
+  const handleShouldDisableDate = (date) => {
+    if (!shouldDisableDate) return false;
+    
+    // Ensure date is a dayjs object
+    const dayjsDate = dayjs.isDayjs(date) ? date : dayjs(date);
+    return shouldDisableDate(dayjsDate);
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DatePicker
@@ -12,6 +22,7 @@ export default function NormalDatePickerComponent({ value, onChange, label }) {
         onChange={onChange}
         label={label}
         disablePast
+        shouldDisableDate={handleShouldDisableDate} 
         slotProps={{
           textField: {
             fullWidth: true,
@@ -61,6 +72,11 @@ export default function NormalDatePickerComponent({ value, onChange, label }) {
               },
               '& .MuiPickersArrowSwitcher-rightArrowIcon': {
                 color: '#0C0C0C',
+              },
+              // ✅ Style for disabled dates
+              '& .MuiPickersDay-root.Mui-disabled': {
+                color: '#999',
+                textDecoration: 'line-through',
               },
             },
           },

@@ -15,6 +15,9 @@ export default function StatusDropdown({ items, onChange, value }) {
         value={value || ''}
         onChange={handleChange}
         className='dropdown'
+        sx={{
+          height: '50px',
+        }}
       >
         {items.map((item, index) => (
           <MenuItem key={index} value={item.value} disabled={item.disabled}>

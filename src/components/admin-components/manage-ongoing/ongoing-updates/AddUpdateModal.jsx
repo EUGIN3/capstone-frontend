@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './AddUpdateModal.css';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import SmallImageUpload from '../../../forms/upload-file/SmallImageUpload';
@@ -10,42 +10,190 @@ import AxiosInstance from '../../../API/AxiosInstance';
 import { ToastContainer, toast, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import useNotificationCreator from '../../../notification/UseNotificationCreator';
-
 import { Tooltip } from '@mui/material';
-import AppHeader from '../../../user-components/user-header/userHeader';
+import Confirmation from '../../../forms/confirmation-modal/Confirmation';
+
+// ✅ Canonical order — DO NOT reorder
+const STATUS_ORDER = [
+  'concept',
+  'sketching',
+  'designing',
+  'material_selection',
+  'pattern_making',
+  'cutting',
+  'sewing',
+  'materializing',
+  'fitting',
+  'alterations',
+  'final_fitting',
+  'ready',
+  'picked_up',
+  'done',
+];
+
+// ✅ Static label mapping
+const PROCESS_STATUS_ITEMS = [
+  { value: 'concept', label: 'Concept' },
+  { value: 'sketching', label: 'Sketching' },
+  { value: 'designing', label: 'Designing' },
+  { value: 'material_selection', label: 'Material Selection' },
+  { value: 'pattern_making', label: 'Pattern Making' },
+  { value: 'cutting', label: 'Cutting' },
+  { value: 'sewing', label: 'Sewing' },
+  { value: 'materializing', label: 'Materializing' },
+  { value: 'fitting', label: 'Fitting' },
+  { value: 'alterations', label: 'Alterations' },
+  { value: 'final_fitting', label: 'Final Fitting' },
+  { value: 'ready', label: 'Ready' },
+  { value: 'picked_up', label: 'Picked up' },
+  { value: 'done', label: 'Done' },
+];
 
 function AddUpdateModal({ onClose, projectId, onSuccess }) {
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       process_status: 'designing',
+      message: '',
+      payment: '',
     },
   });
+
   const [selectedImage, setSelectedImage] = useState(null);
   const [resetUploadBox, setResetUploadBox] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(null);
+  const [currentStatus, setCurrentStatus] = useState(null);
   const { sendDefaultNotification } = useNotificationCreator();
 
-  const processStatusItems = [
-    { value: 'designing', label: 'Designing' },
-    { value: 'materializing', label: 'Materializing' },
-    { value: 'ready', label: 'Ready' },
-    { value: 'done', label: 'Done' },
-  ];
+  // Loading wrapper function
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-  // ✅ Handle image selection from SmallImageUpload
+  const withLoading = async (cb) => {
+    try {
+      setSaving(true);
+      await delay(400); // visible delay
+      await cb();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // 🚀 Fetch current project status on mount
+  useEffect(() => {
+    const fetchProjectData = async () => {
+      if (!projectId) return;
+      
+      try {
+        const response = await AxiosInstance.get(`design/designs/${projectId}/`);
+        const status = response.data.process_status || 'concept';
+        setCurrentStatus(status);
+        reset({
+          process_status: status,
+          message: '',
+          payment: '',
+        });
+      } catch (error) {
+        console.error('❌ Failed to fetch project status:', error);
+        toast.error(
+          <div style={{ padding: '8px' }}>Could not load current status.</div>,
+          {
+            position: 'top-center',
+            autoClose: 3000,
+            hideProgressBar: true,
+            theme: 'colored',
+            transition: Slide,
+            closeButton: false,
+          }
+        );
+      }
+    };
+
+    fetchProjectData();
+  }, [projectId, reset]);
+
+  // ✅ 🔒 Enforce: status can only stay the same or move forward — never backward
+  const getFilteredStatusItems = () => {
+    if (!currentStatus) return PROCESS_STATUS_ITEMS;
+
+    const currentIndex = STATUS_ORDER.indexOf(currentStatus);
+
+    return PROCESS_STATUS_ITEMS.map((item) => {
+      const itemIndex = STATUS_ORDER.indexOf(item.value);
+      return {
+        ...item,
+        disabled: itemIndex < currentIndex, // ← disables *all* earlier statuses
+      };
+    });
+  };
+
   const handleImageSelect = (file) => {
     setSelectedImage(file);
   };
 
-  // ✅ Submit handler
-  const handleUpdate = async (data) => {
-    setLoading(true);
+  // ✅ Get confirmation message based on update type
+  const getConfirmationConfig = (data) => {
+    const hasStatusChange = data.process_status && data.process_status !== currentStatus;
+    const hasPayment = data.payment && parseFloat(data.payment) > 0;
+    const hasImage = selectedImage !== null;
+    const hasMessage = data.message && data.message.trim() !== '';
+
+    // Build confirmation message
+    let message = 'Add this update to the project?';
+    const details = [];
+
+    if (hasStatusChange) {
+      const statusLabel = PROCESS_STATUS_ITEMS.find(item => item.value === data.process_status)?.label;
+      details.push(`Status will change to "${statusLabel}"`);
+    }
+
+    if (hasPayment) {
+      details.push(`Payment of ₱${parseFloat(data.payment).toFixed(2)} will be recorded`);
+    }
+
+    if (hasImage) {
+      details.push('Image will be attached');
+    }
+
+    if (hasMessage) {
+      details.push('Message will be posted');
+    }
+
+    if (details.length > 0) {
+      message += ' ' + details.join(', ') + '. The client will be notified.';
+    }
+
+    return {
+      severity: hasStatusChange ? 'warning' : 'info',
+      message: message
+    };
+  };
+
+  // ✅ Main handler - shows confirmation
+  const handleUpdate = (data) => {
+    if (saving) return;
+
+    const config = getConfirmationConfig(data);
+    setShowConfirm({ ...config, formData: data });
+  };
+
+  // ✅ Actual update logic
+  const doUpdate = async (data) => {
+    setSaving(true);
     try {
       const formData = new FormData();
       formData.append('message', data.message || '');
-      if (data.process_status) formData.append('process_status', data.process_status);
-      if (data.payment) formData.append('amount_paid', data.payment);
-      if (selectedImage) formData.append('image_file', selectedImage);
+      if (data.process_status) {
+        formData.append('process_status', data.process_status);
+      }
+      if (data.payment) {
+        const amount = parseFloat(data.payment);
+        if (!isNaN(amount) && amount > 0) {
+          formData.append('amount_paid', amount.toString());
+        }
+      }
+      if (selectedImage) {
+        formData.append('image_file', selectedImage);
+      }
 
       await AxiosInstance.post(
         `design/designs/${projectId}/add_update/`,
@@ -67,21 +215,28 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
         }
       );
 
-      reset();
-      const response = await  AxiosInstance.get(`design/designs/${projectId}/`)
-      await sendDefaultNotification('update_posted', response.data.user)
+      // Refresh project to get updated status for future updates
+      const response = await AxiosInstance.get(`design/designs/${projectId}/`);
+      await sendDefaultNotification('update_posted', response.data.user);
 
+      // Reset state
+      reset({
+        process_status: response.data.process_status || 'designing',
+        message: '',
+        payment: '',
+      });
       setSelectedImage(null);
       setResetUploadBox((prev) => !prev);
       if (onSuccess) onSuccess();
       onClose();
     } catch (error) {
       console.error('❌ Failed to add update:', error.response?.data || error);
+      const errorMsg = error.response?.data?.detail || error.response?.data?.process_status?.[0] || 'Please try again.';
       toast.error(
-        <div style={{ padding: '8px' }}>Failed to add update. Please try again.</div>,
+        <div style={{ padding: '8px' }}>Failed: {errorMsg}</div>,
         {
           position: 'top-center',
-          autoClose: 3000,
+          autoClose: 4000,
           hideProgressBar: false,
           theme: 'colored',
           transition: Slide,
@@ -89,14 +244,29 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
         }
       );
     } finally {
-      setLoading(false);
+      setSaving(false);
+    }
+  };
+
+  // ✅ Handles confirmation response
+  const handleConfirm = (confirmed) => {
+    setShowConfirm(null);
+
+    if (confirmed && showConfirm?.formData) {
+      doUpdate(showConfirm.formData);
     }
   };
 
   return (
-    <div className="outerAddUpdateModal">
-      <Tooltip title='Close' arrow>
-         <button className="close-update-modal" onClick={onClose}>
+    <div className="outerAddUpdateModal" style={{ position: 'relative' }}>
+      {saving && (
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+        </div>
+      )}
+
+      <Tooltip title="Close" arrow>
+        <button className="close-update-modal" onClick={onClose} disabled={saving}>
           <CloseRoundedIcon
             sx={{
               color: '#f5f5f5',
@@ -104,13 +274,13 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
               padding: '2px',
               backgroundColor: '#0c0c0c',
               borderRadius: '50%',
-              cursor: 'pointer',
+              cursor: saving ? 'not-allowed' : 'pointer',
+              opacity: saving ? 0.5 : 1,
               transition: 'all 0.3s ease',
             }}
           />
         </button>
       </Tooltip>
-     
 
       <div className="AddUpdateModal">
         <div className="add-new-update-header">
@@ -118,10 +288,10 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
         </div>
 
         <div className="image-container">
-          <p>* image for update:</p>
-          <SmallImageUpload 
-            onImageSelect={handleImageSelect} 
-            resetTrigger={resetUploadBox} 
+          <p>* Image for update:</p>
+          <SmallImageUpload
+            onImageSelect={handleImageSelect}
+            resetTrigger={resetUploadBox}
           />
         </div>
 
@@ -132,7 +302,7 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
         <div className="payment-status-container">
           <div className="status-container">
             <DropdownComponentTime
-              items={processStatusItems}
+              items={getFilteredStatusItems()}
               dropDownLabel="Status"
               name="process_status"
               control={control}
@@ -145,21 +315,31 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
               name="payment"
               label="Payment Amount"
               type="number"
+              inputProps={{ min: 0, step: '0.01', placeholder: 'e.g., 150.50' }}
             />
           </div>
         </div>
 
         <div className="save-container">
           <ButtonElement
-            label={loading ? 'Updating...' : 'Update'}
+            label={saving ? 'Updating...' : 'Add Update'}
             variant="filled-black"
             onClick={handleSubmit(handleUpdate)}
-            disabled={loading}
+            disabled={saving}
           />
         </div>
 
         <ToastContainer />
       </div>
+
+      {showConfirm && (
+        <Confirmation
+          message={showConfirm.message}
+          severity={showConfirm.severity}
+          onConfirm={handleConfirm}
+          isOpen={true}
+        />
+      )}
     </div>
   );
 }

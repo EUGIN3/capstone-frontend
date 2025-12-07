@@ -19,28 +19,37 @@ function DisplayAppointments() {
   const [filterStatus, setFilterStatus] = useState('');
   const [userAppointments, setUserAppointments] = useState([]);
   const [designs, setDesigns] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const navigate = useNavigate();
   const navigation = (path) => navigate(path);
 
-  
   const fetchUserDesigns = async () => {
     try {
+      // ⏱️ Artificial loading delay (1.5 seconds)
+      await new Promise(resolve => setTimeout(resolve, 400));
+      
       const response = await AxiosInstance.get('/design/user_designs/');
       setDesigns(response.data);
       console.log('✅ Designs fetched:', response.data);
     } catch (error) {
       console.error('❌ Failed to fetch designs:', error);
+      throw error;
     }
   };
 
   const listAppointments = async () => {
     try {
+      // ⏱️ Artificial loading delay (1.5 seconds)
+      await new Promise(resolve => setTimeout(resolve, 400));
+      
       const response = await AxiosInstance.get('appointment/user_appointments/');
       const reversedList = response.data.slice().reverse(); 
       setUserAppointments(reversedList);
     } catch (error) {
       console.error('❌ Failed to fetch appointments:', error);
+      throw error;
     }
   };
 
@@ -55,7 +64,9 @@ function DisplayAppointments() {
   const renderAppointmentsByStatus = (statusLabel) => {
     return userAppointments
       .filter((app) => {
-        if (statusLabel === "") return app.appointment_status !== "archived";
+         if (statusLabel === "") {
+          return app.appointment_status !== "archived" && app.appointment_status !== "project";
+        }
 
         return app.appointment_status === statusLabel;
       })
@@ -78,9 +89,9 @@ function DisplayAppointments() {
 
   const renderFittingAppointment = () => {
     if (filterStatus !== 'fitting' && filterStatus !== '') return null;
-    
+
     const fittingAppointments = designs.filter(
-      (app) => app.fitting_date && app.fitting_time
+      (app) => app.fitting_date && app.fitting_time && !app.fitting_successful
     );
 
     return fittingAppointments.map((fit) => (
@@ -92,14 +103,60 @@ function DisplayAppointments() {
     ));
   };
 
+  const handleRetry = () => {
+    setLoading(true);
+    setError(null);
+    fetchData();
+  };
+
+  // Skeleton loader component
+  const AppointmentSkeleton = () => (
+    <div className="appointment-skeleton">
+      <div className="skeleton-line skeleton-header"></div>
+      <div className="skeleton-line skeleton-content"></div>
+      <div className="skeleton-line skeleton-content"></div>
+      <div className="skeleton-line skeleton-footer"></div>
+    </div>
+  );
+
   // ✅ Fetch data on mount
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      await Promise.all([
+        listAppointments(),
+        fetchUserDesigns()
+      ]);
+    } catch (error) {
+      console.error('❌ Error fetching data:', error);
+      setError('Failed to load appointments. Please try again.');
+      setUserAppointments([]);
+      setDesigns([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    listAppointments();
-    fetchUserDesigns();
+    fetchData();
   }, []);
 
+  const filteredAppointments = renderAppointmentsByStatus(filterStatus);
+  const fittingAppointments = renderFittingAppointment();
+  const hasAppointments = filteredAppointments.length > 0 || (fittingAppointments && fittingAppointments.length > 0);
+
   return (
-    <div className='appContainer'>
+    <div className='appContainer' style={{ position: 'relative' }}>
+      
+      {/* Loading Overlay */}
+      {loading && (
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+        </div>
+      )}
+
       <div className='top-all-app'>
         <AppHeader headerTitle='all appointment' />
         <div className='top-all-app-btn-con'>
@@ -107,7 +164,8 @@ function DisplayAppointments() {
             label='Set appointment' 
             variant='filled-black' 
             type='button' 
-            onClick={() => navigation('/user/set-appointment')} 
+            onClick={() => navigation('/user/set-appointment')}
+            disabled={loading}
           />
         </div>
       </div>
@@ -115,12 +173,48 @@ function DisplayAppointments() {
       <hr className='all-app-hr' />
 
       <div className='status-drop-container'>
-        <StatusFilter onFilterChange={setFilterStatus} />
+        <StatusFilter 
+          onFilterChange={setFilterStatus}
+          disabled={loading}
+        />
       </div>
 
+      {/* Error State */}
+      {error && !loading && (
+        <div className="error-container">
+          <p className="error-message">{error}</p>
+          <button className="retry-button" onClick={handleRetry}>
+            Retry
+          </button>
+        </div>
+      )}
+
+      {/* Content */}
       <div className="show-appointment-list">
-        {renderAppointmentsByStatus(filterStatus)}
-        {renderFittingAppointment()}
+        {loading ? (
+          // Show skeleton loaders while loading
+          <>
+            <AppointmentSkeleton />
+            <AppointmentSkeleton />
+            <AppointmentSkeleton />
+          </>
+        ) : !error && hasAppointments ? (
+          // Show actual appointments
+          <>
+            {filteredAppointments}
+            {fittingAppointments}
+          </>
+        ) : !error ? (
+          // Show empty state
+          <div className="empty-state">
+            <p>No appointments found</p>
+            <p className="empty-state-subtitle">
+              {filterStatus 
+                ? 'Try changing the filter or create a new appointment' 
+                : 'Create your first appointment to get started'}
+            </p>
+          </div>
+        ) : null}
       </div>
 
       <ToastContainer />

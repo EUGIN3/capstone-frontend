@@ -14,17 +14,32 @@ import SearchIcon from '@mui/icons-material/Search';
 import TextField from '@mui/material/TextField';
 import AppHeader from '../../../user-components/user-header/userHeader';
 import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
-
+import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
 
+import DatePickerComponent from '../../../forms/date-picker/DatePicker';
+import ButtonElement from '../../../forms/button/ButtonElement';
 
 export default function OnGoingProjectsTable() {
+  const [loading, setLoading] = useState(false);
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  const withLoading = async (cb) => {
+    try {
+      setLoading(true);
+      await delay(400); // visible delay
+      await cb();
+    } finally {
+      setLoading(false);
+    }
+  };
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [rows, setRows] = useState([]);
   const [totalProjects, setTotalProjects] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+  const [selectedDate, setSelectedDate] = useState(null);
 
 
   const columns = [
@@ -38,7 +53,7 @@ export default function OnGoingProjectsTable() {
   ];
 
   const fetchDesigns = async () => {
-    try {
+    await withLoading(async () => {
       const [designRes, userRes] = await Promise.all([
         AxiosInstance.get('design/designs/'),
         AxiosInstance.get('auth/users/'),
@@ -46,7 +61,6 @@ export default function OnGoingProjectsTable() {
 
       const users = userRes.data;
       const designs = designRes.data;
-
 
       const merged = designs.map((design) => {
         const matchedUser = users.find((u) => u.id === design.user);
@@ -56,26 +70,15 @@ export default function OnGoingProjectsTable() {
         };
       });
 
-      // const ongoing = merged.filter(
-      //   (design) => design.process_status?.toLowerCase() === 'ongoing'
-      // );
-    
-      setRows(merged);
-      setTotalProjects(merged.length);
-    } catch (error) {
-      console.error('❌ Failed to fetch designs or users:', error);
-    }
+      const ongoing = merged.filter(
+        (design) =>
+          design.process_status?.toLowerCase().trim() !== 'done'
+      );
+
+      setRows(ongoing);
+      setTotalProjects(ongoing.length);
+    });
   };
-
-  // const formatDate = (date) => {
-  //   const formattedDate = new Date(date).toLocaleDateString('en-US', {
-  //     year: 'numeric',
-  //     month: 'long',
-  //     day: 'numeric',
-  //   });
-
-  //   return formattedDate
-  // }
 
   const formatDate = (date) => {
     if (!date) return '—';
@@ -87,31 +90,61 @@ export default function OnGoingProjectsTable() {
     return formattedDate;
   };
 
-
-
   useEffect(() => {
     fetchDesigns();
   }, []);
 
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value.toLowerCase());
-  };
-
-  const handleView = (project) => {
-    // alert(`Viewing project for: ${project.attire_type}`);
-    navigate(`/admin/on-going-project/${project.id}`);
-  };
-
-  const handleChangePage = (event, newPage) => setPage(newPage);
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
+  const handleSearchChange = async (event) => {
+    const value = event.target.value.toLowerCase();
+    setSearchTerm(value);
     setPage(0);
   };
 
+  const handleView = (project) => {
+    navigate(`/admin/on-going-project/${project.id}`);
+  };
 
-  const filteredRows = rows.filter((project) =>
-    Object.values(project).join(' ').toLowerCase().includes(searchTerm)
-  );
+  const handleChangePage = async (event, newPage) => {
+    await withLoading(async () => {
+      setPage(newPage);
+    });
+  };
+
+  const handleChangeRowsPerPage = async (event) => {
+    await withLoading(async () => {
+      setRowsPerPage(+event.target.value);
+      setPage(0);
+    });
+  };
+
+  const handleDateChange = async (newValue) => {
+    await withLoading(async () => {
+      setSelectedDate(newValue);
+      setPage(0);
+    });
+  };
+
+  const handleShowAll = async () => {
+    await withLoading(async () => {
+      setSelectedDate(null);
+      setSearchTerm('');
+      setPage(0);
+    });
+  };
+
+  const filteredRows = rows.filter((project) => {
+    const matchesSearch = Object.values(project)
+      .join(' ')
+      .toLowerCase()
+      .includes(searchTerm);
+
+    const matchesDate = selectedDate
+      ? dayjs(project.targeted_date).format('YYYY-MM-DD') ===
+        dayjs(selectedDate).format('YYYY-MM-DD')
+      : true;
+
+    return matchesSearch && matchesDate;
+  });
 
   useEffect(() => {
     setTotalProjects(filteredRows.length);
@@ -120,8 +153,30 @@ export default function OnGoingProjectsTable() {
 
   return (
     <div className='ongoing-projects'>
+      {loading && (
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+        </div>
+      )}
       <div className="ongoing-projects-header">
         <AppHeader headerTitle="Ongoing Projects" />
+
+        <div className="ongoing-filter-container">
+          <div className="filter">
+            <DatePickerComponent
+              value={selectedDate}
+              onChange={handleDateChange}
+            />
+          </div>
+
+          <div className="ongoing-all-btn">
+            <ButtonElement
+              label="All"
+              variant="outlined-black"
+              onClick={handleShowAll}
+            />
+          </div>
+        </div>
       </div>
 
       <div className="ongoing-projects-table-header">

@@ -1,12 +1,30 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import './ProjectDetails.css';
 import AxiosInstance from '../../../API/AxiosInstance';
 import noImage from '../../../../assets/no-image.jpg';
 
-function ProjectDetails({ project }) {
-  const [appointment, setAppointment] = useState(null);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+function ProjectDetails({ project: projectProp }) {
+  const location = useLocation();
+  const { project: passedProject, prefetched } = location.state || {};
+  const project = projectProp || passedProject;
+
+  const [appointment, setAppointment] = useState(prefetched?.appointment || null);
+  const [user, setUser] = useState(prefetched?.user || null);
+  const [loading, setLoading] = useState(!prefetched);
+
+  // Loading wrapper function
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  const withLoading = async (cb) => {
+    try {
+      setLoading(true);
+      await delay(400); // visible delay
+      await cb();
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // 🧩 Define readable label maps
   const processStatusLabels = {
@@ -30,7 +48,7 @@ function ProjectDetails({ project }) {
       // Convert JSON string to array if needed
       const times = typeof timeData === 'string' ? JSON.parse(timeData) : timeData;
 
-      // Ensure it’s an array and join with commas
+      // Ensure it's an array and join with commas
       if (Array.isArray(times)) {
         return times.join(', ');
       }
@@ -42,29 +60,31 @@ function ProjectDetails({ project }) {
   };
 
   const fetchAppointment = async () => {
-    try {
-      const response = await AxiosInstance.get(`appointment/appointments/`);
-
-      if (project?.appointment) {
-        const matchedAppointment = response.data.find(
-          (item) => item.id === project.appointment
-        );
-        setAppointment(matchedAppointment);
-
-        if (project?.user) {
-          const userResponse = await AxiosInstance.get(`auth/users/${project.user}/`);
-          setUser(userResponse.data);
-        } else {
-          console.warn('⚠️ No user ID found in project.');
-        }
-      } else {
-        console.warn('⚠️ No appointment ID found in project.');
-      }
-    } catch (err) {
-      console.error('❌ Failed to fetch appointment or user:', err);
-    } finally {
+    // Only fetch if not already prefetched
+    if (prefetched && prefetched.appointment && prefetched.user) {
       setLoading(false);
+      return;
     }
+
+    await withLoading(async () => {
+      try {
+        const response = await AxiosInstance.get(`appointment/appointments/`);
+
+        if (project?.appointment) {
+          const matchedAppointment = response.data.find(
+            (item) => item.id === project.appointment
+          );
+          setAppointment(matchedAppointment);
+
+          if (project?.user) {
+            const userResponse = await AxiosInstance.get(`auth/users/${project.user}/`);
+            setUser(userResponse.data);
+          }
+        }
+      } catch (err) {
+        console.error('❌ Failed to fetch appointment or user:', err);
+      }
+    });
   };
 
   const formatDate = (dateStr) => {
@@ -90,124 +110,120 @@ function ProjectDetails({ project }) {
       fetchAppointment();
     }
   }, [project]);
- 
-  if (loading) {
-    return (
-      <div className="ProjectDetails loading">
-        <p>Loading project details...</p>
-      </div>
-    );
-  }
-
-  if (!appointment) {
-    return (
-      <div className="ProjectDetails">
-        <p>No appointment details found.</p>
-      </div>
-    );
-  }
 
   return (
     <div className="ProjectDetails">
-      <div className="image-container">
-        <img
-          src={appointment.image ? appointment.image : noImage}
-          className="appointment-image"
-          alt="Appointment reference image."
-        />
-      </div>
-
-      <div className="project-info-container">
-        <div className="designing-information">
-          <div className="info">
-            <p className="label">Name:</p>
-            <p className="info-text">
-              {appointment.first_name} {appointment.last_name}
-            </p>
-          </div>
-
-          <div className="info">
-            <p className="label">Attire Type:</p>
-            <p className="info-text">{project.attire_type}</p>
-          </div>
-
-          <div className="info">
-            <p className="label">Status:</p>
-            <p className="info-text">
-              {processStatusLabels[project.process_status] || project.process_status}
-            </p>
-          </div>
-
-          <div className="info">
-            <p className="label">Facebook:</p>
-            <p className="info-text">
-              <a href={user.facebook_link} target="_blank" rel="noopener noreferrer">
-                profile
-              </a>
-            </p>
-          </div>
+      {loading && (
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
         </div>
+      )}
 
-        <div className="dates">
-          <div className="info">
-            <p className="label">Target Date:</p>
-            <p className="info-text">{formatDate(project.targeted_date)}</p>
+      {!loading && !appointment ? (
+        <p>No appointment details found.</p>
+      ) : !loading ? (
+        <>
+          <div className="image-container">
+            <img
+              src={appointment.image ? appointment.image : noImage}
+              className="appointment-image"
+              alt="Appointment reference image."
+            />
           </div>
 
-          <div className="info">
-            <p className="label">Date Created:</p>
-            <p className="info-text">{formatDate(project.created_at)}</p>
-          </div>
+          <div className="project-info-container">
+            <div className="designing-information">
+              <div className="info">
+                <p className="label">Name:</p>
+                <p className="info-text">
+                  {appointment.first_name} {appointment.last_name}
+                </p>
+              </div>
 
-          <div className="info">
-            <p className="label">Last Update:</p>
-            <p className="info-text">{formatDate(project.updated_at)}</p>
-          </div>
+              <div className="info">
+                <p className="label">Attire Type:</p>
+                <p className="info-text">{project.attire_type}</p>
+              </div>
 
-          <div className="info">
-            <p className="label">Contact Number:</p>
-            <p className="info-text">{user.phone_number}</p>
-          </div>
-        </div>
+              <div className="info">
+                <p className="label">Status:</p>
+                <p className="info-text">
+                  {processStatusLabels[project.process_status] || project.process_status}
+                </p>
+              </div>
 
-        <div className="payment-details">
-          <div className="info">
-            <p className="label">Payment Status:</p>
-            <p className="info-text">
-              {paymentStatusLabels[project.payment_status] || project.payment_status}
-            </p>
-          </div>
+              <div className="info">
+                <p className="label">Facebook:</p>
+                <p className="info-text">
+                  <a href={user.facebook_link} target="_blank" rel="noopener noreferrer">
+                    profile
+                  </a>
+                </p>
+              </div>
+            </div>
 
-          <div className="info">
-            <p className="label">Total Amount:</p>
-            <p className="info-text total-amount">{formatCurrency(project.total_amount)}</p>
-          </div>
+            <div className="dates">
+              <div className="info">
+                <p className="label">Target Date:</p>
+                <p className="info-text">{formatDate(project.targeted_date)}</p>
+              </div>
 
-          <div className="info">
-            <p className="label">Amount Paid:</p>
-            <p className="info-text paid-text">{formatCurrency(project.amount_paid)}</p>
-          </div>
+              <div className="info">
+                <p className="label">Date Created:</p>
+                <p className="info-text">{formatDate(project.created_at)}</p>
+              </div>
 
-          <div className="info">
-            <p className="label">Remaining Balance:</p>
-            <p className="info-text balance-text">{formatCurrency(project.balance)}</p>
-          </div>
-        </div>
+              <div className="info">
+                <p className="label">Last Update:</p>
+                <p className="info-text">{formatDate(project.updated_at)}</p>
+              </div>
 
-        <div className="payment-details fitting-details">
-          <div className="info">
-            <p className="label">Fitting Date:</p>
-            <p className={`info-text ${project.fitting_successful ? 'done-fitting' : ''}`}>{formatDate(project.fitting_date)}</p>
-          </div>
+              <div className="info">
+                <p className="label">Contact Number:</p>
+                <p className="info-text">{user.phone_number}</p>
+              </div>
+            </div>
 
-          <div className="info">
-            <p className="label">Fitting Time:</p>
-            <p className={`info-text ${project.fitting_successful ? 'done-fitting' : ''}`}>
-              {formatFittingTime(project.fitting_time)}
-            </p>
+            <div className="payment-details">
+              <div className="info">
+                <p className="label">Payment Status:</p>
+                <p className="info-text">
+                  {paymentStatusLabels[project.payment_status] || project.payment_status}
+                </p>
+              </div>
+
+              <div className="info">
+                <p className="label">Total Amount:</p>
+                <p className="info-text total-amount">{formatCurrency(project.total_amount)}</p>
+              </div>
+
+              <div className="info">
+                <p className="label">Amount Paid:</p>
+                <p className="info-text paid-text">{formatCurrency(project.amount_paid)}</p>
+              </div>
+
+              <div className="info">
+                <p className="label">Remaining Balance:</p>
+                <p className="info-text balance-text">{formatCurrency(project.balance)}</p>
+              </div>
+            </div>
+
+            <div className="payment-details fitting-details">
+              <div className="info">
+                <p className="label">Fitting Date:</p>
+                <p className={`info-text ${project.fitting_successful ? 'done-fitting' : ''}`}>{formatDate(project.fitting_date)}</p>
+              </div>
+
+              <div className="info">
+                <p className="label">Fitting Time:</p>
+                <p className={`info-text ${project.fitting_successful ? 'done-fitting' : ''}`}>
+                  {formatFittingTime(project.fitting_time)}
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </>
+      ) : null}
     </div>
   );
 }

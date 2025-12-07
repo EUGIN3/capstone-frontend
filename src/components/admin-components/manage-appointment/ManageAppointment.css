@@ -86,8 +86,8 @@
     height: 80px;
 }
 
-.manage-appointment-header .main-dropdown {
-    width: 150px;
+.filter-appointment .main-dropdown {
+    width: 130px;
 }
 
 .dropdown {
@@ -96,4 +96,40 @@
 
 .dropdown:hover {
     border: 1.5px solid #0c0c0c !important;
+}
+
+.filter-appointment {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(11, 11, 11, 0.336);
+  backdrop-filter: blur(3px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.loading-spinner {
+  width: 60px;
+  height: 60px;
+  border: 6px solid #e5e5e5;
+  border-top: 6px solid #0c0c0c;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

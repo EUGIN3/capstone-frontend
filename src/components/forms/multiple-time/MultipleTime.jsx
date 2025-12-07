@@ -9,14 +9,20 @@ import {
   Chip
 } from '@mui/material';
 
-export default function MultiSelectTimeSlots({ value = [], onChange }) {
-  const timeSlots = [
+export default function MultiSelectTimeSlots({ value = [], onChange, availableSlots = [], disabled = false }) {
+  const allTimeSlots = [
     { value: '7:00 - 8:30 AM', label: '7:00 - 8:30 AM' },
     { value: '8:30 - 10:00 AM', label: '8:30 - 10:00 AM' },
     { value: '10:00 - 11:30 AM', label: '10:00 - 11:30 AM' },
     { value: '1:00 - 2:30 PM', label: '1:00 - 2:30 PM' },
     { value: '2:30 - 4:00 PM', label: '2:30 - 4:00 PM' },
   ];
+
+  // ✅ Filter slots based on availableSlots prop
+  const timeSlots = availableSlots.length > 0
+    ? allTimeSlots.filter(slot => availableSlots.includes(slot.value))
+    : allTimeSlots;
+
   const handleChange = (event) => {
     const { value: newValue } = event.target;
     // Call parent's onChange if provided
@@ -25,6 +31,7 @@ export default function MultiSelectTimeSlots({ value = [], onChange }) {
 
   return (
     <FormControl
+      disabled={disabled} // ✅ Disable entire control when disabled prop is true
       sx={{
         width: '100%',
         '& label.Mui-focused': {
@@ -71,23 +78,29 @@ export default function MultiSelectTimeSlots({ value = [], onChange }) {
           '& .MuiSelect-multiple': { fontSize: '0.8rem' },
         }}
       >
-        {timeSlots.map((slot) => (
-          <MenuItem
-            key={slot.value}
-            value={slot.value}
-            sx={{
-              backgroundColor: value.includes(slot.value) ? '#e0e0e0' : 'transparent',
-              color: value.includes(slot.value) ? '#0C0C0C70' : '#0C0C0C',
-              '&:hover': {
-                backgroundColor: value.includes(slot.value) ? '#d5d5d5' : '#f1f1f1',
-              },
-              transition: 'background-color 0.2s ease',
-              borderRadius: 1,
-            }}
-          >
-            {slot.label}
+        {timeSlots.length > 0 ? (
+          timeSlots.map((slot) => (
+            <MenuItem
+              key={slot.value}
+              value={slot.value}
+              sx={{
+                backgroundColor: value.includes(slot.value) ? '#e0e0e0' : 'transparent',
+                color: value.includes(slot.value) ? '#0C0C0C70' : '#0C0C0C',
+                '&:hover': {
+                  backgroundColor: value.includes(slot.value) ? '#d5d5d5' : '#f1f1f1',
+                },
+                transition: 'background-color 0.2s ease',
+                borderRadius: 1,
+              }}
+            >
+              {slot.label}
+            </MenuItem>
+          ))
+        ) : (
+          <MenuItem disabled sx={{ color: '#999', fontStyle: 'italic' }}>
+            No available time slots for this date
           </MenuItem>
-        ))}
+        )}
       </Select>
     </FormControl>
   );

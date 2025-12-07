@@ -56,9 +56,110 @@
 }
 
 .set-appointment-image-con {
-  height: 500px;          /* Or min-height if you want it flexible */
+  height: auto;          
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
+/* Step 3 Option Buttons */
+.step3-options {
+  display: flex;
+  gap: 12px;
+  margin: 0px 0 15px 0;
+}
+
+.step3-btn {
+  padding: 10px 16px;
+  background: #e8e8e8;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.step3-btn:hover {
+  background: #d5d5d5;
+}
+
+.step3-btn.active {
+  background: #000;
+  color: #fff;
+}
+
+/* Placeholder text / container while building */
+.step3-placeholder {
+  margin-top: 12px;
+  padding: 10px;
+  background: #f7f7f7;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #444;
+  min-height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: 400px;
+  width: 100%;
+  background-color: #0c0c0c63;
+  object-fit: contain;
+}
+
+/* Uploaded / Selected Image Preview */
+.preview-image {
+  max-width: 100%;
+  max-height: 250px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+/* Step 4 Description */
+.set-appointment-description-con .description {
+  width: 100%;
+  min-height: 100px;
+  resize: vertical;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+
+img {
+  height: 100%;
+}
+
+.SetAppointmentUplaodBox {
+  height: 300px;
+}
+
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #000;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

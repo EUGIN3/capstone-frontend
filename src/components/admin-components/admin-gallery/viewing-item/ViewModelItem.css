@@ -72,15 +72,11 @@
 .gallery-view-sub-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: 100px;
+    
     gap: 10px;
 }
 
-.gallery-view-sub-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 4px;
-}
 
 .ViewModalItem img {
     width: 100%;
@@ -93,7 +89,17 @@
 .gallery-view-sub-image {
     width: 100%;
     height: 100%;
+    
+    object-fit: contain;
     background-color: #0c0c0c;
+}
+
+
+.gallery-view-sub-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 4px;
 }
 
 

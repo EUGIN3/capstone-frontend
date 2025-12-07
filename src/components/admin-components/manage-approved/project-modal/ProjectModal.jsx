@@ -1,5 +1,5 @@
 import './ProjectModal.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import NormalTextField from '../../../forms/text-fields/NormalTextField';
 import ButtonElement from '../../../forms/button/ButtonElement';
@@ -10,10 +10,11 @@ import AxiosInstance from '../../../API/AxiosInstance';
 
 import useNotificationCreator from '../../../notification/UseNotificationCreator';
 import MultiSelectTimeSlots from '../../../forms/multiple-time/MultipleTime';
+import Confirmation from '../../../forms/confirmation-modal/Confirmation';
 
 import { Tooltip } from '@mui/material';
 
-function ProjectModal({ onClose, appointment }) {
+function ProjectModal({ onClose, appointment, onUpdate }) {
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       process_status: 'designing',
@@ -25,6 +26,10 @@ function ProjectModal({ onClose, appointment }) {
   const [referenceImage, setReferenceImage] = useState(null);
   const { sendDefaultNotification } = useNotificationCreator();
   const [selectedTimes, setSelectedTimes] = useState([]);
+  const [saving, setSaving] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(null);
+  const [availabilityData, setAvailabilityData] = useState([]);
+  const [availableSlots, setAvailableSlots] = useState([]);
 
   // Dropdown items
   const processStatusItems = [
@@ -43,6 +48,75 @@ function ProjectModal({ onClose, appointment }) {
     '2:30 - 4:00 PM': 'slot_five',
   };
 
+  const allTimeSlots = Object.keys(slotMap);
+
+  // ✅ Fetch availability data on mount
+  useEffect(() => {
+    const fetchAvailability = async () => {
+      try {
+        const response = await AxiosInstance.get('availability/display_unavailability/');
+        setAvailabilityData(response.data || []);
+      } catch (error) {
+        console.error('❌ Error fetching availability:', error);
+      }
+    };
+    fetchAvailability();
+  }, []);
+
+  // ✅ Check if a date should be disabled (NO available slots)
+  const shouldDisableDate = (date) => {
+    if (!date) return false;
+    
+    const dateStr = date.format('YYYY-MM-DD'); // Use dayjs format instead of toISOString
+    const dayAvailability = availabilityData.find(item => item.date === dateStr);
+    if (!dayAvailability) {
+      return false; // No data = all slots available = date is enabled
+    }
+
+    // Check if ALL 5 slots are unavailable (all true)
+    const allSlotsUnavailable = 
+      dayAvailability.slot_one === true &&
+      dayAvailability.slot_two === true &&
+      dayAvailability.slot_three === true &&
+      dayAvailability.slot_four === true &&
+      dayAvailability.slot_five === true;
+
+    // Disable date if ALL slots are unavailable
+    return allSlotsUnavailable;
+  };
+
+  // ✅ Update available slots when fitting date changes
+  useEffect(() => {
+    if (!fittingDate) {
+      setAvailableSlots([]);
+      setSelectedTimes([]);
+      return;
+    }
+
+    const dateStr = fittingDate.format('YYYY-MM-DD');
+    const dayAvailability = availabilityData.find(item => item.date === dateStr);
+
+    if (!dayAvailability) {
+      // No restrictions for this date - all slots available
+      setAvailableSlots(allTimeSlots);
+      return;
+    }
+
+    // Filter available slots (where slot_x === false)
+    const available = allTimeSlots.filter(timeSlot => {
+      const slotKey = slotMap[timeSlot];
+      const isAvailable = dayAvailability[slotKey] === false;
+      
+      
+      return isAvailable;
+    });
+
+    setAvailableSlots(available);
+    
+    // Clear selected times that are no longer available
+    setSelectedTimes(prev => prev.filter(time => available.includes(time)));
+  }, [fittingDate, availabilityData]);
+
   const findSlotKey = (timeStr) => {
     if (!timeStr) return null;
     const normalized = timeStr.toString().trim().replace(/\s+/g, ' ');
@@ -56,33 +130,55 @@ function ProjectModal({ onClose, appointment }) {
     setReferenceImage(e.target.files[0]);
   };
 
-  const handleUpdateStatus = async (appointment_id) => {
-    await AxiosInstance.patch(`appointment/appointments/${appointment_id}/`, {
-      appointment_status: 'archived',
-    });
+  // ✅ Returns config object if confirmation needed
+  const getConfirmationConfig = (data) => {
+    if (!targetDate) {
+      return null;
+    }
+
+    const fittingTimeInfo = selectedTimes.length > 0 
+      ? ` with ${selectedTimes.length} fitting slot${selectedTimes.length > 1 ? 's' : ''}`
+      : '';
+
+    return {
+      severity: 'warning',
+      message: `Create project for ${appointment.first_name} ${appointment.last_name}? This will convert the appointment to a project, free up the original time slot${fittingTimeInfo}, and notify the client.`
+    };
   };
 
-  // MAIN SAVE FUNCTION
-  const handleSave = async (data) => {
+  // ✅ Main save handler
+  const handleSave = (data) => {
+    if (saving) return;
+
     if (!targetDate) {
-      alert('Please select a target date.');
       return;
     }
 
+    const config = getConfirmationConfig(data);
+    
+    if (config) {
+      setShowConfirm({ ...config, formData: data });
+    }
+  };
+
+  // ✅ Actual save logic
+  const doSave = async (data) => {
+    setSaving(true);
+
     try {
-      // FORM DATA FOR PROJECT
       const formData = new FormData();
       formData.append('attire_type', data.attire_type || '');
+      
+      // ✅ Use dayjs format to avoid timezone issues
       formData.append(
         'targeted_date',
-        targetDate.toISOString().split('T')[0]
+        targetDate.format('YYYY-MM-DD')
       );
-
       formData.append(
         'fitting_date',
-        fittingDate ? fittingDate.toISOString().split('T')[0] : ''
+        fittingDate ? fittingDate.format('YYYY-MM-DD') : ''
       );
-
+      
       formData.append('fitting_time', JSON.stringify(selectedTimes));
       formData.append('process_status', data.process_status || 'designing');
       formData.append('total_amount', data.total_amount || '');
@@ -96,67 +192,108 @@ function ProjectModal({ onClose, appointment }) {
         formData.append('reference_image', referenceImage);
       }
 
-      // CREATE PROJECT
       await AxiosInstance.post('design/designs/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      await handleUpdateStatus(appointment.id);
+      await AxiosInstance.patch(`appointment/appointments/${appointment.id}/`, {
+        appointment_status: 'project',
+      });
+
       sendDefaultNotification('project_created', appointment.user);
 
-      alert('✅ Project created successfully!');
+      // HANDLE FITTING TIME UNAVAILABILITY
+      if (fittingDate && selectedTimes.length > 0) {
+        try {
+          const dateStr = fittingDate.format('YYYY-MM-DD'); // ✅ Use dayjs format
+
+          const availabilityRes = await AxiosInstance.get(
+            `availability/display_unavailability/?date=${dateStr}`
+          );
+
+          const existing = availabilityRes.data?.[0] || { date: dateStr };
+
+          const updatedUnavailability = { ...existing };
+
+          selectedTimes.forEach((time) => {
+            const key = slotMap[time];
+            if (key) {
+              updatedUnavailability[key] = true;
+              updatedUnavailability[`reason_${key.split('_')[1]}`] =
+                'Scheduled Fitting';
+            }
+          });
+
+          await AxiosInstance.post(
+            'availability/set_unavailability/',
+            updatedUnavailability
+          );
+        } catch (err) {
+          console.error('Error marking fitting slots unavailable:', err);
+        }
+      }
+
+      // FREE UP ORIGINAL APPOINTMENT SLOT
+      try {
+        const appointmentDate = appointment.date;
+        const availabilityRes = await AxiosInstance.get(
+          `availability/display_unavailability/?date=${appointmentDate}`
+        );
+
+        const existing = availabilityRes.data?.[0];
+        if (existing) {
+          const matchedSlotKey = slotMap[appointment.time];
+
+          if (matchedSlotKey && existing[matchedSlotKey] === true) {
+            const updatedUnavailability = {
+              ...existing,
+              [matchedSlotKey]: false,
+              [`reason_${matchedSlotKey.split('_')[1]}`]: 'Available',
+            };
+
+            await AxiosInstance.post(
+              'availability/set_unavailability/',
+              updatedUnavailability
+            );
+          }
+        }
+      } catch (err) {
+        console.error('Error freeing appointment slots:', err);
+      }
+      
+      if (onUpdate) {
+        onUpdate();
+      }
       reset();
       onClose();
     } catch (error) {
       console.error('Failed to create project:', error);
-      alert('❌ Failed to create project. Please try again.');
+    } finally {
+      setSaving(false);
     }
+  };
 
-    // HANDLE FITTING TIME UNAVAILABILITY
-    if (fittingDate && selectedTimes.length > 0) {
-      try {
-        const dateStr = fittingDate.toISOString().split('T')[0];
+  // ✅ Handles confirmation response
+  const handleConfirm = (confirmed) => {
+    setShowConfirm(null);
 
-        // Check existing unavailability
-        const availabilityRes = await AxiosInstance.get(
-          `availability/display_unavailability/?date=${dateStr}`
-        );
-
-        const existing =
-          availabilityRes.data && availabilityRes.data[0]
-            ? availabilityRes.data[0]
-            : {};
-
-        const updatedUnavailability = { ...existing, date: dateStr };
-
-        // Mark each selected fitting slot as unavailable
-        selectedTimes.forEach((time) => {
-          const key = findSlotKey(time);
-          if (key) {
-            updatedUnavailability[key] = true;
-
-            // 🔥 AUTO-SET MATCHING REASON FIELD
-            updatedUnavailability[key.replace('slot', 'reason')] =
-              'Scheduled Fitting';
-          }
-        });
-
-        await AxiosInstance.post(
-          'availability/set_unavailability/',
-          updatedUnavailability
-        );
-      } catch (err) {
-        console.error('Error marking fitting slots unavailable:', err);
-      }
+    if (confirmed && showConfirm?.formData) {
+      doSave(showConfirm.formData);
     }
   };
 
   return (
-    <div className="projectOuterModal">
+    <div className="projectOuterModal" style={{ position: 'relative' }}>
+      
+      {saving && (
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+        </div>
+      )}
+
       <div className="createProjectModal">
-        {/* Close Button */}
         <Tooltip title="Close" arrow>
-          <button className="close-modal" onClick={onClose}>
+          <button className="close-modal" onClick={onClose} disabled={saving}>
             <CloseRoundedIcon
               sx={{
                 color: '#f5f5f5',
@@ -164,7 +301,8 @@ function ProjectModal({ onClose, appointment }) {
                 padding: '2px',
                 backgroundColor: '#0c0c0c',
                 borderRadius: '50%',
-                cursor: 'pointer',
+                cursor: saving ? 'not-allowed' : 'pointer',
+                opacity: saving ? 0.5 : 1,
               }}
             />
           </button>
@@ -178,7 +316,6 @@ function ProjectModal({ onClose, appointment }) {
             {appointment.first_name} {appointment.last_name}
           </div>
 
-          {/* Attire Type */}
           <div className="attire-type-container project-container">
             <NormalTextField
               label="Attire Type"
@@ -188,7 +325,6 @@ function ProjectModal({ onClose, appointment }) {
             />
           </div>
 
-          {/* Target Date + Process */}
           <div className="date-status-container">
             <div className="targeted-date-container project-container">
               <NormalDatePickerComponent
@@ -208,24 +344,26 @@ function ProjectModal({ onClose, appointment }) {
             </div>
           </div>
 
-          {/* Fitting Date */}
+          {/* ✅ Fitting Date with disabled dates */}
           <div className="total-container project-container">
             <NormalDatePickerComponent
               value={fittingDate}
               onChange={setFittingDate}
               label="Fitting Date"
+              shouldDisableDate={shouldDisableDate}
             />
           </div>
 
-          {/* Fitting Time Slots */}
+          {/* ✅ Fitting Time Slots - only show available slots */}
           <div className="total-container project-container">
             <MultiSelectTimeSlots
               value={selectedTimes}
               onChange={setSelectedTimes}
+              availableSlots={availableSlots}
+              disabled={!fittingDate}
             />
           </div>
 
-          {/* Payments */}
           <div className="payment-container">
             <NormalTextField
               label="Attire Total Cost"
@@ -242,7 +380,6 @@ function ProjectModal({ onClose, appointment }) {
             />
           </div>
 
-          {/* Description */}
           <div className="description-container project-container">
             <NormalTextField
               label="Description"
@@ -254,16 +391,25 @@ function ProjectModal({ onClose, appointment }) {
             />
           </div>
 
-          {/* Save */}
           <div className="save-container">
             <ButtonElement
               label="Save"
               variant="filled-black"
               type="button"
               onClick={handleSubmit(handleSave)}
+              disabled={saving}
             />
           </div>
         </div>
+
+        {showConfirm && (
+          <Confirmation
+            message={showConfirm.message}
+            severity={showConfirm.severity}
+            onConfirm={handleConfirm}
+            isOpen={true}
+          />
+        )}
       </div>
     </div>
   );

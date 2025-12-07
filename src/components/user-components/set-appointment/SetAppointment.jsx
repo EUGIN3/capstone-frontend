@@ -15,6 +15,7 @@ import DatePickerComponent from '../../forms/date-picker/DatePicker';
 import FixTime from '../../forms/fixtime/FixTime';
 import UploadBox from '../../forms/upload-file/ImageUpload';
 import MultilineTextFields from '../../forms/multilines-textfield/MultilineTextFields';
+import Confirmation from '../../forms/confirmation-modal/Confirmation'
 
 import AxiosInstance from '../../API/AxiosInstance'
 
@@ -24,12 +25,17 @@ import "react-toastify/dist/ReactToastify.css"
 
 import useNotificationCreator from "../../notification/UseNotificationCreator";
 
-function SetAppointment() {
-  const [step3Mode, setStep3Mode] = useState('upload'); // upload | gallery | generate
-  const [galleryModalOpen, setGalleryModalOpen] = useState(false);
-  const [galleryList, setGalleryList] = useState([]);
-  const [selectedGalleryItem, setSelectedGalleryItem] = useState(null);
+import Dialog from '@mui/material/Dialog';
+import GalleryModal from './Modals/GalleryModals';
 
+
+function SetAppointment() {
+  const [step3Mode, setStep3Mode] = useState('upload'); 
+  const [openGallery, setOpenGallery] = useState(false);
+  const [selectedAttire, setSelectedAttire] = useState([])
+  const [saving, setSaving] = useState(false);
+  const [loadingStep3, setLoadingStep3] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const { sendDefaultNotification } = useNotificationCreator();
   const [availabilityData, setAvailabilityData] = useState({});
@@ -114,48 +120,57 @@ function SetAppointment() {
     }
   }, [selectedDate]);
 
-  const submission = (data) => {
-    if (!selectedDate || !selectedTime) {
-      toast.error(
-        <div style={{ padding: '8px' }}>
-            Please complete all required fields before submitting.
-        </div>,
-        {
-            position: "top-center",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-            transition: Slide,
-            closeButton: false,
-        }
-      );
-      return;
-    } 
+  const handleStep3ButtonClick = async (mode) => {
+    setLoadingStep3(true);
+    
+    // Simulate loading for UI smoothness
+    await new Promise(resolve => setTimeout(resolve, 400));
+    
+    if (mode === 'upload') {
+      setStep3Mode('upload');
+      setSelectedAttire([]);
+    } else if (mode === 'gallery') {
+      setStep3Mode('gallery');
+      setOpenGallery(true);
+      setSelectedImage(null);
+    } else if (mode === 'generate') {
+      setStep3Mode('generate');
+      setSelectedAttire([]);
+      setSelectedImage(null);
+    }
+    
+    setLoadingStep3(false);
+  };
 
-    if (dayjs(selectedDate).isBefore(dayjs(), 'day')) {
-      toast.error(
-        <div style={{ padding: '8px' }}>
-            You cannot set an appointment in the past.
-        </div>,
-        {
-            position: "top-center",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-            transition: Slide,
-            closeButton: false,
-        }
-      );
-      return;
-    } 
+  const getConfirmationConfig = () => {
+    const hasReference = selectedImage || selectedAttire?.id || step3Mode === 'generate';
+    
+    if (!hasReference) {
+      return {
+        needed: true,
+        severity: 'warning',
+        message: `You haven't added any reference (image, gallery attire, or design). Do you want to proceed without a reference?`
+      };
+    }
+    
+    return {
+      needed: true,
+      severity: 'info',
+      message: `Confirm appointment for ${selectedDate.format('MMM DD, YYYY')} at ${selectedTime}?`
+    };
+  };
+
+  const submission = (data) => {
+    const config = getConfirmationConfig();
+    if (config.needed) {
+      setShowConfirm(config);
+    } else {
+      doSubmit();
+    }
+  };
+
+  const doSubmit = async () => {
+    setSaving(true);
 
     const formData = new FormData();
     formData.append('date', selectedDate.format('YYYY-MM-DD'));
@@ -166,69 +181,65 @@ function SetAppointment() {
       formData.append('image', selectedImage);
     }
 
-    AxiosInstance.post('appointment/set_appointments/', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    })
-    .then(() => {
-    toast.success(
-        <div style={{ padding: '8px' }}>
-            Appointment successfully created!
-        </div>, 
-        {
-            position: "top-center",
-            autoClose: 1000,
-            hideProgressBar: true,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-            transition: Slide,
-            closeButton: false,
-        }
-    );
-    reset();
-    setSelectedTime('');
-    fetchAllUnavailableDates();
-    setDescription('');
-    setSelectedImage(null);
-    setResetUploadBox(prev => !prev);
-    sendDefaultNotification("appointment_created");
-    })
-    .catch((error) => {
+    if (selectedAttire?.id) {
+      formData.append('attire_from_gallery', selectedAttire.id);
+    }
+
+    try {
+      await AxiosInstance.post('appointment/set_appointments/', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      
+      reset();
+      setSelectedTime('');
+      fetchAllUnavailableDates();
+      setDescription('');
+      setSelectedImage(null);
+      setSelectedAttire([]);
+      setResetUploadBox(prev => !prev);
+      sendDefaultNotification("appointment_created");
+    } catch (error) {
       toast.error(
         <div style={{ padding: '8px' }}>
-            Something went wrong while setting your appointment. Please try again.
+          Something went wrong while setting your appointment. Please try again.
         </div>,
         {
-            position: "top-center",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-            transition: Slide,
-            closeButton: false,
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
         }
       );
       console.error('Submission error:', error);
-    });
+    } finally {
+      setSaving(false);
+    }
   };
 
+  const handleConfirm = (confirmed) => {
+    setShowConfirm(null);
+    if (confirmed) {
+      doSubmit();
+    }
+  };
 
-  useEffect(() => {
-    AxiosInstance.get("gallery/list/")   // change endpoint depending on your API
-      .then((res) => setGalleryList(res.data))
-      .catch((err) => console.error(err));
-  }, []);
-
-
-  // Time slots 
   return (
     <div className='set-appointment appContainer'>
       <form onSubmit={handleSubmit(submission)}>
+        
+        {/* Loading Overlay - covers entire browser */}
+        {(saving || loadingStep3) && (
+          <div className="loading-overlay">
+            <div className="loading-spinner"></div>
+          </div>
+        )}
+
         <div className='top-all-app'>
           <AppHeader headerTitle='Set appointment' />
 
@@ -275,36 +286,22 @@ function SetAppointment() {
             />
           </div>
 
-          {/* Image */}
-          {/* <div className={`set-appointment-image-con info-con ${selectedImage ? 'completed-step' : ''}`}>
+          {/* Image/Reference Options */}
+          <div className={`set-appointment-image-con info-con`}>
             <div className="number-note-con">
-              <div className={`step-number ${selectedImage ? 'completed-step' : ''}`}>3</div>
-              <p className={`note ${selectedImage ? 'completed-step' : ''}`}>
-                Upload an image as reference or generate a design
-              </p>
-            </div>
-            <UploadBox 
-              onImageSelect={(file) => setSelectedImage(file)} 
-              resetTrigger={resetUploadBox}
-            />
-          </div> */}
-
-
-          {/* Step 3 – Reference Type */}
-          <div className={`set-appointment-image-con info-con ${selectedImage ? 'completed-step' : ''}`}>
-            <div className="number-note-con">
-              <div className={`step-number ${selectedImage ? 'completed-step' : ''}`}>3</div>
-              <p className={`note ${selectedImage ? 'completed-step' : ''}`}>
-                Choose a reference for your design
+              <div className="step-number">3</div>
+              <p className="note">
+                Choose a reference option
               </p>
             </div>
 
-            {/* Option Selector */}
+            {/* OPTIONS */}
             <div className="step3-options">
               <button
                 type="button"
                 className={`step3-btn ${step3Mode === 'upload' ? 'active' : ''}`}
-                onClick={() => setStep3Mode('upload')}
+                onClick={() => handleStep3ButtonClick('upload')}
+                disabled={loadingStep3}
               >
                 Upload an Image
               </button>
@@ -312,7 +309,8 @@ function SetAppointment() {
               <button
                 type="button"
                 className={`step3-btn ${step3Mode === 'gallery' ? 'active' : ''}`}
-                onClick={() => setStep3Mode('gallery')}
+                onClick={() => handleStep3ButtonClick('gallery')}
+                disabled={loadingStep3}
               >
                 Use Attire from Gallery
               </button>
@@ -320,65 +318,37 @@ function SetAppointment() {
               <button
                 type="button"
                 className={`step3-btn ${step3Mode === 'generate' ? 'active' : ''}`}
-                onClick={() => {
-                  setStep3Mode('generate');
-                  navigate('/user/generate-design'); // change this path if needed
-                }}
+                onClick={() => handleStep3ButtonClick('generate')}
+                disabled={loadingStep3}
               >
                 Generate a Design
               </button>
             </div>
 
-            {/* RENDER 3 MODES */}
             {step3Mode === 'upload' && (
-              <UploadBox 
-                onImageSelect={(file) => setSelectedImage(file)} 
-                resetTrigger={resetUploadBox}
-              />
-            )}
-
-            {step3Mode === 'gallery' && (
-              <>
-                <ButtonElement
-                  label="Choose from gallery"
-                  variant="filled-black"
-                  type="button"
-                  onClick={() => setGalleryModalOpen(true)}
+              <div className="SetAppointmentUplaodBox">
+                <UploadBox 
+                  onImageSelect={(file) => setSelectedImage(file)}
+                  resetTrigger={resetUploadBox}
                 />
-
-                {selectedGalleryItem && (
-                  <div className="selected-gallery-preview">
-                    <img src={selectedGalleryItem.image} alt="Selected" />
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* Modal for gallery selection */}
-            <Dialog
-              open={galleryModalOpen}
-              onClose={() => setGalleryModalOpen(false)}
-              maxWidth="md"
-            >
-              <div className="gallery-modal">
-                <h3>Select an attire</h3>
-                <div className="gallery-grid">
-                  {galleryList.map((item) => (
-                    <div
-                      key={item.id}
-                      className="gallery-item"
-                      onClick={() => {
-                        setSelectedGalleryItem(item);
-                        setSelectedImage(null); // remove uploaded
-                        setGalleryModalOpen(false);
-                      }}
-                    >
-                      <img src={item.image} alt="" />
-                    </div>
-                  ))}
-                </div>
               </div>
-            </Dialog>
+            )}
+            {step3Mode === 'gallery' && (
+              <div className="step3-placeholder">
+                {
+                  selectedAttire
+                  ? <img 
+                      src={selectedAttire.image1} 
+                      alt="" 
+                      className='setAppointmentSelectedAttire'/>
+
+                  : <p>Use Attire from Gallery</p>
+                }
+              </div>
+            )}
+            {step3Mode === 'generate' && (
+              <p className="step3-placeholder">Design generator coming next…</p>
+            )}
           </div>
 
           {/* Description */}
@@ -397,10 +367,9 @@ function SetAppointment() {
             />
           </div>
 
-
           <div className="set-appointment-submit-btn-con">
             <ButtonElement 
-              label='Appointment' 
+              label='Set Appointment' 
               variant='filled-black' 
               type='submit'
             />
@@ -409,6 +378,41 @@ function SetAppointment() {
         </div>
         <ToastContainer />
       </form>
+
+      {/* Confirmation Modal */}
+      {showConfirm && (
+        <Confirmation
+          message={showConfirm.message}
+          severity={showConfirm.severity}
+          onConfirm={handleConfirm}
+          isOpen={!!showConfirm}
+        />
+      )}
+
+      <Dialog
+        open={openGallery}
+        onClose={() => setOpenGallery(false)}
+        fullWidth 
+        maxWidth={false}
+        PaperProps={{
+          style: {
+            width: 'auto',
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            padding: '0px',
+            backgroundColor: 'transparent',
+            boxShadow: 'none',
+          },
+        }}
+      >
+        <GalleryModal
+          onClose={() => setOpenGallery(false)}
+          onSelect={(attire) => {
+            setSelectedAttire(attire)
+            setOpenGallery(false);
+          }}
+        />
+      </Dialog>
     </div>
   )
 }

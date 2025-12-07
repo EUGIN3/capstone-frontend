@@ -18,12 +18,29 @@ import CheckCircleTwoToneIcon from '@mui/icons-material/CheckCircleTwoTone';
 import Dialog from '@mui/material/Dialog';
 import ModalDetails from '../manage-appointment/ModalDetails';
 import ProjectModal from './project-modal/ProjectModal';
+import dayjs from 'dayjs';
 
-import noImage from '../../../assets/no-image.jpg'
+import noImage from '../../../assets/no-image.jpg';
 
 import { Tooltip } from '@mui/material';
+import DatePickerComponent from '../../forms/date-picker/DatePicker';
+import ButtonElement from '../../forms/button/ButtonElement';
 
 export default function ApprovedAppointmentTable() {
+  const [loading, setLoading] = useState(false);
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  const withLoading = async (cb) => {
+    try {
+      setLoading(true);
+      await delay(400);
+      await cb();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const [selectedDate, setSelectedDate] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [rows, setRows] = useState([]);
@@ -33,6 +50,7 @@ export default function ApprovedAppointmentTable() {
   const [open, setOpen] = useState(false);
   const [openCreate, setOpenCreate] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [attire, setAttire] = useState(null);
 
   const timeOrder = {
     '7:00 - 8:30 AM': 1,
@@ -42,8 +60,22 @@ export default function ApprovedAppointmentTable() {
     '2:30 - 4:00 PM': 5,
   };
 
+  const handleDateChange = async (newValue) => {
+    await withLoading(async () => {
+      setSelectedDate(newValue);
+      setPage(0);
+    });
+  };
+
+  const handleShowAll = async () => {
+    await withLoading(async () => {
+      setSelectedDate(null);
+      setSearchTerm('');
+      setPage(0);
+    });
+  };
+
   const columns = [
-    { id: 'image', label: 'Image', minWidth: 60, align: 'left' },
     { id: 'firstName', label: 'First Name', minWidth: 150, align: 'center' },
     { id: 'lastName', label: 'Last Name', minWidth: 150, align: 'center' },
     { id: 'date', label: 'Date', minWidth: 100, align: 'center' },
@@ -53,6 +85,26 @@ export default function ApprovedAppointmentTable() {
   ];
 
   const fetchAppointments = async () => {
+    await withLoading(async () => {
+      const response = await AxiosInstance.get('appointment/appointments/');
+      const approvedAppointments = response.data
+        .filter((app) => app.appointment_status?.toLowerCase() === 'approved')
+        .sort((a, b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          if (dateA.getTime() !== dateB.getTime()) return dateA - dateB;
+          const timeA = timeOrder[a.time] || 999;
+          const timeB = timeOrder[b.time] || 999;
+          return timeA - timeB;
+        });
+
+      setRows(approvedAppointments);
+      setTotalAppointments(approvedAppointments.length);
+    });
+  };
+
+  // ✅ Lightweight refresh — for onUpdate only (no loading UI)
+  const refreshAppointments = async () => {
     try {
       const response = await AxiosInstance.get('appointment/appointments/');
       const approvedAppointments = response.data
@@ -69,7 +121,23 @@ export default function ApprovedAppointmentTable() {
       setRows(approvedAppointments);
       setTotalAppointments(approvedAppointments.length);
     } catch (error) {
-      console.error('❌ Failed to fetch appointments:', error);
+      console.error('Refresh failed:', error);
+    }
+  };
+
+  const getAttireImage = async (appointment) => {
+    if (!appointment.attire_from_gallery) {
+      setAttire(null);
+      return;
+    }
+    try {
+      const response = await AxiosInstance.get(
+        `/gallery/admin/attire/${appointment.attire_from_gallery}/`
+      );
+      setAttire(response.data);
+    } catch (err) {
+      console.error("Failed to fetch attire:", err);
+      setAttire(null);
     }
   };
 
@@ -77,15 +145,18 @@ export default function ApprovedAppointmentTable() {
     fetchAppointments();
   }, []);
 
-  const handleOpen = (appointment) => {
+  const handleOpen = async (appointment) => {
     setSelectedAppointment(appointment);
+    await getAttireImage(appointment);
     setOpen(true);
   };
 
+  // ✅ FIXED: No auto-refresh on close
   const handleClose = () => {
     setSelectedAppointment(null);
+    setAttire(null);
     setOpen(false);
-    fetchAppointments();
+    // ❌ Removed: fetchAppointments()
   };
 
   const handleOpenCreate = (appointment) => {
@@ -93,20 +164,30 @@ export default function ApprovedAppointmentTable() {
     setOpenCreate(true);
   };
 
+  // ✅ FIXED: No auto-refresh on close
   const handleCloseCreate = () => {
     setSelectedAppointment(null);
     setOpenCreate(false);
-    fetchAppointments();
+    // ❌ Removed: fetchAppointments()
   };
 
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value.toLowerCase());
-  };
-
-  const handleChangePage = (event, newPage) => setPage(newPage);
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
+  const handleSearchChange = async (event) => {
+    const value = event.target.value.toLowerCase();
+    setSearchTerm(value);
     setPage(0);
+  };
+
+  const handleChangePage = async (event, newPage) => {
+    await withLoading(async () => {
+      setPage(newPage);
+    });
+  };
+
+  const handleChangeRowsPerPage = async (event) => {
+    await withLoading(async () => {
+      setRowsPerPage(+event.target.value);
+      setPage(0);
+    });
   };
 
   const getStatusColor = (status) => {
@@ -114,9 +195,18 @@ export default function ApprovedAppointmentTable() {
     return '#000000';
   };
 
-  const filteredRows = rows.filter((appointment) =>
-    Object.values(appointment).join(' ').toLowerCase().includes(searchTerm)
-  );
+  const filteredRows = rows.filter((appointment) => {
+    const matchesSearch = Object.values(appointment)
+      .join(' ')
+      .toLowerCase()
+      .includes(searchTerm);
+
+    const matchesDate = selectedDate
+      ? appointment.date === dayjs(selectedDate).format('YYYY-MM-DD')
+      : true;
+
+    return matchesSearch && matchesDate;
+  });
 
   useEffect(() => {
     setTotalAppointments(filteredRows.length);
@@ -124,8 +214,30 @@ export default function ApprovedAppointmentTable() {
 
   return (
     <>
+      {loading && (
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+        </div>
+      )}
       <div className="manage-appointment-header">
         <AppHeader headerTitle="Approved Appointments" />
+
+        <div className="approve-filter-container">
+          <div className="filter">
+            <DatePickerComponent
+              value={selectedDate}
+              onChange={handleDateChange}
+            />
+          </div>
+
+          <div className="approve-all-btn">
+            <ButtonElement
+              label='All'
+              variant='outlined-black'
+              onClick={handleShowAll}
+            />
+          </div>
+        </div>
       </div>
 
       <div className="table-header">
@@ -182,7 +294,7 @@ export default function ApprovedAppointmentTable() {
 
             <TableBody>
               {filteredRows.length === 0 ? (
-                <TableRow sx={{height:'100px'}}>
+                <TableRow sx={{ height: '100px' }}>
                   <TableCell colSpan={columns.length} align="center">
                     No Approved Appointments
                   </TableCell>
@@ -196,13 +308,6 @@ export default function ApprovedAppointmentTable() {
                       key={appointment.id}
                       className="appointment-row"
                     >
-                      <TableCell align="left">
-                      <img
-                        src={appointment.image ? appointment.image : noImage}
-                        alt="appointment"
-                        className="appointment-image"
-                      />
-                      </TableCell>
                       <TableCell align="center">{appointment.first_name || '—'}</TableCell>
                       <TableCell align="center">{appointment.last_name || '—'}</TableCell>
                       <TableCell align="center">{appointment.date || '—'}</TableCell>
@@ -305,8 +410,9 @@ export default function ApprovedAppointmentTable() {
           {selectedAppointment && (
             <ModalDetails
               {...selectedAppointment}
-              onUpdate={fetchAppointments}
+              onUpdate={fetchAppointments}  
               onClose={handleClose}
+              attire={attire}
             />
           )}
         </Dialog>
@@ -331,6 +437,7 @@ export default function ApprovedAppointmentTable() {
             <ProjectModal 
               onClose={handleCloseCreate}
               appointment={selectedAppointment}
+              onUpdate={fetchAppointments}
             />
           )}
         </Dialog>

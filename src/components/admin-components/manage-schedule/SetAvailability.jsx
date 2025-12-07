@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import ButtonElement from '../../forms/button/ButtonElement';
 import AxiosInstance from '../../API/AxiosInstance';
 import dayjs from 'dayjs';
+import Confirmation from '../../forms/confirmation-modal/Confirmation'
 
 const SetUnavailability = ({ selectedDate, onClose }) => {
   const [slots, setSlots] = useState([
@@ -14,7 +15,9 @@ const SetUnavailability = ({ selectedDate, onClose }) => {
   ]);
 
   const [wholeDay, setWholeDay] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // for initial fetch
+  const [saving, setSaving] = useState(false);  // ✅ for save action
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const timeSlots = [
     '7:00 - 8:30 AM',
@@ -34,7 +37,6 @@ const SetUnavailability = ({ selectedDate, onClose }) => {
 
       if (response.data.length > 0) {
         const data = response.data[0];
-
         setSlots([
           { slot: data.slot_one, reason: data.reason_one },
           { slot: data.slot_two, reason: data.reason_two },
@@ -43,47 +45,43 @@ const SetUnavailability = ({ selectedDate, onClose }) => {
           { slot: data.slot_five, reason: data.reason_five },
         ]);
       } else {
-        setSlots([
-          { slot: false, reason: "Designer not available" },
-          { slot: false, reason: "Designer not available" },
-          { slot: false, reason: "Designer not available" },
-          { slot: false, reason: "Designer not available" },
-          { slot: false, reason: "Designer not available" },
-        ]);
+        resetSlots();
       }
     } catch (error) {
       console.error("Error fetching schedule:", error);
+      resetSlots();
     } finally {
       setLoading(false);
     }
+  };
+
+  const resetSlots = () => {
+    setSlots([
+      { slot: false, reason: "Designer not available" },
+      { slot: false, reason: "Designer not available" },
+      { slot: false, reason: "Designer not available" },
+      { slot: false, reason: "Designer not available" },
+      { slot: false, reason: "Designer not available" },
+    ]);
   };
 
   useEffect(() => {
     fetchUnavailability();
   }, [selectedDate]);
 
-  // ------------------------- CALCULATE WHOLE DAY BASED ON SLOT STATUS -------------------------
   useEffect(() => {
-    const availableCount = slots.filter(
-      s => s.reason !== "Scheduled Appointment" && s.reason !== "Scheduled Fitting" && !s.slot
-    ).length;
-
     const unavailableCount = slots.filter(
       s => s.reason !== "Scheduled Appointment" && s.reason !== "Scheduled Fitting" && s.slot
     ).length;
-
-    // Majority decides the wholeDay status
-    if (availableCount > unavailableCount) setWholeDay(false); // more available → whole day available
-    else if (unavailableCount > availableCount) setWholeDay(true); // more unavailable → whole day unavailable
-    else setWholeDay(false); // tie → available
+    const totalCount = slots.filter(
+      s => s.reason !== "Scheduled Appointment" && s.reason !== "Scheduled Fitting"
+    ).length;
+    setWholeDay(unavailableCount === totalCount && totalCount > 0);
   }, [slots]);
 
-  // ------------------------- TOGGLE SLOT -------------------------
   const toggleSlot = (index) => {
     const newSlots = [...slots];
     const current = newSlots[index];
-
-    // Only toggle free slots
     if (current.reason !== "Scheduled Appointment" && current.reason !== "Scheduled Fitting") {
       current.slot = !current.slot;
       current.reason = current.slot ? "Designer not available" : "Available";
@@ -91,10 +89,8 @@ const SetUnavailability = ({ selectedDate, onClose }) => {
     }
   };
 
-  // ------------------------- WHOLE DAY TOGGLE -------------------------
   const toggleWholeDay = () => {
     const newVal = !wholeDay;
-
     setSlots(
       slots.map((s) => {
         if (s.reason !== "Scheduled Appointment" && s.reason !== "Scheduled Fitting") {
@@ -107,12 +103,44 @@ const SetUnavailability = ({ selectedDate, onClose }) => {
         return s;
       })
     );
-
     setWholeDay(newVal);
   };
 
-  // ------------------------- SAVE SCHEDULE -------------------------
-  const handleSave = async () => {
+  const getConfirmationConfig = () => {
+    const unavailableSlots = slots.filter(
+      s => s.slot && s.reason === "Designer not available"
+    ).length;
+
+    if (unavailableSlots === 0) {
+      return { needed: false };
+    } else if (unavailableSlots === 5) {
+      return {
+        needed: true,
+        severity: 'alert',
+        message: `You're marking the entire day (${dayjs(selectedDate).format('MMM DD')}) as unavailable. Are you sure?`
+      };
+    } else {
+      return {
+        needed: true,
+        severity: 'warning',
+        message: `You're marking ${unavailableSlots} time slot(s) as unavailable. Proceed?`
+      };
+    }
+  };
+
+  // ✅ New: Save with loading spinner (copied from BigCalendar)
+  const handleSave = () => {
+    const config = getConfirmationConfig();
+    if (config.needed) {
+      setShowConfirm(config);
+    } else {
+      doSave();
+    }
+  };
+
+  const doSave = async () => {
+    setSaving(true);
+
     const payload = {
       date: selectedDate,
       slot_one: slots[0].slot,
@@ -129,17 +157,39 @@ const SetUnavailability = ({ selectedDate, onClose }) => {
 
     try {
       await AxiosInstance.post(`/availability/set_unavailability/`, payload);
-      alert("Saved successfully");
-      onClose();
+      
+      // ✅ Refresh the whole page after success
+      window.location.reload(); // ⚠️ This will reload the entire page
+      
+      // Note: onClose() is no longer needed because page reloads
+      // So you can remove or keep it — it won’t execute after reload.
+      
     } catch (error) {
       console.error("Save failed:", error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleConfirm = (confirmed) => {
+    setShowConfirm(null);
+    if (confirmed) {
+      doSave();
     }
   };
 
   if (loading) return <p>Loading...</p>;
 
   return (
-    <div className='setAppointmentAvailability'>
+    <div className='setAppointmentAvailability' style={{ position: 'relative' }}>
+      
+      {/* ✅ Loading Overlay — copied exactly from BigCalendar */}
+      {saving && (
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+        </div>
+      )}
+
       <p className='setAppointmentAvailability-header'>
         {dayjs(selectedDate).format('MMMM DD, YYYY')}
       </p>
@@ -148,7 +198,7 @@ const SetUnavailability = ({ selectedDate, onClose }) => {
 
       <div className="wholeDaySwitch">
         <span
-          className="reason-text available"
+          className={`reason-text ${wholeDay ? 'unavailable' : 'available'}`}
           style={{ cursor: "pointer" }}
           onClick={toggleWholeDay}
         >
@@ -161,7 +211,6 @@ const SetUnavailability = ({ selectedDate, onClose }) => {
       <div className="availability-container">
         {slots.map((item, index) => (
           <div key={index} className="slot-row">
-            {/* Slot time */}
             <div
               className={`slot-time ${
                 !item.slot
@@ -175,10 +224,8 @@ const SetUnavailability = ({ selectedDate, onClose }) => {
               {timeSlots[index]}
             </div>
 
-            {/* Separator */}
             <div className="slot-separator">:</div>
 
-            {/* Reason text */}
             <span
               className={`reason-text ${
                 !item.slot
@@ -197,10 +244,19 @@ const SetUnavailability = ({ selectedDate, onClose }) => {
 
       <ButtonElement
         label='SAVE SCHEDULE'
-        variant='filled-blue'
+        variant='filled-black'
         type='button'
         onClick={handleSave}
       />
+
+      {showConfirm && (
+        <Confirmation
+          message={showConfirm.message}
+          severity={showConfirm.severity}
+          onConfirm={handleConfirm}
+          isOpen={!!showConfirm}
+        />
+      )}
     </div>
   );
 };

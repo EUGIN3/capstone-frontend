@@ -7,8 +7,6 @@ import Dialog from '@mui/material/Dialog';
 import SetUnavailability from './SetAvailability';
 import BigCalendar from '../../forms/big-calendar/BigCalendar'
 import AxiosInstance from '../../API/AxiosInstance';
-// import AlertComponent from '../../Alert';
-// Toast
 import { ToastContainer, toast, Slide } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css"
 

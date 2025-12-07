@@ -1,0 +1,109 @@
+#setAppointGalleryOuterModal {
+    padding: 12px;
+    background-color: transparent;
+    width: 600px;
+}
+
+/* Main Modal Container */
+.galleryContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-sizing: border-box;
+
+    padding: 24px;
+    background-color: #f5f5f5;
+    border-radius: 6px;
+
+    /* Modal scroll (hidden scrollbar) */
+    max-height: 80vh;
+    overflow-y: auto;
+    -ms-overflow-style: none;     /* IE/Edge */
+    scrollbar-width: none;        /* Firefox */
+}
+
+.galleryContainer::-webkit-scrollbar {
+    display: none;                /* Chrome/Safari */
+}
+
+/* Close Button */
+.galleryCloseButton {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    background-color: transparent;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+}
+
+/* Title */
+.galleryHeaderTitle {
+    font-size: 24px;
+    font-weight: 600;
+    text-transform: uppercase;
+    text-align: center;
+    background-color: transparent;
+    border-radius: 4px;
+    padding: 8px;
+}
+
+/* Body */
+.galleryBody {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* Attire Grid */
+.galleryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 14px;
+
+    /* Allow scroll but hide scrollbar */
+    overflow-y: auto;
+    -ms-overflow-style: none;     
+    scrollbar-width: none;        
+}
+
+.galleryGrid::-webkit-scrollbar {
+    display: none;                
+}
+
+.galleryItem {
+    width: 100%;
+    height: 140px;
+    background-color: #f5f5f5;
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.galleryItem:hover {
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.galleryImage {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Confirm button container */
+.galleryConfirmContainer {
+    display: flex;
+    justify-content: center;
+    padding-top: 6px;
+    height: 50px;
+}

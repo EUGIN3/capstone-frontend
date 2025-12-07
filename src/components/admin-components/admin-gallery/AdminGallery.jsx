@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import './AdminGallery.css';
 import SearchIcon from '@mui/icons-material/Search';
@@ -17,23 +18,38 @@ const AdminGallery = () => {
   const [attires, setAttires] = useState([]);
   const [filteredAttires, setFilteredAttires] = useState([]);
   const [selectedAttire, setSelectedAttire] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const [isAdd, setIsAdd] = useState(false);
   const [isSelecting, setIsSelecting] = useState(false);
   const [isView, setIsView] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
 
+  // Loading wrapper function
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  const withLoading = async (cb) => {
+    try {
+      setLoading(true);
+      await delay(400); // visible delay
+      await cb();
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSearchChange = (event) => setSearchTerm(event.target.value);
 
   const fetchAttires = async () => {
-    try {
-      const response = await AxiosInstance.get('/gallery/admin/attire/?show_archived=true');
-      setAttires(response.data);
-      setFilteredAttires(response.data);
-    } catch (error) {
-      console.error(error);
-      alert('Failed to fetch attires');
-    }
+    await withLoading(async () => {
+      try {
+        const response = await AxiosInstance.get('/gallery/admin/attire/?show_archived=true');
+        setAttires(response.data);
+        setFilteredAttires(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    });
   };
 
   useEffect(() => { fetchAttires(); }, []);
@@ -47,19 +63,45 @@ const AdminGallery = () => {
   }, [searchTerm, attires]);
 
   const handleOpenAdd = () => setIsAdd(true);
-  const handleCloseAdd = () => setIsAdd(false);
+  const handleCloseAdd = () => {
+    setIsAdd(false);
+    fetchAttires();
+  };
 
   const handleOpenSelecting = () => setIsSelecting(true);
-  const handleCloseSelecting = () => { setIsSelecting(false); fetchAttires(); };
+  const handleCloseSelecting = () => { 
+    setIsSelecting(false); 
+    fetchAttires(); 
+  };
 
-  const handleOpenView = (attire) => { setSelectedAttire(attire); setIsView(true); };
-  const handleCloseView = () => { setIsView(false); setSelectedAttire(null); fetchAttires(); };
+  const handleOpenView = (attire) => { 
+    setSelectedAttire(attire); 
+    setIsView(true); 
+  };
+  const handleCloseView = () => { 
+    setIsView(false); 
+    setSelectedAttire(null); 
+    fetchAttires(); 
+  };
 
-  const handleOpenEdit = (attire) => { setSelectedAttire(attire); setIsEdit(true); };
-  const handleCloseEdit = () => { setIsEdit(false); setSelectedAttire(null); fetchAttires(); };
+  const handleOpenEdit = (attire) => { 
+    setSelectedAttire(attire); 
+    setIsEdit(true); 
+  };
+  const handleCloseEdit = () => { 
+    setIsEdit(false); 
+    setSelectedAttire(null); 
+    fetchAttires(); 
+  };
 
   return (
     <div id="gallery">
+      {loading && (
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+        </div>
+      )}
+
       <div className="gallery-header">
         <h2 className="gallery-header-title">GALLERY</h2>
 
@@ -82,7 +124,13 @@ const AdminGallery = () => {
           </div>
           
           <div className="select-what-see">
-            <ButtonElement label='Select attire' variant='filled-black' type='button' onClick={handleOpenSelecting} />
+            <ButtonElement 
+              label='Select attire' 
+              variant='filled-black' 
+              type='button' 
+              onClick={handleOpenSelecting}
+              disabled={loading}
+            />
           </div>
         </div>
       </div>
@@ -104,6 +152,7 @@ const AdminGallery = () => {
                   <button
                     className="overlay-button view-btn"
                     onClick={() => handleOpenView(attire)}
+                    disabled={loading}
                   >
                     View
                   </button>
@@ -112,6 +161,7 @@ const AdminGallery = () => {
                   <button
                     className="overlay-button edit-btn"
                     onClick={() => handleOpenEdit(attire)}
+                    disabled={loading}
                   >
                     Edit
                   </button>
@@ -123,7 +173,11 @@ const AdminGallery = () => {
           <p>No attires found.</p>
         )}
 
-        <div className="gallery-item gallery-add-item" onClick={handleOpenAdd}>
+        <div 
+          className="gallery-item gallery-add-item" 
+          onClick={loading ? undefined : handleOpenAdd}
+          style={{ cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1 }}
+        >
           <span>+</span>
         </div>
       </div>
