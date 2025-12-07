@@ -25,6 +25,12 @@ import "react-toastify/dist/ReactToastify.css"
 import useNotificationCreator from "../../notification/UseNotificationCreator";
 
 function SetAppointment() {
+  const [step3Mode, setStep3Mode] = useState('upload'); // upload | gallery | generate
+  const [galleryModalOpen, setGalleryModalOpen] = useState(false);
+  const [galleryList, setGalleryList] = useState([]);
+  const [selectedGalleryItem, setSelectedGalleryItem] = useState(null);
+
+
   const { sendDefaultNotification } = useNotificationCreator();
   const [availabilityData, setAvailabilityData] = useState({});
   const [disabledSlots, setDisabledSlots] = useState({});
@@ -212,6 +218,13 @@ function SetAppointment() {
   };
 
 
+  useEffect(() => {
+    AxiosInstance.get("gallery/list/")   // change endpoint depending on your API
+      .then((res) => setGalleryList(res.data))
+      .catch((err) => console.error(err));
+  }, []);
+
+
   // Time slots 
   return (
     <div className='set-appointment appContainer'>
@@ -263,7 +276,7 @@ function SetAppointment() {
           </div>
 
           {/* Image */}
-          <div className={`set-appointment-image-con info-con ${selectedImage ? 'completed-step' : ''}`}>
+          {/* <div className={`set-appointment-image-con info-con ${selectedImage ? 'completed-step' : ''}`}>
             <div className="number-note-con">
               <div className={`step-number ${selectedImage ? 'completed-step' : ''}`}>3</div>
               <p className={`note ${selectedImage ? 'completed-step' : ''}`}>
@@ -274,6 +287,98 @@ function SetAppointment() {
               onImageSelect={(file) => setSelectedImage(file)} 
               resetTrigger={resetUploadBox}
             />
+          </div> */}
+
+
+          {/* Step 3 – Reference Type */}
+          <div className={`set-appointment-image-con info-con ${selectedImage ? 'completed-step' : ''}`}>
+            <div className="number-note-con">
+              <div className={`step-number ${selectedImage ? 'completed-step' : ''}`}>3</div>
+              <p className={`note ${selectedImage ? 'completed-step' : ''}`}>
+                Choose a reference for your design
+              </p>
+            </div>
+
+            {/* Option Selector */}
+            <div className="step3-options">
+              <button
+                type="button"
+                className={`step3-btn ${step3Mode === 'upload' ? 'active' : ''}`}
+                onClick={() => setStep3Mode('upload')}
+              >
+                Upload an Image
+              </button>
+
+              <button
+                type="button"
+                className={`step3-btn ${step3Mode === 'gallery' ? 'active' : ''}`}
+                onClick={() => setStep3Mode('gallery')}
+              >
+                Use Attire from Gallery
+              </button>
+
+              <button
+                type="button"
+                className={`step3-btn ${step3Mode === 'generate' ? 'active' : ''}`}
+                onClick={() => {
+                  setStep3Mode('generate');
+                  navigate('/user/generate-design'); // change this path if needed
+                }}
+              >
+                Generate a Design
+              </button>
+            </div>
+
+            {/* RENDER 3 MODES */}
+            {step3Mode === 'upload' && (
+              <UploadBox 
+                onImageSelect={(file) => setSelectedImage(file)} 
+                resetTrigger={resetUploadBox}
+              />
+            )}
+
+            {step3Mode === 'gallery' && (
+              <>
+                <ButtonElement
+                  label="Choose from gallery"
+                  variant="filled-black"
+                  type="button"
+                  onClick={() => setGalleryModalOpen(true)}
+                />
+
+                {selectedGalleryItem && (
+                  <div className="selected-gallery-preview">
+                    <img src={selectedGalleryItem.image} alt="Selected" />
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Modal for gallery selection */}
+            <Dialog
+              open={galleryModalOpen}
+              onClose={() => setGalleryModalOpen(false)}
+              maxWidth="md"
+            >
+              <div className="gallery-modal">
+                <h3>Select an attire</h3>
+                <div className="gallery-grid">
+                  {galleryList.map((item) => (
+                    <div
+                      key={item.id}
+                      className="gallery-item"
+                      onClick={() => {
+                        setSelectedGalleryItem(item);
+                        setSelectedImage(null); // remove uploaded
+                        setGalleryModalOpen(false);
+                      }}
+                    >
+                      <img src={item.image} alt="" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Dialog>
           </div>
 
           {/* Description */}
