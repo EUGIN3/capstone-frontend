@@ -34,6 +34,15 @@ export default function UploadBox({ onImageSelect, resetTrigger }) {
     handleFile(e.dataTransfer.files[0]);
   };
 
+  // ✅ Remove image functionality
+  const removeImage = (e) => {
+    e.stopPropagation();
+    setPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   useEffect(() => {
     if (resetTrigger) {
       setPreview(null);
@@ -50,7 +59,13 @@ export default function UploadBox({ onImageSelect, resetTrigger }) {
       onDrop={onDrop}
     >
       {preview ? (
-        <img src={preview} alt="preview" />
+        <>
+          <img src={preview} alt="preview" />
+          {/* ✅ Remove button */}
+          <button className="remove-image-btn" onClick={removeImage}>
+            ×
+          </button>
+        </>
       ) : (
         <>
           <div className="icon">📁</div>

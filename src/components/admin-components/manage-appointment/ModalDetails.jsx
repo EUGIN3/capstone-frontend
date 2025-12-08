@@ -11,6 +11,8 @@ import noImage from '../../../assets/no-image.jpg';
 import { Tooltip } from '@mui/material';
 import useNotificationCreator from '../../notification/UseNotificationCreator';
 import Confirmation from '../../forms/confirmation-modal/Confirmation';
+import { ToastContainer, toast, Slide } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css"
 
 const ModalDetails = (props) => {
   const {
@@ -23,11 +25,20 @@ const ModalDetails = (props) => {
   const [selectedStatus, setSelectedStatus] = useState(appointment_status || '');
   const [isImageFullscreen, setIsImageFullscreen] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(null); // null = hidden
+  const [showConfirm, setShowConfirm] = useState(null);
+  // ✅ Cache the image so it doesn't disappear when status updates
+  const [cachedImage, setCachedImage] = useState(image);
 
   useEffect(() => {
     setSelectedStatus(appointment_status || '');
   }, [appointment_status]);
+
+  // ✅ Update cached image when image prop changes and is not null
+  useEffect(() => {
+    if (image) {
+      setCachedImage(image);
+    }
+  }, [image]);
 
   const handleImageClick = () => setIsImageFullscreen(true);
   const handleCloseImage = () => setIsImageFullscreen(false);
@@ -42,7 +53,6 @@ const ModalDetails = (props) => {
     setSelectedStatus(value);
   };
 
-  // ✅ Returns config object if confirmation needed, else null
   const getConfirmationConfig = (newStatus, oldStatus) => {
     if (newStatus === oldStatus) return null;
 
@@ -67,27 +77,23 @@ const ModalDetails = (props) => {
       };
     }
 
-    return null; // e.g., pending → pending
+    return null;
   };
 
-  // ✅ Main save handler — shows confirmation OR saves directly
   const handleSave = () => {
-    if (saving) return; // prevent double-click
+    if (saving) return;
 
     const config = getConfirmationConfig(selectedStatus, appointment_status);
     
     if (config) {
-      // ✅ Show confirmation — DO NOT save yet
       setShowConfirm({ ...config, newStatus: selectedStatus });
     } else {
-      // ✅ Safe to save directly (e.g., no change or pending → pending)
       doSave(selectedStatus);
     }
   };
 
-  // ✅ Actual save logic — called ONLY after confirmation or safe change
   const doSave = async (newStatus) => {
-    setSaving(true); // ✅ Must be first — blocks UI & shows spinner
+    setSaving(true);
 
     try {
       const oldStatus = appointment_status;
@@ -224,30 +230,86 @@ const ModalDetails = (props) => {
         }
       }
 
-      // ✅ Notify parent to refresh — but do NOT close yet
+      // ✅ Success notification
+      const statusMessage = {
+        'approved': 'Appointment approved successfully!',
+        'denied': 'Appointment denied and client notified.',
+        'archived': 'Appointment archived successfully.',
+        'pending': 'Appointment status updated to pending.'
+      };
+
+      toast.success(
+        <div style={{ padding: '8px' }}>
+          {statusMessage[newStatus] || 'Appointment updated successfully!'}
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
+
       if (onUpdate) onUpdate();
+
+      setTimeout(() => {
+        if (onClose) onClose();
+      }, 2200);
 
     } catch (error) {
       console.error('Error updating appointment:', error);
-    } finally {
       setSaving(false);
-      // ✅ Close AFTER save completes (success or fail)
-      if (onClose) onClose();
+
+      let errorMessage = 'Failed to update appointment. Please try again.';
+
+      if (error.response?.status === 400) {
+        errorMessage = error.response?.data?.detail || 
+                      error.response?.data?.error ||
+                      'Invalid appointment data. Please check and try again.';
+      } else if (error.response?.status === 401) {
+        errorMessage = 'Your session has expired. Please log in again.';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'You do not have permission to modify this appointment.';
+      } else if (error.response?.status === 404) {
+        errorMessage = 'Appointment not found. Please refresh and try again.';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      } else if (error.message === 'Network Error') {
+        errorMessage = 'Network connection failed. Please check your internet connection.';
+      }
+
+      toast.error(
+        <div style={{ padding: '8px' }}>
+          {errorMessage}
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
     }
   };
 
-  // ✅ Handles confirmation response
   const handleConfirm = (confirmed) => {
-    // Hide confirmation first
     setShowConfirm(null);
 
-    // Only proceed if confirmed AND newStatus exists
     if (confirmed && showConfirm?.newStatus) {
       doSave(showConfirm.newStatus);
     }
   };
 
-  // ✅ Archive button now uses confirmation (no separate handler)
   const handleArchiveClick = () => {
     if (saving) return;
     const config = getConfirmationConfig('archived', appointment_status);
@@ -259,155 +321,157 @@ const ModalDetails = (props) => {
   };
 
   return (
-    <div className="outerModal" style={{ position: 'relative' }}>
+    <>
+      <div className="outerModal" style={{ position: 'relative' }}>
 
-      {/* ✅ Loading Overlay — exact copy from BigCalendar */}
-      {saving && (
-        <div className="loading-overlay">
-          <div className="loading-spinner"></div>
-        </div>
-      )}
+        {saving && (
+          <div className="loading-overlay">
+            <div className="loading-spinner"></div>
+          </div>
+        )}
 
-      <div className='modalDetails'>
-        
-        <Tooltip title='Close' arrow>
-          <button className="close-modal" onClick={onClose}>
-            <CloseRoundedIcon
-              sx={{
-                color: '#f5f5f5',
-                fontSize: 28,
-                padding: '2px',
-                backgroundColor: '#0c0c0c',
-                borderRadius: '50%',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-              }}
-            />
-          </button>
-        </Tooltip>
-
-        <div className="title">
-          Appointment Details 
-        </div>
-
-        <div className="modalDetailsTop">
-          <div className="image-section">
-            <div className="modalDetails-image">
-              <img
-                src={
-                  image
-                    ? image
-                    : (attire && attire.image1)
-                      ? attire.image1
-                      : noImage
-                }
-                alt="Appointment"
-                className="modalDetails-preview"
-                onClick={handleImageClick}
+        <div className='modalDetails'>
+          
+          <Tooltip title='Close' arrow>
+            <button className="close-modal" onClick={onClose}>
+              <CloseRoundedIcon
+                sx={{
+                  color: '#f5f5f5',
+                  fontSize: 28,
+                  padding: '2px',
+                  backgroundColor: '#0c0c0c',
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                }}
               />
-            </div>
+            </button>
+          </Tooltip>
+
+          <div className="title">
+            Appointment Details 
           </div>
 
-          <div className="info-section">
-            <div className="modalDetails-status">
-              <div className="modalDetails-status-label">
-                <p className={appointment_status}>{appointment_status}</p>
+          <div className="modalDetailsTop">
+            <div className="image-section">
+              <div className="modalDetails-image">
+                <img
+                  src={
+                    cachedImage
+                      ? cachedImage
+                      : (attire && attire.image1)
+                        ? attire.image1
+                        : noImage
+                  }
+                  alt="Appointment"
+                  className="modalDetails-preview"
+                  onClick={handleImageClick}
+                />
+              </div>
+            </div>
+
+            <div className="info-section">
+              <div className="modalDetails-status">
+                <div className="modalDetails-status-label">
+                  <p className={appointment_status}>{appointment_status}</p>
+                </div>
+
+                <p className="modalDetails-date-set">
+                  <span>created:</span>
+                  {created_at ? dayjs(created_at).format('MMMM DD, YYYY') : 'No date set'}
+                </p>
+              </div>
+              
+              <div className="modalDetails-date-time">
+                <p className="modalDetails-time">{time}</p>|
+                <p className="modalDetails-date">{dayjs(date).format('MMMM DD, YYYY')}</p>
               </div>
 
-              <p className="modalDetails-date-set">
-                <span>created:</span>
-                {created_at ? dayjs(created_at).format('MMMM DD, YYYY') : 'No date set'}
-              </p>
-            </div>
-            
-            <div className="modalDetails-date-time">
-              <p className="modalDetails-time">{time}</p>|
-              <p className="modalDetails-date">{dayjs(date).format('MMMM DD, YYYY')}</p>
-            </div>
-
-            <div className="modalDetails-personal-info">
-              <p className="modalDetails-name">{first_name} {last_name}</p>
-              <p className="modalDetails-address">{address}</p>
-              <p className="modalDetails-fblink">
-                <a href={facebook_link} target='_blank' rel="noreferrer">profile</a>
-              </p>
-              <p className="modalDetails-email">{email}</p>
-              <p className="modalDetails-number">{phone_number}</p>
+              <div className="modalDetails-personal-info">
+                <p className="modalDetails-name">{first_name} {last_name}</p>
+                <p className="modalDetails-address">{address}</p>
+                <p className="modalDetails-fblink">
+                  <a href={facebook_link} target='_blank' rel="noreferrer">profile</a>
+                </p>
+                <p className="modalDetails-number">{phone_number}</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="modalDetailsBottom">
-          <div className="modalDetails-description">
-            <p className='description-title'>Description:</p>
-            <p>
-              {
-                attire?.attire_name && (
-                  <span>I want the <strong>{attire.attire_name}</strong>.</span>
-                )
-              }
-              {description}
-            </p>
-          </div>
+          <div className="modalDetailsBottom">
+            <div className="modalDetails-description">
+              <p className='description-title'>Description:</p>
+              <p className='description-content'>
+                {
+                  attire?.attire_name && (
+                    <span>I want the <strong>{attire.attire_name}</strong>.</span>
+                  )
+                }
+                {description}
+              </p>
+            </div>
 
-          <div className="modalDetails-update-status">
-            {appointment_status.toLowerCase() === 'denied' ? (
+            <div className="modalDetails-update-status">
+              {appointment_status.toLowerCase() === 'denied' ? (
+                <ButtonElement
+                  label="Archive"
+                  variant="filled-black"
+                  type="button"
+                  onClick={handleArchiveClick}
+                  disabled={saving}
+                />
+              ) : (
+                <StatusDropdown
+                  items={dropdownItems}
+                  onChange={handleDropdownChange}
+                  value={selectedStatus}
+                  dropDownLabel="Update Status"
+                  name="status"
+                  control={control}
+                />
+              )}
+            </div>
+
+            <div className="modalDetails-save-button">
               <ButtonElement
-                label="Archive"
-                variant="filled-black"
-                type="button"
-                onClick={handleArchiveClick} // ✅ Now uses confirmation
+                label='Save'
+                variant='filled-black'
+                type='button'
+                onClick={handleSave}
+                disabled={saving}
               />
-            ) : (
-              <StatusDropdown
-                items={dropdownItems}
-                onChange={handleDropdownChange}
-                value={selectedStatus}
-                dropDownLabel="Update Status"
-                name="status"
-                control={control}
+            </div>
+
+            {isImageFullscreen && (
+              <div className="image-fullscreen-overlay" onClick={handleCloseImage}>
+                <img
+                  src={
+                    cachedImage
+                      ? cachedImage
+                      : (attire && attire.image1)
+                        ? attire.image1
+                        : noImage
+                  }
+                  alt="Full appointment"
+                  className="image-fullscreen"
+                />
+              </div>
+            )}
+
+            {showConfirm && (
+              <Confirmation
+                message={showConfirm.message}
+                severity={showConfirm.severity}
+                onConfirm={handleConfirm}
+                isOpen={true}
               />
             )}
           </div>
-
-          <div className="modalDetails-save-button">
-            <ButtonElement
-              label='Save'
-              variant='filled-black'
-              type='button'
-              onClick={handleSave}
-              disabled={saving} // ✅ prevent double-click
-            />
-          </div>
-
-          {isImageFullscreen && (
-            <div className="image-fullscreen-overlay" onClick={handleCloseImage}>
-              <img
-                src={
-                  image
-                    ? image
-                    : (attire && attire.image1)
-                      ? attire.image1
-                      : noImage
-                }
-                alt="Full appointment"
-                className="image-fullscreen"
-              />
-            </div>
-          )}
-
-          {/* ✅ Confirmation Modal */}
-          {showConfirm && (
-            <Confirmation
-              message={showConfirm.message}
-              severity={showConfirm.severity}
-              onConfirm={handleConfirm}
-              isOpen={true}
-            />
-          )}
         </div>
       </div>
-    </div>
+
+      <ToastContainer />
+    </>
   );
 };
 

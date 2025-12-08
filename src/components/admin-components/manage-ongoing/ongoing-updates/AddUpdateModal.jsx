@@ -163,7 +163,7 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
     }
 
     return {
-      severity: hasStatusChange ? 'warning' : 'info',
+      severity: hasStatusChange ? 'warning' : 'normal',
       message: message
     };
   };
@@ -171,6 +171,27 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
   // ✅ Main handler - shows confirmation
   const handleUpdate = (data) => {
     if (saving) return;
+
+    // ✅ Validate: Note is required
+    if (!data.message || data.message.trim() === '') {
+      toast.error(
+        <div style={{ padding: '8px' }}>
+          Please enter a note for this update.
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
+      return;
+    }
 
     const config = getConfirmationConfig(data);
     setShowConfirm({ ...config, formData: data });
@@ -203,17 +224,7 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
         }
       );
 
-      toast.success(
-        <div style={{ padding: '8px' }}>Update added successfully!</div>,
-        {
-          position: 'top-center',
-          autoClose: 1000,
-          hideProgressBar: true,
-          theme: 'colored',
-          transition: Slide,
-          closeButton: false,
-        }
-      );
+
 
       // Refresh project to get updated status for future updates
       const response = await AxiosInstance.get(`design/designs/${projectId}/`);
@@ -225,15 +236,50 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
         message: '',
         payment: '',
       });
-      setSelectedImage(null);
-      setResetUploadBox((prev) => !prev);
-      if (onSuccess) onSuccess();
-      onClose();
+      
+      toast.success(
+        <div style={{ padding: '8px' }}>Update added successfully!</div>,
+        {
+          position: 'top-center',
+          autoClose: 2000,
+          hideProgressBar: true,
+          theme: 'colored',
+          transition: Slide,
+          closeButton: false,
+        }
+      );
+
+      setTimeout(() => {
+        onClose();
+      }, 1000);
+
     } catch (error) {
       console.error('❌ Failed to add update:', error.response?.data || error);
-      const errorMsg = error.response?.data?.detail || error.response?.data?.process_status?.[0] || 'Please try again.';
+      setSaving(false);
+
+      let errorMessage = 'Failed to add update. Please try again.';
+
+      if (error.response?.status === 400) {
+        errorMessage = error.response?.data?.detail || 
+                      error.response?.data?.message?.[0] ||
+                      error.response?.data?.process_status?.[0] ||
+                      'Invalid update data. Please check and try again.';
+      } else if (error.response?.status === 401) {
+        errorMessage = 'Your session has expired. Please log in again.';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'You do not have permission to add updates to this project.';
+      } else if (error.response?.status === 404) {
+        errorMessage = 'Project not found. Please refresh and try again.';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      } else if (error.message === 'Network Error') {
+        errorMessage = 'Network connection failed. Please check your internet connection.';
+      }
+
       toast.error(
-        <div style={{ padding: '8px' }}>Failed: {errorMsg}</div>,
+        <div style={{ padding: '8px' }}>
+          {errorMessage}
+        </div>,
         {
           position: 'top-center',
           autoClose: 4000,
@@ -243,104 +289,108 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
           closeButton: false,
         }
       );
-    } finally {
-      setSaving(false);
     }
   };
 
-  // ✅ Handles confirmation response
+  // ✅ Handles confirmation response - FIXED HERE ⭐
   const handleConfirm = (confirmed) => {
-    setShowConfirm(null);
-
     if (confirmed && showConfirm?.formData) {
-      doUpdate(showConfirm.formData);
+      setShowConfirm(null); // Close confirmation immediately
+      doUpdate(showConfirm.formData); // Then proceed with update
+    } else {
+      setShowConfirm(null);
     }
   };
 
   return (
-    <div className="outerAddUpdateModal" style={{ position: 'relative' }}>
-      {saving && (
-        <div className="loading-overlay">
-          <div className="loading-spinner"></div>
-        </div>
-      )}
+    <>
+      <div className="outerAddUpdateModal" style={{ position: 'relative' }}>
+        {saving && (
+          <div className="loading-overlay">
+            <div className="loading-spinner"></div>
+          </div>
+        )}
 
-      <Tooltip title="Close" arrow>
-        <button className="close-update-modal" onClick={onClose} disabled={saving}>
-          <CloseRoundedIcon
-            sx={{
-              color: '#f5f5f5',
-              fontSize: 28,
-              padding: '2px',
-              backgroundColor: '#0c0c0c',
-              borderRadius: '50%',
-              cursor: saving ? 'not-allowed' : 'pointer',
-              opacity: saving ? 0.5 : 1,
-              transition: 'all 0.3s ease',
-            }}
-          />
-        </button>
-      </Tooltip>
+        <Tooltip title="Close" arrow>
+          <button className="close-update-modal" onClick={onClose} disabled={saving}>
+            <CloseRoundedIcon
+              sx={{
+                color: '#f5f5f5',
+                fontSize: 28,
+                padding: '2px',
+                backgroundColor: '#0c0c0c',
+                borderRadius: '50%',
+                cursor: saving ? 'not-allowed' : 'pointer',
+                opacity: saving ? 0.5 : 1,
+                transition: 'all 0.3s ease',
+              }}
+            />
+          </button>
+        </Tooltip>
 
-      <div className="AddUpdateModal">
-        <div className="add-new-update-header">
-          <p>Add New Update</p>
-        </div>
+        <div className="AddUpdateModal">
+          <div className="add-new-update-header">
+            <p>Add New Update</p>
+          </div>
 
-        <div className="image-container">
-          <p>* Image for update:</p>
-          <SmallImageUpload
-            onImageSelect={handleImageSelect}
-            resetTrigger={resetUploadBox}
-          />
-        </div>
-
-        <div className="message-container">
-          <NormalTextField control={control} name="message" label="Note" />
-        </div>
-
-        <div className="payment-status-container">
-          <div className="status-container">
-            <DropdownComponentTime
-              items={getFilteredStatusItems()}
-              dropDownLabel="Status"
-              name="process_status"
-              control={control}
+          <div className="image-container">
+            <p>* Image for update:</p>
+            <SmallImageUpload
+              onImageSelect={handleImageSelect}
+              resetTrigger={resetUploadBox}
             />
           </div>
 
-          <div className="payment-container">
-            <NormalTextField
-              control={control}
-              name="payment"
-              label="Payment Amount"
-              type="number"
-              inputProps={{ min: 0, step: '0.01', placeholder: 'e.g., 150.50' }}
+          <div className="message-container">
+            <NormalTextField control={control} name="message" label="Note" />
+          </div>
+
+          <div className="payment-status-container">
+            <div className="status-container">
+              <DropdownComponentTime
+                items={getFilteredStatusItems()}
+                dropDownLabel="Status"
+                name="process_status"
+                control={control}
+              />
+            </div>
+
+            <div className="payment-container">
+              <NormalTextField
+                control={control}
+                name="payment"
+                label="Payment Amount"
+                type="number"
+                inputProps={{ min: 0, step: '0.01', placeholder: 'e.g., 150.50' }}
+              />
+            </div>
+          </div>
+
+          <div className="save-container">
+            <ButtonElement
+              label={saving ? 'Updating...' : 'Add Update'}
+              variant="filled-black"
+              onClick={handleSubmit(handleUpdate)}
+              disabled={saving}
             />
           </div>
+
         </div>
 
-        <div className="save-container">
-          <ButtonElement
-            label={saving ? 'Updating...' : 'Add Update'}
-            variant="filled-black"
-            onClick={handleSubmit(handleUpdate)}
-            disabled={saving}
+        {showConfirm && (
+          <Confirmation
+            message={showConfirm.message}
+            severity={showConfirm.severity}
+            onConfirm={handleConfirm}
+            isOpen={true}
           />
-        </div>
+        )}
 
+
+        
         <ToastContainer />
       </div>
-
-      {showConfirm && (
-        <Confirmation
-          message={showConfirm.message}
-          severity={showConfirm.severity}
-          onConfirm={handleConfirm}
-          isOpen={true}
-        />
-      )}
-    </div>
+    </>
   );
 }
 

@@ -117,8 +117,12 @@ function SetAppointment() {
     if (selectedDate) {
       const formattedDate = selectedDate.format('YYYY-MM-DD');
       getAvailability(formattedDate);
+      // ✅ Reset selected time when date changes
+      setSelectedTime('');
+      // ✅ Reset the form field as well
+      reset({ time: '' });
     }
-  }, [selectedDate]);
+  }, [selectedDate, reset]);
 
   const handleStep3ButtonClick = async (mode) => {
     setLoadingStep3(true);
@@ -160,6 +164,62 @@ function SetAppointment() {
     };
   };
 
+  // ✅ Toast notification helper - matches AddItemModal pattern
+  const showToast = (message, type = 'info', duration = 3000) => {
+    if (type === 'error') {
+      toast.error(
+        <div style={{ padding: '8px' }}>
+          {message}
+        </div>,
+        {
+          position: "top-center",
+          autoClose: duration,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
+    } else if (type === 'success') {
+      toast.success(
+        <div style={{ padding: '8px' }}>
+          {message}
+        </div>,
+        {
+          position: "top-center",
+          autoClose: duration,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
+    } else {
+      toast.info(
+        <div style={{ padding: '8px' }}>
+          {message}
+        </div>,
+        {
+          position: "top-center",
+          autoClose: duration,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
+    }
+  };
+
   const submission = (data) => {
     const config = getConfirmationConfig();
     if (config.needed) {
@@ -190,6 +250,13 @@ function SetAppointment() {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       
+      // ✅ Success toast
+      showToast(
+        `Appointment set for ${selectedDate.format('MMM DD, YYYY')} at ${selectedTime}!`,
+        'success',
+        2000
+      );
+
       reset();
       setSelectedTime('');
       fetchAllUnavailableDates();
@@ -198,25 +265,35 @@ function SetAppointment() {
       setSelectedAttire([]);
       setResetUploadBox(prev => !prev);
       sendDefaultNotification("appointment_created");
+
+      // Close after toast displays
+      setTimeout(() => {
+        // Navigate or close modal if needed
+      }, 1000);
+
     } catch (error) {
-      toast.error(
-        <div style={{ padding: '8px' }}>
-          Something went wrong while setting your appointment. Please try again.
-        </div>,
-        {
-          position: "top-center",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-          transition: Slide,
-          closeButton: false,
-        }
-      );
       console.error('Submission error:', error);
+      
+      let errorMessage = 'Failed to set appointment. Please try again.';
+
+      // ✅ Comprehensive error handling - matches AddItemModal pattern
+      if (error.response?.status === 400) {
+        errorMessage = error.response?.data?.detail || 
+                      error.response?.data?.error ||
+                      'Invalid appointment data. Please check and try again.';
+      } else if (error.response?.status === 401) {
+        errorMessage = 'Your session has expired. Please log in again.';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'You do not have permission to set appointments.';
+      } else if (error.response?.status === 409) {
+        errorMessage = 'This time slot is no longer available. Please select another.';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      } else if (error.message === 'Network Error') {
+        errorMessage = 'Network connection failed. Please check your internet connection.';
+      }
+
+      showToast(errorMessage, 'error', 5000);
     } finally {
       setSaving(false);
     }
@@ -231,6 +308,21 @@ function SetAppointment() {
 
   return (
     <div className='set-appointment appContainer'>
+      <ToastContainer
+        position="top-center"
+        autoClose={2000}
+        hideProgressBar={true}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        transition={Slide}
+        style={{ zIndex: 99999 }}
+      />
+
       <form onSubmit={handleSubmit(submission)}>
         
         {/* Loading Overlay - covers entire browser */}
@@ -371,12 +463,19 @@ function SetAppointment() {
             <ButtonElement 
               label='Set Appointment' 
               variant='filled-black' 
-              type='submit'
+              type='button'
+              onClick={() => {
+                if (!selectedTime) {
+                  showToast('Please select a time for your appointment.', 'error', 3000);
+                  return;
+                }
+                handleSubmit(submission)();
+              }}
+              disabled={saving}
             />
           </div>
 
         </div>
-        <ToastContainer />
       </form>
 
       {/* Confirmation Modal */}

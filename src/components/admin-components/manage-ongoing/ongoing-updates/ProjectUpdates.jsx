@@ -15,7 +15,8 @@ function ProjectUpdates({ project }) {
   return (
     <div className="ProjectUpdates">
       {project?.updates && project.updates.length > 0 ? (
-        project.updates.map((update, index) => (
+        // ✅ Reverse the array to show latest updates first
+        [...project.updates].reverse().map((update, index) => (
           <div className="update-container" key={index}>
             {/* 🖼 Image */}
             <div className="update-image">

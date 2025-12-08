@@ -4,6 +4,8 @@ import ButtonElement from '../../forms/button/ButtonElement';
 import AxiosInstance from '../../API/AxiosInstance';
 import dayjs from 'dayjs';
 import Confirmation from '../../forms/confirmation-modal/Confirmation'
+import { ToastContainer, toast, Slide } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css"
 
 const SetUnavailability = ({ selectedDate, onClose }) => {
   const [slots, setSlots] = useState([
@@ -15,9 +17,9 @@ const SetUnavailability = ({ selectedDate, onClose }) => {
   ]);
 
   const [wholeDay, setWholeDay] = useState(false);
-  const [loading, setLoading] = useState(true); // for initial fetch
-  const [saving, setSaving] = useState(false);  // ✅ for save action
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(null);
 
   const timeSlots = [
     '7:00 - 8:30 AM',
@@ -48,8 +50,28 @@ const SetUnavailability = ({ selectedDate, onClose }) => {
         resetSlots();
       }
     } catch (error) {
-      console.error("Error fetching schedule:", error);
       resetSlots();
+
+      const errorMessage = error.response?.data?.detail || 
+                          error.response?.data?.error ||
+                          'Failed to load schedule. Please try again.';
+
+      toast.error(
+        <div style={{ padding: '8px' }}>
+          {errorMessage}
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
     } finally {
       setLoading(false);
     }
@@ -107,28 +129,41 @@ const SetUnavailability = ({ selectedDate, onClose }) => {
   };
 
   const getConfirmationConfig = () => {
-    const unavailableSlots = slots.filter(
+    const designerUnavailableSlots = slots.filter(
       s => s.slot && s.reason === "Designer not available"
     ).length;
+    
+    const totalManageableSlots = slots.filter(
+      s => s.reason !== "Scheduled Appointment" && s.reason !== "Scheduled Fitting"
+    ).length;
+    
+    const availableSlots = totalManageableSlots - designerUnavailableSlots;
 
-    if (unavailableSlots === 0) {
-      return { needed: false };
-    } else if (unavailableSlots === 5) {
+    if (designerUnavailableSlots > 0) {
+      if (designerUnavailableSlots === 5) {
+        return {
+          needed: true,
+          severity: 'alert',
+          message: `You're marking the entire day (${dayjs(selectedDate).format('MMM DD')}) as unavailable. Are you sure?`
+        };
+      } else {
+        return {
+          needed: true,
+          severity: 'warning',
+          message: `You're marking ${designerUnavailableSlots} time slot(s) as unavailable. Proceed?`
+        };
+      }
+    } else if (availableSlots > 0) {
       return {
         needed: true,
-        severity: 'alert',
-        message: `You're marking the entire day (${dayjs(selectedDate).format('MMM DD')}) as unavailable. Are you sure?`
-      };
-    } else {
-      return {
-        needed: true,
-        severity: 'warning',
-        message: `You're marking ${unavailableSlots} time slot(s) as unavailable. Proceed?`
+        severity: 'normal',
+        message: `All time slots are available. Save changes?`
       };
     }
+
+    return { needed: false };
   };
 
-  // ✅ New: Save with loading spinner (copied from BigCalendar)
   const handleSave = () => {
     const config = getConfirmationConfig();
     if (config.needed) {
@@ -158,16 +193,63 @@ const SetUnavailability = ({ selectedDate, onClose }) => {
     try {
       await AxiosInstance.post(`/availability/set_unavailability/`, payload);
       
-      // ✅ Refresh the whole page after success
-      window.location.reload(); // ⚠️ This will reload the entire page
-      
-      // Note: onClose() is no longer needed because page reloads
-      // So you can remove or keep it — it won’t execute after reload.
+      toast.success(
+        <div style={{ padding: '8px' }}>
+          Schedule saved successfully!
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 2200);
       
     } catch (error) {
-      console.error("Save failed:", error);
-    } finally {
       setSaving(false);
+      let errorMessage = 'Failed to save schedule. Please try again.';
+
+      if (error.response?.status === 400) {
+        errorMessage = error.response?.data?.detail || 
+                      error.response?.data?.error ||
+                      'Invalid schedule data. Please check your changes and try again.';
+      } else if (error.response?.status === 401) {
+        errorMessage = 'Your session has expired. Please log in again.';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'You do not have permission to modify this schedule.';
+      } else if (error.response?.status === 404) {
+        errorMessage = 'Schedule not found. Please try again.';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      } else if (error.message === 'Network Error') {
+        errorMessage = 'Network connection failed. Please check your internet connection.';
+      }
+
+      toast.error(
+        <div style={{ padding: '8px' }}>
+          {errorMessage}
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
     }
   };
 
@@ -178,86 +260,99 @@ const SetUnavailability = ({ selectedDate, onClose }) => {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
-
-  return (
-    <div className='setAppointmentAvailability' style={{ position: 'relative' }}>
-      
-      {/* ✅ Loading Overlay — copied exactly from BigCalendar */}
-      {saving && (
+  if (loading) {
+    return (
+      <div className='setAppointmentAvailability' style={{ position: 'relative' }}>
         <div className="loading-overlay">
           <div className="loading-spinner"></div>
         </div>
-      )}
-
-      <p className='setAppointmentAvailability-header'>
-        {dayjs(selectedDate).format('MMMM DD, YYYY')}
-      </p>
-
-      <hr />
-
-      <div className="wholeDaySwitch">
-        <span
-          className={`reason-text ${wholeDay ? 'unavailable' : 'available'}`}
-          style={{ cursor: "pointer" }}
-          onClick={toggleWholeDay}
-        >
-          {wholeDay ? "Unavailable" : "Available"}
-        </span>
       </div>
+    );
+  }
 
-      <hr />
-
-      <div className="availability-container">
-        {slots.map((item, index) => (
-          <div key={index} className="slot-row">
-            <div
-              className={`slot-time ${
-                !item.slot
-                  ? "available"
-                  : item.reason === "Designer not available"
-                    ? "unavailable"
-                    : "fixed-reason"
-              }`}
-              onClick={() => toggleSlot(index)}
-            >
-              {timeSlots[index]}
-            </div>
-
-            <div className="slot-separator">:</div>
-
-            <span
-              className={`reason-text ${
-                !item.slot
-                  ? "available"
-                  : item.reason === "Designer not available"
-                    ? "unavailable"
-                    : "fixed-reason"
-              }`}
-              onClick={() => toggleSlot(index)}
-            >
-              {item.slot ? item.reason : "Available"}
-            </span>
+  return (
+    <>
+      <div className='setAppointmentAvailability' style={{ position: 'relative' }}>
+        
+        {/* Loading Overlay */}
+        {saving && (
+          <div className="loading-overlay">
+            <div className="loading-spinner"></div>
           </div>
-        ))}
+        )}
+
+        <p className='setAppointmentAvailability-header'>
+          {dayjs(selectedDate).format('MMMM DD, YYYY')}
+        </p>
+
+        <hr />
+
+        <div className="wholeDaySwitch">
+          <span
+            className={`reason-text ${wholeDay ? 'unavailable' : 'available'}`}
+            style={{ cursor: "pointer" }}
+            onClick={toggleWholeDay}
+          >
+            {wholeDay ? "Unavailable" : "Available"}
+          </span>
+        </div>
+
+        <hr />
+
+        <div className="availability-container">
+          {slots.map((item, index) => (
+            <div key={index} className="slot-row">
+              <div
+                className={`slot-time ${
+                  !item.slot
+                    ? "available"
+                    : item.reason === "Designer not available"
+                      ? "unavailable"
+                      : "fixed-reason"
+                }`}
+                onClick={() => toggleSlot(index)}
+              >
+                {timeSlots[index]}
+              </div>
+
+              <div className="slot-separator">:</div>
+
+              <span
+                className={`reason-text ${
+                  !item.slot
+                    ? "available"
+                    : item.reason === "Designer not available"
+                      ? "unavailable"
+                      : "fixed-reason"
+                }`}
+                onClick={() => toggleSlot(index)}
+              >
+                {item.slot ? item.reason : "Available"}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <ButtonElement
+          label='SAVE SCHEDULE'
+          variant='filled-black'
+          type='button'
+          onClick={handleSave}
+          disabled={saving}
+        />
+
+        {showConfirm && (
+          <Confirmation
+            message={showConfirm.message}
+            severity={showConfirm.severity}
+            onConfirm={handleConfirm}
+            isOpen={true}
+          />
+        )}
       </div>
 
-      <ButtonElement
-        label='SAVE SCHEDULE'
-        variant='filled-black'
-        type='button'
-        onClick={handleSave}
-      />
-
-      {showConfirm && (
-        <Confirmation
-          message={showConfirm.message}
-          severity={showConfirm.severity}
-          onConfirm={handleConfirm}
-          isOpen={!!showConfirm}
-        />
-      )}
-    </div>
+      <ToastContainer />
+    </>
   );
 };
 

@@ -451,7 +451,7 @@ export default function AppointmentTable() {
             style: {
               width: 'auto',
               maxWidth: '90vw',
-              maxHeight: '90vh',
+              maxHeight: '100vh',
               padding: '0px',
               backgroundColor: 'transparent',
               boxShadow: 'none', 

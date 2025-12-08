@@ -136,6 +136,14 @@ const AdminGallery = () => {
       </div>
 
       <div className="gallery-items-container">
+        <div 
+          className="gallery-item gallery-add-item" 
+          onClick={loading ? undefined : handleOpenAdd}
+          style={{ cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1 }}
+        >
+          <span>+</span>
+        </div>
+
         {filteredAttires.length > 0 ? (
           [...filteredAttires]
             .sort((a, b) => (b.to_show === true) - (a.to_show === true))
@@ -172,14 +180,6 @@ const AdminGallery = () => {
         ) : (
           <p>No attires found.</p>
         )}
-
-        <div 
-          className="gallery-item gallery-add-item" 
-          onClick={loading ? undefined : handleOpenAdd}
-          style={{ cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1 }}
-        >
-          <span>+</span>
-        </div>
       </div>
 
       {/* Add Modal */}

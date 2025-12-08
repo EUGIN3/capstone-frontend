@@ -10,6 +10,9 @@ import MultiSelectTimeSlots from '../../../forms/multiple-time/MultipleTime'
 import ButtonElement from '../../../forms/button/ButtonElement';
 import CheckCircleTwoToneIcon from '@mui/icons-material/CheckCircleTwoTone';
 import Confirmation from '../../../forms/confirmation-modal/Confirmation';
+import { ToastContainer, toast, Slide } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css"
+import useNotificationCreator from '../../../notification/UseNotificationCreator';
 
 
 function ChangeFitting({ onClose, project, onSuccess }) {
@@ -37,6 +40,7 @@ function ChangeFitting({ onClose, project, onSuccess }) {
   const [showConfirm, setShowConfirm] = useState(null);
   const [availabilityData, setAvailabilityData] = useState([]);
   const [availableSlots, setAvailableSlots] = useState([]);
+  const { sendDefaultNotification } = useNotificationCreator();
 
   // ✅ Fetch availability data on mount
   useEffect(() => {
@@ -117,16 +121,11 @@ function ChangeFitting({ onClose, project, onSuccess }) {
   const doMarkDone = async () => {
     setSaving(true);
     try {
-      // -----------------------------
-      // 1️⃣ MARK PROJECT AS FITTING SUCCESSFUL
-      // -----------------------------
       await AxiosInstance.patch(`design/designs/${project.id}/`, {
         fitting_successful: true
       });
 
-      // -----------------------------
-      // 2️⃣ FREE UP THE FITTING SLOTS
-      // -----------------------------
+    
       const fittingDateStr = project.fitting_date;
       const fittingTimes = JSON.parse(project.fitting_time || '[]');
 
@@ -153,12 +152,80 @@ function ChangeFitting({ onClose, project, onSuccess }) {
         }
       }
 
-      onSuccess && onSuccess();
-      onClose();
+      // ✅ ADD UPDATE TO PROJECT TIMELINE
+      const updateMessage = `Fitting completed successfully on ${formatDate(fittingDateStr)}.`;
+      
+      const updateFormData = new FormData();
+      updateFormData.append('message', updateMessage);
+
+      await AxiosInstance.post(
+        `design/designs/${project.id}/add_update/`,
+        updateFormData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        }
+      );
+
+      // ✅ SEND NOTIFICATION
+      await sendDefaultNotification('update_posted', project.user);
+
+      // Then show success toast
+      toast.success(
+        <div style={{ padding: '8px' }}>
+          Fitting marked as successful!
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
+
+      // Close modal after success toast
+      setTimeout(() => {
+        onClose();
+      }, 1000);
+
     } catch (error) {
       console.error("❌ Error marking fitting as done:", error);
-    } finally {
       setSaving(false);
+
+      let errorMessage = 'Failed to mark fitting as successful. Please try again.';
+
+      if (error.response?.status === 400) {
+        errorMessage = error.response?.data?.detail || 
+                      error.response?.data?.error ||
+                      'Invalid data. Please try again.';
+      } else if (error.response?.status === 404) {
+        errorMessage = 'Project not found. Please refresh and try again.';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      } else if (error.message === 'Network Error') {
+        errorMessage = 'Network connection failed. Please check your internet connection.';
+      }
+
+      toast.error(
+        <div style={{ padding: '8px' }}>
+          {errorMessage}
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
     }
   };
 
@@ -201,7 +268,43 @@ function ChangeFitting({ onClose, project, onSuccess }) {
   const handleSave = () => {
     if (saving) return;
 
-    if (!fittingDate || selectedTimes.length === 0) {
+    if (!fittingDate) {
+      toast.error(
+        <div style={{ padding: '8px' }}>
+          Please select a new fitting date.
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
+      return;
+    }
+
+    if (selectedTimes.length === 0) {
+      toast.error(
+        <div style={{ padding: '8px' }}>
+          Please select at least one time slot.
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
       return;
     }
 
@@ -278,12 +381,84 @@ function ChangeFitting({ onClose, project, onSuccess }) {
         fitting_successful: false
       });
 
-      onSuccess && onSuccess();
-      onClose();
+      // ✅ ADD UPDATE TO PROJECT TIMELINE
+      const oldDateFormatted = formatDate(oldDateStr);
+      const newDateFormatted = formatDate(newDateStr);
+      const timeSlotsText = selectedTimes.join(', ');
+      
+      const updateMessage = `Fitting rescheduled from ${oldDateFormatted} to ${newDateFormatted} at ${timeSlotsText}.`;
+      
+      const updateFormData = new FormData();
+      updateFormData.append('message', updateMessage);
+
+      await AxiosInstance.post(
+        `design/designs/${project.id}/add_update/`,
+        updateFormData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        }
+      );
+
+      // ✅ SEND NOTIFICATION
+      await sendDefaultNotification('update_posted', project.user);
+
+      // Then show success toast
+      toast.success(
+        <div style={{ padding: '8px' }}>
+          Fitting schedule updated successfully!
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
+
+      // Close modal after success toast
+      setTimeout(() => {
+        onClose();
+      }, 1000);
+
     } catch (err) {
       console.error('Error updating fitting schedule:', err);
-    } finally {
       setSaving(false);
+
+      let errorMessage = 'Failed to update fitting schedule. Please try again.';
+
+      if (err.response?.status === 400) {
+        errorMessage = err.response?.data?.detail || 
+                      err.response?.data?.error ||
+                      'Invalid schedule data. Please check and try again.';
+      } else if (err.response?.status === 404) {
+        errorMessage = 'Project not found. Please refresh and try again.';
+      } else if (err.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      } else if (err.message === 'Network Error') {
+        errorMessage = 'Network connection failed. Please check your internet connection.';
+      }
+
+      toast.error(
+        <div style={{ padding: '8px' }}>
+          {errorMessage}
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
     }
   };
 
@@ -302,110 +477,115 @@ function ChangeFitting({ onClose, project, onSuccess }) {
   };
 
   return (
-    <div className="outerChangeFittingModal" style={{ position: 'relative' }}>
-      {saving && (
-        <div className="loading-overlay">
-          <div className="loading-spinner"></div>
-        </div>
-      )}
+    <>
+      <div className="outerChangeFittingModal" style={{ position: 'relative' }}>
+        {saving && (
+          <div className="loading-overlay">
+            <div className="loading-spinner"></div>
+          </div>
+        )}
 
-      <Tooltip title='Close' arrow>
-         <button className="close-update-modal" onClick={onClose} disabled={saving}>
-          <CloseRoundedIcon
-            sx={{
-              color: '#f5f5f5',
-              fontSize: 28,
-              padding: '2px',
-              backgroundColor: '#0c0c0c',
-              borderRadius: '50%',
-              cursor: saving ? 'not-allowed' : 'pointer',
-              opacity: saving ? 0.5 : 1,
-              transition: 'all 0.3s ease',
-            }}
-          />
-        </button>
-      </Tooltip>
+        <Tooltip title='Close' arrow>
+          <button className="close-update-modal" onClick={onClose} disabled={saving}>
+            <CloseRoundedIcon
+              sx={{
+                color: '#f5f5f5',
+                fontSize: 28,
+                padding: '2px',
+                backgroundColor: '#0c0c0c',
+                borderRadius: '50%',
+                cursor: saving ? 'not-allowed' : 'pointer',
+                opacity: saving ? 0.5 : 1,
+                transition: 'all 0.3s ease',
+              }}
+            />
+          </button>
+        </Tooltip>
 
-      <div className='ChangeFitting'>
-        <div className="update-fitting-header">
-          <p>Update Fitting Schedule</p>
-        </div>
+        <div className='ChangeFitting'>
+          <div className="update-fitting-header">
+            <p>Update Fitting Schedule</p>
+          </div>
 
-        <div className="old-fitting-details">
-          <div className="old-fitting-details-text">     
-            <div className="old-fitting-date">
-              <span>Date:</span> {formatDate(project.fitting_date)}
-            </div> 
-            <div className="old-fitting-time">
-              <span>Time:</span> {formatFittingTime(project.fitting_time)}
+          <div className="old-fitting-details">
+            <div className="old-fitting-details-text">     
+              <div className="old-fitting-date">
+                <span>Date:</span> {formatDate(project.fitting_date)}
+              </div> 
+              <div className="old-fitting-time">
+                <span>Time:</span> {formatFittingTime(project.fitting_time)}
+              </div>
+            </div>
+            
+            <div className="done-button">
+              <Tooltip title='Fitting Successful' arrow>
+                <button
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  className="done-btn"
+                  onClick={handleDoneFitting}
+                  disabled={saving}
+                >
+                  <CheckCircleTwoToneIcon
+                    sx={{
+                      color: saving ? '#11b36550' : '#11b3658a',
+                      fontSize: 30,
+                      cursor: saving ? 'not-allowed' : 'pointer',
+                      '&:hover': { color: saving ? '#11b36550' : '#11b365ff' },
+                    }}
+                  />
+                </button>
+              </Tooltip>
             </div>
           </div>
-          
-          <div className="done-button">
-            <Tooltip title='Fitting Successful' arrow>
-              <button
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-                className="done-btn"
-                onClick={handleDoneFitting}
+      
+          <hr/>
+              
+          <div className="new-fitting-detials">
+            <NormalDatePickerComponent
+              value={fittingDate}
+              onChange={(nDate) => setFittingDate(nDate)}
+              label={'New Date'}
+              shouldDisableDate={shouldDisableDate}
+            />
+
+            <MultiSelectTimeSlots
+              value={selectedTimes}
+              onChange={(newTimes) => setSelectedTimes(newTimes)}
+              availableSlots={availableSlots}
+              disabled={!fittingDate}
+            />
+          </div>
+
+          <div className="new-fitting-save-btn">
+              <ButtonElement
+                label="Save"
+                variant="filled-black"
+                type="button"
+                onClick={handleSubmit(handleSave)}
                 disabled={saving}
-              >
-                <CheckCircleTwoToneIcon
-                  sx={{
-                    color: saving ? '#11b36550' : '#11b3658a',
-                    fontSize: 30,
-                    cursor: saving ? 'not-allowed' : 'pointer',
-                    '&:hover': { color: saving ? '#11b36550' : '#11b365ff' },
-                  }}
-                />
-              </button>
-            </Tooltip>
+              />
           </div>
         </div>
-    
-        <hr/>
-            
-        <div className="new-fitting-detials">
-          <NormalDatePickerComponent
-            value={fittingDate}
-            onChange={(nDate) => setFittingDate(nDate)}
-            label={'New Date'}
-            shouldDisableDate={shouldDisableDate}
-          />
 
-          <MultiSelectTimeSlots
-            value={selectedTimes}
-            onChange={(newTimes) => setSelectedTimes(newTimes)}
-            availableSlots={availableSlots}
-            disabled={!fittingDate}
+        {showConfirm && (
+          <Confirmation
+            message={showConfirm.message}
+            severity={showConfirm.severity}
+            onConfirm={handleConfirm}
+            isOpen={true}
           />
-        </div>
+        )}
 
-        <div className="new-fitting-save-btn">
-            <ButtonElement
-              label="Save"
-              variant="filled-black"
-              type="button"
-              onClick={handleSubmit(handleSave)}
-              disabled={saving}
-            />
-        </div>
+        
+        <ToastContainer />
       </div>
-
-      {showConfirm && (
-        <Confirmation
-          message={showConfirm.message}
-          severity={showConfirm.severity}
-          onConfirm={handleConfirm}
-          isOpen={true}
-        />
-      )}
-    </div>
+    </>
   )
 }
 

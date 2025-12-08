@@ -11,6 +11,7 @@
   transition: border 0.3s ease;
   cursor: pointer;
   padding: 20px;
+  position: relative;           /* ✅ For button positioning */
 }
 
 .drag-area.active {
@@ -28,7 +29,7 @@
   color: #000000;
 }
 
-.drag-area button {
+.drag-area button:not(.remove-image-btn) {
   padding: 10px 25px;
   font-size: 20px;
   font-weight: 500;
@@ -40,11 +41,11 @@
   transition: all 0.3s ease;
 }
 
-.drag-area button:hover {
+.drag-area button:not(.remove-image-btn):hover {
   opacity: 0.8;
 }
 
-.drag-area button:active {
+.drag-area button:not(.remove-image-btn):active {
   opacity: 1;
 }
 
@@ -53,4 +54,29 @@
   width: 100%;
   object-fit: contain;
   border-radius: 5px;
+}
+
+/* ✅ X DELETE BUTTON */
+.remove-image-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s ease;
+  z-index: 10;
+  border: none;
+  padding: 0;
+}
+
+.remove-image-btn:hover {
+  background: rgba(255, 0, 0, 0.8);
 }

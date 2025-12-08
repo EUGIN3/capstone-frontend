@@ -41,6 +41,15 @@ export default function SmallImageUpload({ onImageSelect, resetTrigger }) {
     handleFile(e.dataTransfer.files[0]);
   };
 
+  // ✅ Remove image functionality
+  const removeImage = (e) => {
+    e.stopPropagation();
+    setPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   // ✅ Reset preview when parent triggers reset
   useEffect(() => {
     if (resetTrigger) {
@@ -60,7 +69,17 @@ export default function SmallImageUpload({ onImageSelect, resetTrigger }) {
             onClick={onBrowse}
             >
             {preview ? (
-                <img src={preview} alt="preview" />
+                <>
+                  <img src={preview} alt="preview" />
+                  {/* ✅ Remove button */}
+                  <button 
+                    className="remove-image-btn" 
+                    onClick={removeImage}
+                    type="button"
+                  >
+                    ×
+                  </button>
+                </>
             ) : (
                 <>
                 <div className="icon">📁</div>

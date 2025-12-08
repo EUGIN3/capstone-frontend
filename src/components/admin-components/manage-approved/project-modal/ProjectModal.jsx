@@ -11,11 +11,13 @@ import AxiosInstance from '../../../API/AxiosInstance';
 import useNotificationCreator from '../../../notification/UseNotificationCreator';
 import MultiSelectTimeSlots from '../../../forms/multiple-time/MultipleTime';
 import Confirmation from '../../../forms/confirmation-modal/Confirmation';
+import { ToastContainer, toast, Slide } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css"
 
 import { Tooltip } from '@mui/material';
 
 function ProjectModal({ onClose, appointment, onUpdate }) {
-  const { control, handleSubmit, reset } = useForm({
+  const { control, handleSubmit, reset, formState: { errors } } = useForm({
     defaultValues: {
       process_status: 'designing',
     },
@@ -67,13 +69,12 @@ function ProjectModal({ onClose, appointment, onUpdate }) {
   const shouldDisableDate = (date) => {
     if (!date) return false;
     
-    const dateStr = date.format('YYYY-MM-DD'); // Use dayjs format instead of toISOString
+    const dateStr = date.format('YYYY-MM-DD');
     const dayAvailability = availabilityData.find(item => item.date === dateStr);
     if (!dayAvailability) {
-      return false; // No data = all slots available = date is enabled
+      return false;
     }
 
-    // Check if ALL 5 slots are unavailable (all true)
     const allSlotsUnavailable = 
       dayAvailability.slot_one === true &&
       dayAvailability.slot_two === true &&
@@ -81,7 +82,6 @@ function ProjectModal({ onClose, appointment, onUpdate }) {
       dayAvailability.slot_four === true &&
       dayAvailability.slot_five === true;
 
-    // Disable date if ALL slots are unavailable
     return allSlotsUnavailable;
   };
 
@@ -97,23 +97,19 @@ function ProjectModal({ onClose, appointment, onUpdate }) {
     const dayAvailability = availabilityData.find(item => item.date === dateStr);
 
     if (!dayAvailability) {
-      // No restrictions for this date - all slots available
       setAvailableSlots(allTimeSlots);
       return;
     }
 
-    // Filter available slots (where slot_x === false)
     const available = allTimeSlots.filter(timeSlot => {
       const slotKey = slotMap[timeSlot];
       const isAvailable = dayAvailability[slotKey] === false;
-      
       
       return isAvailable;
     });
 
     setAvailableSlots(available);
     
-    // Clear selected times that are no longer available
     setSelectedTimes(prev => prev.filter(time => available.includes(time)));
   }, [fittingDate, availabilityData]);
 
@@ -150,7 +146,124 @@ function ProjectModal({ onClose, appointment, onUpdate }) {
   const handleSave = (data) => {
     if (saving) return;
 
+    // Check all required fields
+    if (!data.attire_type || data.attire_type.trim() === '') {
+      toast.error(
+        <div style={{ padding: '8px' }}>
+          Please enter attire type.
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
+      return;
+    }
+
     if (!targetDate) {
+      toast.error(
+        <div style={{ padding: '8px' }}>
+          Please select a target date.
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
+      return;
+    }
+
+    if (!data.total_amount || data.total_amount.trim() === '') {
+      toast.error(
+        <div style={{ padding: '8px' }}>
+          Please enter attire total cost.
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
+      return;
+    }
+
+    if (!data.amount_paid || data.amount_paid.trim() === '') {
+      toast.error(
+        <div style={{ padding: '8px' }}>
+          Please enter amount paid.
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
+      return;
+    }
+
+    if (!fittingDate) {
+      toast.error(
+        <div style={{ padding: '8px' }}>
+          Please select a fitting date.
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
+      return;
+    }
+
+    if (!selectedTimes || selectedTimes.length === 0) {
+      toast.error(
+        <div style={{ padding: '8px' }}>
+          Please select at least one fitting time slot.
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
       return;
     }
 
@@ -169,7 +282,6 @@ function ProjectModal({ onClose, appointment, onUpdate }) {
       const formData = new FormData();
       formData.append('attire_type', data.attire_type || '');
       
-      // ✅ Use dayjs format to avoid timezone issues
       formData.append(
         'targeted_date',
         targetDate.format('YYYY-MM-DD')
@@ -205,7 +317,7 @@ function ProjectModal({ onClose, appointment, onUpdate }) {
       // HANDLE FITTING TIME UNAVAILABILITY
       if (fittingDate && selectedTimes.length > 0) {
         try {
-          const dateStr = fittingDate.format('YYYY-MM-DD'); // ✅ Use dayjs format
+          const dateStr = fittingDate.format('YYYY-MM-DD');
 
           const availabilityRes = await AxiosInstance.get(
             `availability/display_unavailability/?date=${dateStr}`
@@ -260,16 +372,77 @@ function ProjectModal({ onClose, appointment, onUpdate }) {
       } catch (err) {
         console.error('Error freeing appointment slots:', err);
       }
-      
+
+      // ✅ Success notification - show AFTER loading completes
       if (onUpdate) {
         onUpdate();
       }
-      reset();
-      onClose();
+
+      // Hide loading spinner first
+      setSaving(false);
+
+      // Then show success toast
+      toast.success(
+        <div style={{ padding: '8px' }}>
+          Project created successfully for {appointment.first_name} {appointment.last_name}!
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
+
+      // Close modal after success toast
+      setTimeout(() => {
+        reset();
+        onClose();
+      }, 1000);
+
     } catch (error) {
       console.error('Failed to create project:', error);
-    } finally {
       setSaving(false);
+
+      let errorMessage = 'Failed to create project. Please try again.';
+
+      if (error.response?.status === 400) {
+        errorMessage = error.response?.data?.detail || 
+                      error.response?.data?.error ||
+                      'Invalid project data. Please check and try again.';
+      } else if (error.response?.status === 401) {
+        errorMessage = 'Your session has expired. Please log in again.';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'You do not have permission to create this project.';
+      } else if (error.response?.status === 404) {
+        errorMessage = 'Appointment not found. Please try again.';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      } else if (error.message === 'Network Error') {
+        errorMessage = 'Network connection failed. Please check your internet connection.';
+      }
+
+      toast.error(
+        <div style={{ padding: '8px' }}>
+          {errorMessage}
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
     }
   };
 
@@ -283,135 +456,137 @@ function ProjectModal({ onClose, appointment, onUpdate }) {
   };
 
   return (
-    <div className="projectOuterModal" style={{ position: 'relative' }}>
-      
-      {saving && (
-        <div className="loading-overlay">
-          <div className="loading-spinner"></div>
-        </div>
-      )}
-
-      <div className="createProjectModal">
-        <Tooltip title="Close" arrow>
-          <button className="close-modal" onClick={onClose} disabled={saving}>
-            <CloseRoundedIcon
-              sx={{
-                color: '#f5f5f5',
-                fontSize: 28,
-                padding: '2px',
-                backgroundColor: '#0c0c0c',
-                borderRadius: '50%',
-                cursor: saving ? 'not-allowed' : 'pointer',
-                opacity: saving ? 0.5 : 1,
-              }}
-            />
-          </button>
-        </Tooltip>
-
-        <div className="project-modal-body">
-          <div className="project-title">Create Project</div>
-
-          <div className="project-user">
-            <span>Name: </span>
-            {appointment.first_name} {appointment.last_name}
+    <>
+      <div className="projectOuterModal" style={{ position: 'relative' }}>
+        
+        {saving && (
+          <div className="loading-overlay">
+            <div className="loading-spinner"></div>
           </div>
-
-          <div className="attire-type-container project-container">
-            <NormalTextField
-              label="Attire Type"
-              name="attire_type"
-              control={control}
-              placeHolder="Enter attire type"
-            />
-          </div>
-
-          <div className="date-status-container">
-            <div className="targeted-date-container project-container">
-              <NormalDatePickerComponent
-                value={targetDate}
-                onChange={setTargetDate}
-                label="Target Date"
-              />
-            </div>
-
-            <div className="progress-status-container project-container">
-              <DropdownComponentTime
-                items={processStatusItems}
-                dropDownLabel="Process Status"
-                name="process_status"
-                control={control}
-              />
-            </div>
-          </div>
-
-          {/* ✅ Fitting Date with disabled dates */}
-          <div className="total-container project-container">
-            <NormalDatePickerComponent
-              value={fittingDate}
-              onChange={setFittingDate}
-              label="Fitting Date"
-              shouldDisableDate={shouldDisableDate}
-            />
-          </div>
-
-          {/* ✅ Fitting Time Slots - only show available slots */}
-          <div className="total-container project-container">
-            <MultiSelectTimeSlots
-              value={selectedTimes}
-              onChange={setSelectedTimes}
-              availableSlots={availableSlots}
-              disabled={!fittingDate}
-            />
-          </div>
-
-          <div className="payment-container">
-            <NormalTextField
-              label="Attire Total Cost"
-              name="total_amount"
-              control={control}
-              placeHolder="Enter Total Cost"
-            />
-
-            <NormalTextField
-              label="Amount Paid"
-              name="amount_paid"
-              control={control}
-              placeHolder="Enter Amount"
-            />
-          </div>
-
-          <div className="description-container project-container">
-            <NormalTextField
-              label="Description"
-              name="description"
-              control={control}
-              placeHolder="Enter project description"
-              multiline
-              rows={3}
-            />
-          </div>
-
-          <div className="save-container">
-            <ButtonElement
-              label="Save"
-              variant="filled-black"
-              type="button"
-              onClick={handleSubmit(handleSave)}
-              disabled={saving}
-            />
-          </div>
-        </div>
-
-        {showConfirm && (
-          <Confirmation
-            message={showConfirm.message}
-            severity={showConfirm.severity}
-            onConfirm={handleConfirm}
-            isOpen={true}
-          />
         )}
+
+        <div className="createProjectModal">
+          <Tooltip title="Close" arrow>
+            <button className="close-modal" onClick={onClose} disabled={saving}>
+              <CloseRoundedIcon
+                sx={{
+                  color: '#f5f5f5',
+                  fontSize: 28,
+                  padding: '2px',
+                  backgroundColor: '#0c0c0c',
+                  borderRadius: '50%',
+                  cursor: saving ? 'not-allowed' : 'pointer',
+                  opacity: saving ? 0.5 : 1,
+                }}
+              />
+            </button>
+          </Tooltip>
+
+          <div className="project-modal-body">
+            <div className="project-title">Create Project</div>
+
+            <div className="project-user">
+              <span>Name: </span>
+              {appointment.first_name} {appointment.last_name}
+            </div>
+
+            <div className="attire-type-container project-container">
+              <NormalTextField
+                label="Attire Type"
+                name="attire_type"
+                control={control}
+                placeHolder="Enter attire type"
+              />
+            </div>
+
+            <div className="date-status-container">
+              <div className="targeted-date-container project-container">
+                <NormalDatePickerComponent
+                  value={targetDate}
+                  onChange={setTargetDate}
+                  label="Target Date"
+                />
+              </div>
+
+              <div className="progress-status-container project-container">
+                <DropdownComponentTime
+                  items={processStatusItems}
+                  dropDownLabel="Process Status"
+                  name="process_status"
+                  control={control}
+                />
+              </div>
+            </div>
+
+            <div className="total-container project-container">
+              <NormalDatePickerComponent
+                value={fittingDate}
+                onChange={setFittingDate}
+                label="Fitting Date"
+                shouldDisableDate={shouldDisableDate}
+              />
+            </div>
+
+            <div className="total-container project-container">
+              <MultiSelectTimeSlots
+                value={selectedTimes}
+                onChange={setSelectedTimes}
+                availableSlots={availableSlots}
+                disabled={!fittingDate}
+              />
+            </div>
+
+            <div className="payment-container">
+              <NormalTextField
+                label="Attire Total Cost"
+                name="total_amount"
+                control={control}
+                placeHolder="Enter Total Cost"
+              />
+
+              <NormalTextField
+                label="Amount Paid"
+                name="amount_paid"
+                control={control}
+                placeHolder="Enter Amount"
+              />
+            </div>
+
+            <div className="description-container project-container">
+              <NormalTextField
+                label="Description"
+                name="description"
+                control={control}
+                placeHolder="Enter project description"
+                multiline
+                rows={3}
+              />
+            </div>
+
+            <div className="save-container">
+              <ButtonElement
+                label="Save"
+                variant="filled-black"
+                type="button"
+                onClick={handleSubmit(handleSave)}
+                disabled={saving}
+              />
+            </div>
+          </div>
+
+          {showConfirm && (
+            <Confirmation
+              message={showConfirm.message}
+              severity={showConfirm.severity}
+              onConfirm={handleConfirm}
+              isOpen={true}
+            />
+          )}
+        </div>
       </div>
-    </div>
+
+      <ToastContainer />
+    </>
   );
 }
 

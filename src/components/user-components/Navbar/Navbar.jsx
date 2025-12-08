@@ -42,6 +42,7 @@ import ButtonElement from '../../forms/button/ButtonElement';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import UserProjects from '../user-projects/UserProjects';
 import NotificationPanel from '../../notification/Notification';
+import ManageSchedule from '../user-schedule/UserManageSchedule';
 
 // Drawer width
 const drawerWidth = 240;
@@ -328,6 +329,7 @@ function Navbar({ window }) {
               <Route path="/generate" element={<ImageGeneratorComponent />} />
               <Route path="/gallery" element={<UserGallery />} />
               <Route path="/message" element={<UserMessages />} />
+              <Route path="/deisgner-calendar" element={<ManageSchedule />} />
             </Routes>
           </Main>
         </Box>

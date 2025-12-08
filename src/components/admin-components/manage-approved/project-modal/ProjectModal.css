@@ -5,6 +5,7 @@
     box-sizing: border-box;
     padding: 24px;
     background-color: #f5f5f5;
+    border-radius: 4px;
 }
 
 .projectOuterModal {

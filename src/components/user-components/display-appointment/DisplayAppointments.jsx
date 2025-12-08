@@ -27,7 +27,7 @@ function DisplayAppointments() {
 
   const fetchUserDesigns = async () => {
     try {
-      // ⏱️ Artificial loading delay (1.5 seconds)
+      // ⏱️ Artificial loading delay (0.4 seconds)
       await new Promise(resolve => setTimeout(resolve, 400));
       
       const response = await AxiosInstance.get('/design/user_designs/');
@@ -41,7 +41,7 @@ function DisplayAppointments() {
 
   const listAppointments = async () => {
     try {
-      // ⏱️ Artificial loading delay (1.5 seconds)
+      // ⏱️ Artificial loading delay (0.4 seconds)
       await new Promise(resolve => setTimeout(resolve, 400));
       
       const response = await AxiosInstance.get('appointment/user_appointments/');
@@ -53,18 +53,22 @@ function DisplayAppointments() {
     }
   };
 
-  const handleUpdate = (updatedAppointment) => {
-    setUserAppointments((prevAppointments) =>
-      prevAppointments.map((appointment) =>
-        appointment.id === updatedAppointment.id ? updatedAppointment : appointment
-      )
-    );
+  // ✅ Updated to refresh all data instead of updating single appointment
+  const handleUpdate = async () => {
+    try {
+      await listAppointments();
+    } catch (error) {
+      console.error('❌ Failed to refresh appointments:', error);
+    }
   };
 
   const renderAppointmentsByStatus = (statusLabel) => {
     return userAppointments
       .filter((app) => {
-         if (statusLabel === "") {
+        // Safety check: ensure app exists
+        if (!app) return false;
+
+        if (statusLabel === "") {
           return app.appointment_status !== "archived" && app.appointment_status !== "project";
         }
 

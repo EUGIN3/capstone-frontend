@@ -10,6 +10,7 @@ import NotificationsNoneTwoToneIcon from '@mui/icons-material/NotificationsNoneT
 import ForumTwoToneIcon from '@mui/icons-material/ForumTwoTone';
 import SquareFootTwoToneIcon from '@mui/icons-material/SquareFootTwoTone';
 import DesignServicesIcon from '@mui/icons-material/DesignServices';
+import EventAvailableTwoToneIcon from '@mui/icons-material/EventAvailableTwoTone';
 
 
 const useNavigation = () => {
@@ -19,6 +20,8 @@ const useNavigation = () => {
     { segment: 'user/message', title: 'Message', icon: <ForumTwoToneIcon /> },
 
     { segment: 'user/generate', title: 'Generate Design', icon: <AddPhotoAlternateTwoToneIcon /> },
+
+    { segment: 'user/deisgner-calendar', title: 'Designer Calendar', icon: <ScheduleTwoToneIcon /> },
 
     { segment: 'user/set-appointment', title: 'Set Appointment', icon: <EditCalendarTwoToneIcon /> },
 

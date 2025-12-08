@@ -21,7 +21,7 @@ function ManageOngoingUpdates() {
   const navigate = useNavigate();
 
   const [project, setProject] = useState(null);
-  const [loading, setLoading] = useState(true); // ✅ Loading state
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false)
   const [changeFittingOpen, setChangeFittingOpen] = useState(false)
@@ -29,15 +29,21 @@ function ManageOngoingUpdates() {
   const handleOpenFitting = () => {
     setChangeFittingOpen(true)
   }
+  
   const handleCloseFitting = () => {
     setChangeFittingOpen(false)
+    // ✅ Refresh project data after modal closes
+    fetchProject()
   }
 
   const handleOpenAdd = () => {
     setOpen(true)
   }
+  
   const handleCloseAdd = () => {
     setOpen(false)
+    // ✅ Refresh project data after modal closes
+    fetchProject()
   }
 
   const fetchProject = async () => {

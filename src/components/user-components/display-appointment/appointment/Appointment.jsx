@@ -18,6 +18,8 @@ import noImage from '../../../../assets/no-image.jpg'
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone'
 import { Tooltip } from '@mui/material'
 import Confirmation from '../../../forms/confirmation-modal/Confirmation'
+import { toast, Slide } from 'react-toastify'
+import "react-toastify/dist/ReactToastify.css"
 
 function Appointment(props) {
   const {
@@ -69,6 +71,25 @@ function Appointment(props) {
           setDisabledSlots({})
         }
       })
+      .catch((error) => {
+        console.error('Failed to fetch availability:', error)
+        toast.error(
+          <div style={{ padding: '8px' }}>
+            Failed to load available time slots.
+          </div>,
+          {
+            position: "top-center",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: false,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "colored",
+            transition: Slide,
+            closeButton: false,
+          }
+        )
+      })
   }
 
   useEffect(() => {
@@ -88,6 +109,13 @@ function Appointment(props) {
   useEffect(() => {
     const formattedDate = selectedDate.format('YYYY-MM-DD')
     getAvailability(formattedDate)
+    // Empty the time selection when date changes
+    setSelectedTime('')
+    // Reset the form field for time
+    reset((formValues) => ({
+      ...formValues,
+      time: ''
+    }))
   }, [selectedDate])
 
   const timeToSlotMap = {
@@ -107,37 +135,103 @@ function Appointment(props) {
   }
 
   const handleCancel = async () => {
+    if (loading) return
     setLoading(true)
+
     try {
+      const oldStatus = status
+
       // Cancel the appointment
-      const appointmentResponse = await AxiosInstance.patch(
+      await AxiosInstance.patch(
         `appointment/user_appointments/${id}/`,
         { appointment_status: 'cancelled' }
       )
 
-      if (onUpdate) onUpdate(appointmentResponse.data)
-
       // If appointment was approved, free up the slot
-      if (status === 'approved') {
+      if (oldStatus === 'approved') {
         const formattedDate = dayjs(date).format('YYYY-MM-DD')
         const slotField = timeToSlotMap[time]
 
         if (slotField) {
-          const res = await AxiosInstance.get(
-            `availability/display_unavailability/?date=${formattedDate}`
-          )
-          const unavailability = res.data[0]
-
-          if (unavailability) {
-            await AxiosInstance.patch(
-              `availability/set_unavailability/${unavailability.id}/`,
-              { [slotField]: false }
+          try {
+            const res = await AxiosInstance.get(
+              `availability/display_unavailability/?date=${formattedDate}`
             )
+            const unavailability = res.data[0]
+
+            if (unavailability) {
+              await AxiosInstance.patch(
+                `availability/set_unavailability/${unavailability.id}/`,
+                { [slotField]: false }
+              )
+            }
+          } catch (err) {
+            console.error('Error freeing slot:', err)
           }
         }
       }
+
+      toast.success(
+        <div style={{ padding: '8px' }}>
+          Appointment cancelled successfully.
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      )
+
+      // Trigger parent refresh
+      if (onUpdate) {
+        setTimeout(() => {
+          onUpdate()
+        }, 100)
+      }
+
     } catch (error) {
       console.error('Failed to cancel appointment:', error)
+      
+      let errorMessage = 'Failed to cancel appointment. Please try again.'
+
+      if (error.response?.status === 400) {
+        errorMessage = error.response?.data?.detail || 
+                      error.response?.data?.error ||
+                      'Invalid request. Please try again.';
+      } else if (error.response?.status === 401) {
+        errorMessage = 'Your session has expired. Please log in again.';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'You do not have permission to cancel this appointment.';
+      } else if (error.response?.status === 404) {
+        errorMessage = 'Appointment not found. It may have been deleted.';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      } else if (error.message === 'Network Error') {
+        errorMessage = 'Network connection failed. Please check your internet connection.';
+      }
+
+      toast.error(
+        <div style={{ padding: '8px' }}>
+          {errorMessage}
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      )
     } finally {
       setLoading(false)
     }
@@ -152,20 +246,102 @@ function Appointment(props) {
   }
 
   const handleDelete = async () => {
+    if (loading) return
     setLoading(true)
+
     try {
-      const response = await AxiosInstance.patch(`appointment/user_appointments/${id}/`, {
+      await AxiosInstance.patch(`appointment/user_appointments/${id}/`, {
         appointment_status: 'archived'
       })
-      if (onUpdate) onUpdate(response.data)
+
+      toast.success(
+        <div style={{ padding: '8px' }}>
+          Appointment deleted successfully.
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      )
+
+      // Trigger parent refresh
+      if (onUpdate) {
+        setTimeout(() => {
+          onUpdate()
+        }, 100)
+      }
+
     } catch (error) {
       console.error('Failed to delete appointment:', error)
+      
+      let errorMessage = 'Failed to delete appointment. Please try again.'
+
+      if (error.response?.status === 400) {
+        errorMessage = error.response?.data?.detail || 
+                      error.response?.data?.error ||
+                      'Invalid request. Please try again.';
+      } else if (error.response?.status === 401) {
+        errorMessage = 'Your session has expired. Please log in again.';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'You do not have permission to delete this appointment.';
+      } else if (error.response?.status === 404) {
+        errorMessage = 'Appointment not found. It may have already been deleted.';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      } else if (error.message === 'Network Error') {
+        errorMessage = 'Network connection failed. Please check your internet connection.';
+      }
+
+      toast.error(
+        <div style={{ padding: '8px' }}>
+          {errorMessage}
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      )
     } finally {
       setLoading(false)
     }
   }
 
   const submission = (data) => {
+    // Validation: Check if time is selected
+    if (!selectedTime) {
+      toast.error(
+        <div style={{ padding: '8px' }}>
+          Please select a time slot.
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      )
+      return
+    }
+
     setShowConfirm({
       action: 'edit',
       severity: 'warning',
@@ -175,6 +351,7 @@ function Appointment(props) {
   }
 
   const doSubmit = async (data) => {
+    if (loading) return
     setLoading(true)
     
     const formData = new FormData()
@@ -187,18 +364,81 @@ function Appointment(props) {
     }
 
     try {
-      const response = await AxiosInstance.patch(`appointment/user_appointments/${id}/`, formData, {
+      await AxiosInstance.patch(`appointment/user_appointments/${id}/`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
-      handleClose()
-      if (onUpdate) onUpdate(response.data)
-      reset()
-      setSelectedTime('')
-      setSelectedDate(dayjs(date))
-      setSelectedImage(null)
-      setResetUploadBox((prev) => !prev)
+      
+      toast.success(
+        <div style={{ padding: '8px' }}>
+          Appointment updated successfully!
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      )
+
+      // Trigger parent refresh
+      if (onUpdate) {
+        setTimeout(() => {
+          onUpdate()
+        }, 100)
+      }
+
+      // Close modal after slight delay to show success message
+      setTimeout(() => {
+        handleClose()
+        reset()
+        setSelectedTime('')
+        setSelectedDate(dayjs(date))
+        setSelectedImage(null)
+        setResetUploadBox((prev) => !prev)
+      }, 100)
+
     } catch (error) {
       console.error('Failed to update appointment:', error)
+      
+      let errorMessage = 'Failed to update appointment. Please try again.'
+
+      if (error.response?.status === 400) {
+        errorMessage = error.response?.data?.detail || 
+                      error.response?.data?.error ||
+                      'Invalid appointment data. Please check and try again.';
+      } else if (error.response?.status === 401) {
+        errorMessage = 'Your session has expired. Please log in again.';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'You do not have permission to update this appointment.';
+      } else if (error.response?.status === 404) {
+        errorMessage = 'Appointment not found. It may have been deleted.';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      } else if (error.message === 'Network Error') {
+        errorMessage = 'Network connection failed. Please check your internet connection.';
+      }
+
+      toast.error(
+        <div style={{ padding: '8px' }}>
+          {errorMessage}
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      )
     } finally {
       setLoading(false)
     }
@@ -222,14 +462,7 @@ function Appointment(props) {
 
   const handleSaveClick = (e) => {
     e.preventDefault()
-    handleSubmit((data) => {
-      setShowConfirm({
-        action: 'edit',
-        severity: 'warning',
-        message: `Save changes to your appointment on ${selectedDate.format('MMM DD, YYYY')} at ${selectedTime}?`,
-        data: data
-      })
-    })()
+    handleSubmit(submission)()
   }
 
   const handleTimeSelect = (time) => setSelectedTime(time)
@@ -238,14 +471,14 @@ function Appointment(props) {
 
   return (
     <>
-      {/* Loading Overlay */}
-      {loading && (
-        <div className="loading-overlay">
-          <div className="loading-spinner"></div>
-        </div>
-      )}
+      <div className={`appointment-box ${status}`} style={{ position: 'relative' }}>
+        {/* Loading Overlay */}
+        {loading && (
+          <div className="loading-overlay">
+            <div className="loading-spinner"></div>
+          </div>
+        )}
 
-      <div className={`appointment-box ${status}`}>
         <Dialog
           open={open}
           onClose={handleClose}
@@ -323,7 +556,13 @@ function Appointment(props) {
                 </div>
 
                 <div className="update-dialog-button-container">
-                  <ButtonElement label="Save" variant="filled-black" type={'button'} onClick={handleSaveClick} />
+                  <ButtonElement 
+                    label="Save" 
+                    variant="filled-black" 
+                    type={'button'} 
+                    onClick={handleSaveClick} 
+                    disabled={loading} 
+                  />
                 </div>
               </div>
             </div>
@@ -386,7 +625,7 @@ function Appointment(props) {
           message={showConfirm.message}
           severity={showConfirm.severity}
           onConfirm={handleConfirm}
-          isOpen={!!showConfirm}
+          isOpen={true}
         />
       )}
     </>
