@@ -43,10 +43,16 @@
     gap: 10px;
 }
 
+.userview-sub-image {
+    object-fit: contain;
+    height: 100px;
+    background-color: #0c0c0c;
+}
+
+
 .userview-sub-image img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
     border-radius: 4px;
 }
 

@@ -410,7 +410,7 @@ function SetAppointment() {
               <button
                 type="button"
                 className={`step3-btn ${step3Mode === 'generate' ? 'active' : ''}`}
-                onClick={() => handleStep3ButtonClick('generate')}
+                onClick={() => navigate('/user/generate')}
                 disabled={loadingStep3}
               >
                 Generate a Design
@@ -437,9 +437,6 @@ function SetAppointment() {
                   : <p>Use Attire from Gallery</p>
                 }
               </div>
-            )}
-            {step3Mode === 'generate' && (
-              <p className="step3-placeholder">Design generator coming next…</p>
             )}
           </div>
 

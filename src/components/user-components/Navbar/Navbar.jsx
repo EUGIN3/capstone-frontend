@@ -44,6 +44,8 @@ import UserProjects from '../user-projects/UserProjects';
 import NotificationPanel from '../../notification/Notification';
 import ManageSchedule from '../user-schedule/UserManageSchedule';
 
+import ProjectDetails from '../user-projects/ProjectDetails/ProjectDetails';
+
 // Drawer width
 const drawerWidth = 240;
 
@@ -330,6 +332,7 @@ function Navbar({ window }) {
               <Route path="/gallery" element={<UserGallery />} />
               <Route path="/message" element={<UserMessages />} />
               <Route path="/deisgner-calendar" element={<ManageSchedule />} />
+              <Route path="/on-going-project/:projectId" element={<ProjectDetails />} />
             </Routes>
           </Main>
         </Box>

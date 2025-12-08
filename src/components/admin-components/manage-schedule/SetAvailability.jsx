@@ -6,6 +6,8 @@ import dayjs from 'dayjs';
 import Confirmation from '../../forms/confirmation-modal/Confirmation'
 import { ToastContainer, toast, Slide } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css"
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import { Tooltip } from '@mui/material';
 
 const SetUnavailability = ({ selectedDate, onClose }) => {
   const [slots, setSlots] = useState([
@@ -262,9 +264,11 @@ const SetUnavailability = ({ selectedDate, onClose }) => {
 
   if (loading) {
     return (
-      <div className='setAppointmentAvailability' style={{ position: 'relative' }}>
-        <div className="loading-overlay">
-          <div className="loading-spinner"></div>
+      <div className='setAppointmentAvailability-outer' style={{ position: 'relative' }}>
+        <div className='setAppointmentAvailability'>
+          <div className="loading-overlay">
+            <div className="loading-spinner"></div>
+          </div>
         </div>
       </div>
     );
@@ -272,83 +276,102 @@ const SetUnavailability = ({ selectedDate, onClose }) => {
 
   return (
     <>
-      <div className='setAppointmentAvailability' style={{ position: 'relative' }}>
-        
-        {/* Loading Overlay */}
-        {saving && (
-          <div className="loading-overlay">
-            <div className="loading-spinner"></div>
-          </div>
-        )}
+      <div className='setAppointmentAvailability-outer'>
+          <Tooltip title="Close" arrow>
+            <button className="close-modal-set" onClick={onClose} disabled={saving}>
+              <CloseRoundedIcon
+                sx={{
+                  color: '#f5f5f5',
+                  fontSize: 28,
+                  padding: '2px',
+                  backgroundColor: '#0c0c0c',
+                  borderRadius: '50%',
+                  cursor: saving ? 'not-allowed' : 'pointer',
+                  opacity: saving ? 0.5 : 1,
+                }}
+              />
+            </button>
+          </Tooltip>
 
-        <p className='setAppointmentAvailability-header'>
-          {dayjs(selectedDate).format('MMMM DD, YYYY')}
-        </p>
+        <div className='setAppointmentAvailability'>
 
-        <hr />
-
-        <div className="wholeDaySwitch">
-          <span
-            className={`reason-text ${wholeDay ? 'unavailable' : 'available'}`}
-            style={{ cursor: "pointer" }}
-            onClick={toggleWholeDay}
-          >
-            {wholeDay ? "Unavailable" : "Available"}
-          </span>
-        </div>
-
-        <hr />
-
-        <div className="availability-container">
-          {slots.map((item, index) => (
-            <div key={index} className="slot-row">
-              <div
-                className={`slot-time ${
-                  !item.slot
-                    ? "available"
-                    : item.reason === "Designer not available"
-                      ? "unavailable"
-                      : "fixed-reason"
-                }`}
-                onClick={() => toggleSlot(index)}
-              >
-                {timeSlots[index]}
-              </div>
-
-              <div className="slot-separator">:</div>
-
-              <span
-                className={`reason-text ${
-                  !item.slot
-                    ? "available"
-                    : item.reason === "Designer not available"
-                      ? "unavailable"
-                      : "fixed-reason"
-                }`}
-                onClick={() => toggleSlot(index)}
-              >
-                {item.slot ? item.reason : "Available"}
-              </span>
+          
+          {/* Loading Overlay */}
+          {saving && (
+            <div className="loading-overlay">
+              <div className="loading-spinner"></div>
             </div>
-          ))}
-        </div>
+          )}
 
-        <ButtonElement
-          label='SAVE SCHEDULE'
-          variant='filled-black'
-          type='button'
-          onClick={handleSave}
-          disabled={saving}
-        />
+          <p className='setAppointmentAvailability-header'>
+            {dayjs(selectedDate).format('MMMM DD, YYYY')}
+          </p>
 
-        {showConfirm && (
-          <Confirmation
-            message={showConfirm.message}
-            severity={showConfirm.severity}
-            onConfirm={handleConfirm}
-            isOpen={true}
+          <hr />
+
+          <div className="wholeDaySwitch">
+            <span
+              className={`reason-text ${wholeDay ? 'unavailable' : 'available'}`}
+              style={{ cursor: "pointer" }}
+              onClick={toggleWholeDay}
+            >
+              {wholeDay ? "Unavailable" : "Available"}
+            </span>
+          </div>
+
+          <hr />
+
+          <div className="availability-container">
+            {slots.map((item, index) => (
+              <div key={index} className="slot-row">
+                <div
+                  className={`slot-time ${
+                    !item.slot
+                      ? "available"
+                      : item.reason === "Designer not available"
+                        ? "unavailable"
+                        : "fixed-reason"
+                  }`}
+                  onClick={() => toggleSlot(index)}
+                >
+                  {timeSlots[index]}
+                </div>
+
+                <div className="slot-separator">:</div>
+
+                <span
+                  className={`reason-text ${
+                    !item.slot
+                      ? "available"
+                      : item.reason === "Designer not available"
+                        ? "unavailable"
+                        : "fixed-reason"
+                  }`}
+                  onClick={() => toggleSlot(index)}
+                >
+                  {item.slot ? item.reason : "Available"}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <ButtonElement
+            label='SAVE SCHEDULE'
+            variant='filled-black'
+            type='button'
+            onClick={handleSave}
+            disabled={saving}
           />
-        )}
+
+          {showConfirm && (
+            <Confirmation
+              message={showConfirm.message}
+              severity={showConfirm.severity}
+              onConfirm={handleConfirm}
+              isOpen={true}
+            />
+          )}
+        </div>
       </div>
 
       <ToastContainer />

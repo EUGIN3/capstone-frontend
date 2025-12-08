@@ -63,6 +63,9 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
   const [saving, setSaving] = useState(false);
   const [showConfirm, setShowConfirm] = useState(null);
   const [currentStatus, setCurrentStatus] = useState(null);
+  const [projectBalance, setProjectBalance] = useState(0);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [amountPaid, setAmountPaid] = useState(0);
   const { sendDefaultNotification } = useNotificationCreator();
 
   // Loading wrapper function
@@ -78,7 +81,7 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
     }
   };
 
-  // 🚀 Fetch current project status on mount
+  // 🚀 Fetch current project status and balance on mount
   useEffect(() => {
     const fetchProjectData = async () => {
       if (!projectId) return;
@@ -86,7 +89,15 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
       try {
         const response = await AxiosInstance.get(`design/designs/${projectId}/`);
         const status = response.data.process_status || 'concept';
+        const total = parseFloat(response.data.total_amount || 0);
+        const paid = parseFloat(response.data.amount_paid || 0);
+        const balance = total - paid;
+
         setCurrentStatus(status);
+        setTotalAmount(total);
+        setAmountPaid(paid);
+        setProjectBalance(balance);
+
         reset({
           process_status: status,
           message: '',
@@ -168,7 +179,7 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
     };
   };
 
-  // ✅ Main handler - shows confirmation
+  // ✅ Main handler - shows confirmation with balance validation
   const handleUpdate = (data) => {
     if (saving) return;
 
@@ -191,6 +202,74 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
         }
       );
       return;
+    }
+
+    // ✅ Validate: Payment amount cannot exceed balance
+    if (data.payment && data.payment.trim() !== '') {
+      const paymentAmount = parseFloat(data.payment);
+
+      // Check if payment is a valid number
+      if (isNaN(paymentAmount)) {
+        toast.error(
+          <div style={{ padding: '8px' }}>
+            Please enter a valid payment amount.
+          </div>,
+          {
+            position: "top-center",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: false,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "colored",
+            transition: Slide,
+            closeButton: false,
+          }
+        );
+        return;
+      }
+
+      // Check if payment is negative
+      if (paymentAmount < 0) {
+        toast.error(
+          <div style={{ padding: '8px' }}>
+            Payment amount cannot be negative.
+          </div>,
+          {
+            position: "top-center",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: false,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "colored",
+            transition: Slide,
+            closeButton: false,
+          }
+        );
+        return;
+      }
+
+      // Check if payment exceeds balance
+      if (paymentAmount > projectBalance) {
+        toast.error(
+          <div style={{ padding: '8px' }}>
+            Payment amount (₱{paymentAmount.toFixed(2)}) cannot exceed the remaining balance (₱{projectBalance.toFixed(2)}).
+          </div>,
+          {
+            position: "top-center",
+            autoClose: 4000,
+            hideProgressBar: true,
+            closeOnClick: false,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "colored",
+            transition: Slide,
+            closeButton: false,
+          }
+        );
+        return;
+      }
     }
 
     const config = getConfirmationConfig(data);
@@ -224,13 +303,21 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
         }
       );
 
-
-
-      // Refresh project to get updated status for future updates
+      // Refresh project to get updated status and balance for future updates
       const response = await AxiosInstance.get(`design/designs/${projectId}/`);
       await sendDefaultNotification('update_posted', response.data.user);
 
-      // Reset state
+      // Update state with new balance
+      const newTotal = parseFloat(response.data.total_amount || 0);
+      const newPaid = parseFloat(response.data.amount_paid || 0);
+      const newBalance = newTotal - newPaid;
+
+      setTotalAmount(newTotal);
+      setAmountPaid(newPaid);
+      setProjectBalance(newBalance);
+      setCurrentStatus(response.data.process_status || 'designing');
+
+      // Reset form
       reset({
         process_status: response.data.process_status || 'designing',
         message: '',
@@ -292,7 +379,7 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
     }
   };
 
-  // ✅ Handles confirmation response - FIXED HERE ⭐
+  // ✅ Handles confirmation response
   const handleConfirm = (confirmed) => {
     if (confirmed && showConfirm?.formData) {
       setShowConfirm(null); // Close confirmation immediately
@@ -361,7 +448,12 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
                 name="payment"
                 label="Payment Amount"
                 type="number"
-                inputProps={{ min: 0, step: '0.01', placeholder: 'e.g., 150.50' }}
+                inputProps={{ 
+                  min: 0, 
+                  max: projectBalance,
+                  step: '0.01', 
+                  placeholder: `Max: ₱${projectBalance.toFixed(2)}` 
+                }}
               />
             </div>
           </div>
@@ -385,8 +477,6 @@ function AddUpdateModal({ onClose, projectId, onSuccess }) {
             isOpen={true}
           />
         )}
-
-
         
         <ToastContainer />
       </div>

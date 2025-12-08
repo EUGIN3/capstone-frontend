@@ -12,6 +12,7 @@ function ProjectDetails({ project: projectProp }) {
   const [appointment, setAppointment] = useState(prefetched?.appointment || null);
   const [user, setUser] = useState(prefetched?.user || null);
   const [loading, setLoading] = useState(!prefetched);
+  const [hasAppointment, setHasAppointment] = useState(false);
 
   // Loading wrapper function
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -28,9 +29,19 @@ function ProjectDetails({ project: projectProp }) {
 
   // 🧩 Define readable label maps
   const processStatusLabels = {
+    concept: 'Concept',
+    sketching: 'Sketching',
     designing: 'Designing',
+    material_selection: 'Material Selection',
+    pattern_making: 'Pattern Making',
+    cutting: 'Cutting',
+    sewing: 'Sewing',
     materializing: 'Materializing',
+    fitting: 'Fitting',
+    alterations: 'Alterations',
+    final_fitting: 'Final Fitting',
     ready: 'Ready',
+    picked_up: 'Picked Up',
     done: 'Done',
   };
 
@@ -59,36 +70,41 @@ function ProjectDetails({ project: projectProp }) {
     }
   };
 
-  const fetchAppointment = async () => {
+  const fetchProjectData = async () => {
     // Only fetch if not already prefetched
-    if (prefetched && prefetched.appointment && prefetched.user) {
+    if (prefetched && prefetched.user) {
       setLoading(false);
       return;
     }
 
     await withLoading(async () => {
       try {
-        const response = await AxiosInstance.get(`appointment/appointments/`);
+        // Always fetch user data
+        if (project?.user) {
+          const userResponse = await AxiosInstance.get(`auth/users/${project.user}/`);
+          setUser(userResponse.data);
+        }
 
+        // Only fetch appointment if project has appointment linked
         if (project?.appointment) {
-          const matchedAppointment = response.data.find(
-            (item) => item.id === project.appointment
+          setHasAppointment(true);
+          const appointmentResponse = await AxiosInstance.get(
+            `appointment/appointments/${project.appointment}/`
           );
-          setAppointment(matchedAppointment);
-
-          if (project?.user) {
-            const userResponse = await AxiosInstance.get(`auth/users/${project.user}/`);
-            setUser(userResponse.data);
-          }
+          setAppointment(appointmentResponse.data);
+        } else {
+          setHasAppointment(false);
+          setAppointment(null);
         }
       } catch (err) {
-        console.error('❌ Failed to fetch appointment or user:', err);
+        console.error('❌ Failed to fetch project data:', err);
       }
     });
   };
 
   const formatDate = (dateStr) => {
-    const date = dateStr ? new Date(dateStr) : new Date();
+    if (!dateStr) return 'N/A';
+    const date = new Date(dateStr);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
@@ -107,123 +123,148 @@ function ProjectDetails({ project: projectProp }) {
 
   useEffect(() => {
     if (project) {
-      fetchAppointment();
+      fetchProjectData();
     }
   }, [project]);
 
-  return (
-    <div className="ProjectDetails">
-      {loading && (
+  // Show loading spinner
+  if (loading) {
+    return (
+      <div className="ProjectDetails">
         <div className="loading-overlay">
           <div className="loading-spinner"></div>
         </div>
-      )}
+      </div>
+    );
+  }
 
-      {!loading && !appointment ? (
-        <p>No appointment details found.</p>
-      ) : !loading ? (
-        <>
-          <div className="image-container">
-            <img
-              src={appointment.image ? appointment.image : noImage}
-              className="appointment-image"
-              alt="Appointment reference image."
-            />
+  // Show error if no user data
+  if (!user) {
+    return (
+      <div className="ProjectDetails">
+        <p>No user details found for this project.</p>
+      </div>
+    );
+  }
+
+  // Get the display image - from appointment if available, otherwise use placeholder
+  const displayImage = hasAppointment && appointment?.image ? appointment.image : noImage;
+
+  // Get the display name - from appointment if available, otherwise from user
+  const displayFirstName = hasAppointment && appointment?.first_name 
+    ? appointment.first_name 
+    : user?.first_name || 'N/A';
+  const displayLastName = hasAppointment && appointment?.last_name 
+    ? appointment.last_name 
+    : user?.last_name || '';
+
+  return (
+    <div className="ProjectDetails">
+      <div className="image-container">
+        <img
+          src={displayImage}
+          className="appointment-image"
+          alt="Project reference image."
+        />
+      </div>
+
+      <div className="project-info-container">
+        <div className="designing-information">
+          <div className="info">
+            <p className="label">Name:</p>
+            <p className="info-text">
+              {displayFirstName} {displayLastName}
+            </p>
           </div>
 
-          <div className="project-info-container">
-            <div className="designing-information">
-              <div className="info">
-                <p className="label">Name:</p>
-                <p className="info-text">
-                  {appointment.first_name} {appointment.last_name}
-                </p>
-              </div>
-
-              <div className="info">
-                <p className="label">Attire Type:</p>
-                <p className="info-text">{project.attire_type}</p>
-              </div>
-
-              <div className="info">
-                <p className="label">Status:</p>
-                <p className="info-text">
-                  {processStatusLabels[project.process_status] || project.process_status}
-                </p>
-              </div>
-
-              <div className="info">
-                <p className="label">Facebook:</p>
-                <p className="info-text">
-                  <a href={user.facebook_link} target="_blank" rel="noopener noreferrer">
-                    profile
-                  </a>
-                </p>
-              </div>
-            </div>
-
-            <div className="dates">
-              <div className="info">
-                <p className="label">Target Date:</p>
-                <p className="info-text">{formatDate(project.targeted_date)}</p>
-              </div>
-
-              <div className="info">
-                <p className="label">Date Created:</p>
-                <p className="info-text">{formatDate(project.created_at)}</p>
-              </div>
-
-              <div className="info">
-                <p className="label">Last Update:</p>
-                <p className="info-text">{formatDate(project.updated_at)}</p>
-              </div>
-
-              <div className="info">
-                <p className="label">Contact Number:</p>
-                <p className="info-text">{user.phone_number}</p>
-              </div>
-            </div>
-
-            <div className="payment-details">
-              <div className="info">
-                <p className="label">Payment Status:</p>
-                <p className="info-text">
-                  {paymentStatusLabels[project.payment_status] || project.payment_status}
-                </p>
-              </div>
-
-              <div className="info">
-                <p className="label">Total Amount:</p>
-                <p className="info-text total-amount">{formatCurrency(project.total_amount)}</p>
-              </div>
-
-              <div className="info">
-                <p className="label">Amount Paid:</p>
-                <p className="info-text paid-text">{formatCurrency(project.amount_paid)}</p>
-              </div>
-
-              <div className="info">
-                <p className="label">Remaining Balance:</p>
-                <p className="info-text balance-text">{formatCurrency(project.balance)}</p>
-              </div>
-            </div>
-
-            <div className="payment-details fitting-details">
-              <div className="info">
-                <p className="label">Fitting Date:</p>
-                <p className={`info-text ${project.fitting_successful ? 'done-fitting' : ''}`}>{formatDate(project.fitting_date)}</p>
-              </div>
-
-              <div className="info">
-                <p className="label">Fitting Time:</p>
-                <p className={`info-text ${project.fitting_successful ? 'done-fitting' : ''}`}>
-                  {formatFittingTime(project.fitting_time)}
-                </p>
-              </div>
-            </div>
+          <div className="info">
+            <p className="label">Attire Type:</p>
+            <p className="info-text">{project.attire_type || 'N/A'}</p>
           </div>
-        </>
-      ) : null}
+
+          <div className="info">
+            <p className="label">Status:</p>
+            <p className="info-text">
+              {processStatusLabels[project.process_status] || project.process_status}
+            </p>
+          </div>
+
+          <div className="info">
+            <p className="label">Facebook:</p>
+            <p className="info-text">
+              {user.facebook_link ? (
+                <a href={user.facebook_link} target="_blank" rel="noopener noreferrer">
+                  profile
+                </a>
+              ) : (
+                'N/A'
+              )}
+            </p>
+          </div>
+        </div>
+
+        <div className="dates">
+          <div className="info">
+            <p className="label">Target Date:</p>
+            <p className="info-text">{formatDate(project.targeted_date)}</p>
+          </div>
+
+          <div className="info">
+            <p className="label">Date Created:</p>
+            <p className="info-text">{formatDate(project.created_at)}</p>
+          </div>
+
+          <div className="info">
+            <p className="label">Last Update:</p>
+            <p className="info-text">{formatDate(project.updated_at)}</p>
+          </div>
+
+          <div className="info">
+            <p className="label">Contact Number:</p>
+            <p className="info-text">{user.phone_number || 'N/A'}</p>
+          </div>
+        </div>
+
+        <div className="payment-details">
+          <div className="info">
+            <p className="label">Payment Status:</p>
+            <p className="info-text">
+              {paymentStatusLabels[project.payment_status] || project.payment_status}
+            </p>
+          </div>
+
+          <div className="info">
+            <p className="label">Total Amount:</p>
+            <p className="info-text total-amount">{formatCurrency(project.total_amount)}</p>
+          </div>
+
+          <div className="info">
+            <p className="label">Amount Paid:</p>
+            <p className="info-text paid-text">{formatCurrency(project.amount_paid)}</p>
+          </div>
+
+          <div className="info">
+            <p className="label">Remaining Balance:</p>
+            <p className="info-text balance-text">{formatCurrency(project.balance)}</p>
+          </div>
+        </div>
+
+        <div className="payment-details fitting-details">
+          <div className="info">
+            <p className="label">Fitting Date:</p>
+            <p className={`info-text ${project.fitting_successful ? 'done-fitting' : ''}`}>
+              {formatDate(project.fitting_date)}
+            </p>
+          </div>
+
+          <div className="info">
+            <p className="label">Fitting Time:</p>
+            <p className={`info-text ${project.fitting_successful ? 'done-fitting' : ''}`}>
+              {formatFittingTime(project.fitting_time)}
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

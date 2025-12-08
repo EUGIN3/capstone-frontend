@@ -4,6 +4,8 @@ import AxiosInstance from '../../API/AxiosInstance';
 import dayjs from 'dayjs';
 import { ToastContainer, toast, Slide } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css"
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import { Tooltip } from '@mui/material';
 
 const SetUnavailability = ({ selectedDate, onClose }) => {
   const [slots, setSlots] = useState([
@@ -95,9 +97,11 @@ const SetUnavailability = ({ selectedDate, onClose }) => {
 
   if (loading) {
     return (
-      <div className='setAppointmentAvailability' style={{ position: 'relative' }}>
-        <div className="loading-overlay">
-          <div className="loading-spinner"></div>
+      <div className='setAppointmentAvailability-outer' style={{ position: 'relative' }}>
+        <div className='setAppointmentAvailability'>
+          <div className="loading-overlay">
+            <div className="loading-spinner"></div>
+          </div>
         </div>
       </div>
     );
@@ -105,45 +109,64 @@ const SetUnavailability = ({ selectedDate, onClose }) => {
 
   return (
     <>
-      <div className='setAppointmentAvailability'>
-        <p className='setAppointmentAvailability-header'>
-          {dayjs(selectedDate).format('MMMM DD, YYYY')}
-        </p>
+      <div className='setAppointmentAvailability-outer' style={{ position: 'relative' }}>
+        
+        {/* Close Button */}
+        <Tooltip title="Close" arrow>
+          <button className="close-modal" onClick={onClose}>
+            <CloseRoundedIcon
+              sx={{
+                color: '#f5f5f5',
+                fontSize: 28,
+                padding: '2px',
+                backgroundColor: '#0c0c0c',
+                borderRadius: '50%',
+                cursor: 'pointer',
+              }}
+            />
+          </button>
+        </Tooltip>
 
-        <hr />
+        <div className='setAppointmentAvailability'>
+          <p className='setAppointmentAvailability-header'>
+            {dayjs(selectedDate).format('MMMM DD, YYYY')}
+          </p>
 
-        <hr />
+          <hr />
 
-        <div className="availability-container">
-          {slots.map((item, index) => (
-            <div key={index} className="slot-row">
-              <div
-                className={`slot-time ${
-                  !item.slot
-                    ? "available"
-                    : item.reason === "Designer not available"
-                      ? "unavailable"
-                      : "fixed-reason"
-                }`}
-              >
-                {timeSlots[index]}
+          <hr />
+
+          <div className="availability-container">
+            {slots.map((item, index) => (
+              <div key={index} className="slot-row">
+                <div
+                  className={`slot-time ${
+                    !item.slot
+                      ? "available"
+                      : item.reason === "Designer not available"
+                        ? "unavailable"
+                        : "fixed-reason"
+                  }`}
+                >
+                  {timeSlots[index]}
+                </div>
+
+                <div className="slot-separator">:</div>
+
+                <span
+                  className={`reason-text ${
+                    !item.slot
+                      ? "available"
+                      : item.reason === "Designer not available"
+                        ? "unavailable"
+                        : "fixed-reason"
+                  }`}
+                >
+                  {item.slot ? item.reason : "Available"}
+                </span>
               </div>
-
-              <div className="slot-separator">:</div>
-
-              <span
-                className={`reason-text ${
-                  !item.slot
-                    ? "available"
-                    : item.reason === "Designer not available"
-                      ? "unavailable"
-                      : "fixed-reason"
-                }`}
-              >
-                {item.slot ? item.reason : "Available"}
-              </span>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 

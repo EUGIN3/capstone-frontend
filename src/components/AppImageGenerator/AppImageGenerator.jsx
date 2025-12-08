@@ -14,13 +14,13 @@ import {
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 
-import ImageGenerationDropdown from './ImageGenerationDropdown';
+import ImageGenerationDropdown from '../ImageGenerator/ImageGenerationDropdown';
 import ButtonElement from '../forms/button/ButtonElement';
 import Confirmation from '../forms/confirmation-modal/Confirmation';
 import { ToastContainer, toast, Slide } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 
-import './ImageGeneratorComponent.css';
+import './AppImageGenerator.css';
 
 // Dropdown options - Separated by Gender
 const femaleAttireOptions = [
@@ -178,7 +178,7 @@ const schema = yup.object({
   color: yup.string().required('Please select a color'),
 });
 
-const ImageGeneratorComponent = () => {
+const AppImageGeneratorComponent = ({ onImageGenerated }) => {
   const [imageSrc, setImageSrc] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -228,6 +228,11 @@ const ImageGeneratorComponent = () => {
       if (fileUrl) {
         setImageSrc(fileUrl);
         
+        // Call the callback if provided
+        if (onImageGenerated) {
+          onImageGenerated(fileUrl);
+        }
+        
         // Show success toast
         toast.success(
           <div style={{ padding: '8px' }}>
@@ -246,7 +251,13 @@ const ImageGeneratorComponent = () => {
           }
         );
       } else if (response.data.image) {
-        setImageSrc(`data:image/png;base64,${response.data.image}`);
+        const base64Image = `data:image/png;base64,${response.data.image}`;
+        setImageSrc(base64Image);
+        
+        // Call the callback if provided
+        if (onImageGenerated) {
+          onImageGenerated(base64Image);
+        }
         
         toast.success(
           <div style={{ padding: '8px' }}>
@@ -455,8 +466,6 @@ const ImageGeneratorComponent = () => {
             </div>
           )}
 
-          <div className="imageGeneratorTitle">Generate designs</div>
-          
           <div className="imageGenerator-bottomPart">
             <div className="imageGeneratorInputContainer">
               {/* Gender */}
@@ -587,4 +596,4 @@ const ImageGeneratorComponent = () => {
   );
 };
 
-export default ImageGeneratorComponent;
+export default AppImageGeneratorComponent;

@@ -1,3 +1,27 @@
+/* Outer wrapper for positioning close button */
+.setAppointmentAvailability-outer {
+    padding: 12px;
+    background-color: transparent;
+}
+
+/* Close button positioning */
+.close-modal-set{
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  background-color: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+
 .manageSchedule-calendar {
     height: 760px;
 }
@@ -6,6 +30,9 @@
 .setAppointmentAvailability {
     padding: 20px;
     width: 500px;
+    border-radius: 8px;
+
+    background-color: #ffffff;
 }
 
 .setAppointmentAvailability-header {
@@ -185,3 +212,5 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+

@@ -20,6 +20,15 @@
   margin-bottom: 10px;
 }
 
+.create-search {
+  display: flex;
+  gap: 10px;
+}
+
+.create-project .filled-black {
+  width: 120px;
+}
+
 /* ------------------------------
    SEARCH BAR
 --------------------------------- */
@@ -160,4 +169,9 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+
+.ongoing-projects .ongoing-download-btn .outlined-black {
+  padding: 0px 20px;
 }

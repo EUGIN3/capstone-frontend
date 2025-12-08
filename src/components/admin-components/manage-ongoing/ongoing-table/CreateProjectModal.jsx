@@ -1,4 +1,4 @@
-import './ProjectModal.css';
+import './CreateProjectModal.css';
 import React, { useState, useEffect } from 'react';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import NormalTextField from '../../../forms/text-fields/NormalTextField';
@@ -7,18 +7,18 @@ import NormalDatePickerComponent from '../../../forms/date-picker/NormalDatePick
 import DropdownComponentTime from '../../../forms/time-dropdown/DropDownForTime';
 import { useForm } from 'react-hook-form';
 import AxiosInstance from '../../../API/AxiosInstance';
-
 import useNotificationCreator from '../../../notification/UseNotificationCreator';
 import MultiSelectTimeSlots from '../../../forms/multiple-time/MultipleTime';
 import Confirmation from '../../../forms/confirmation-modal/Confirmation';
 import { ToastContainer, toast, Slide } from 'react-toastify';
-import "react-toastify/dist/ReactToastify.css"
-
+import "react-toastify/dist/ReactToastify.css";
 import { Tooltip } from '@mui/material';
 
-function ProjectModal({ onClose, appointment, onUpdate }) {
+function CreateProjectModal({ onClose, onProjectCreated }) {
   const { control, handleSubmit, reset, formState: { errors }, watch, setValue } = useForm({
     defaultValues: {
+      user: '',
+      attire_type: '',
       process_status: 'concept',
       total_amount: '',
       amount_paid: '',
@@ -34,12 +34,14 @@ function ProjectModal({ onClose, appointment, onUpdate }) {
   const [showConfirm, setShowConfirm] = useState(null);
   const [availabilityData, setAvailabilityData] = useState([]);
   const [availableSlots, setAvailableSlots] = useState([]);
+  const [users, setUsers] = useState([]);
 
   // Watch form values for validation
   const totalAmount = watch('total_amount');
   const amountPaid = watch('amount_paid');
+  const selectedUser = watch('user');
 
-  // ✅ Attire type options (copied from AddItemModal)
+  // ✅ Attire type options
   const attireTypeOptions = [
     // Women's Formal Attire - Gowns & Dresses
     { value: 'ball gown', label: 'Ball Gown' },
@@ -102,6 +104,24 @@ function ProjectModal({ onClose, appointment, onUpdate }) {
 
   const allTimeSlots = Object.keys(slotMap);
 
+  // ✅ Fetch users on mount
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await AxiosInstance.get('auth/users/');
+        const userOptions = response.data.map(user => ({
+          value: user.id,
+          label: `${user.first_name} ${user.last_name}`.trim() || user.username || `User ${user.id}`
+        }));
+        setUsers(userOptions);
+      } catch (error) {
+        console.error('❌ Error fetching users:', error);
+        toast.error('Failed to load users');
+      }
+    };
+    fetchUsers();
+  }, []);
+
   // ✅ Fetch availability data on mount
   useEffect(() => {
     const fetchAvailability = async () => {
@@ -163,15 +183,6 @@ function ProjectModal({ onClose, appointment, onUpdate }) {
     setSelectedTimes(prev => prev.filter(time => available.includes(time)));
   }, [fittingDate, availabilityData]);
 
-  const findSlotKey = (timeStr) => {
-    if (!timeStr) return null;
-    const normalized = timeStr.toString().trim().replace(/\s+/g, ' ');
-    for (const [label, key] of Object.entries(slotMap)) {
-      if (label.replace(/\s+/g, ' ') === normalized) return key;
-    }
-    return null;
-  };
-
   const handleImageChange = (e) => {
     setReferenceImage(e.target.files[0]);
   };
@@ -209,9 +220,12 @@ function ProjectModal({ onClose, appointment, onUpdate }) {
 
   // ✅ Returns config object if confirmation needed
   const getConfirmationConfig = (data) => {
-    if (!targetDate) {
+    if (!targetDate || !data.user) {
       return null;
     }
+
+    const selectedUserData = users.find(u => u.value === data.user);
+    const userName = selectedUserData?.label || 'the selected user';
 
     const fittingTimeInfo = selectedTimes.length > 0 
       ? ` with ${selectedTimes.length} fitting slot${selectedTimes.length > 1 ? 's' : ''}`
@@ -219,7 +233,7 @@ function ProjectModal({ onClose, appointment, onUpdate }) {
 
     return {
       severity: 'warning',
-      message: `Create project for ${appointment.first_name} ${appointment.last_name}? This will convert the appointment to a project, free up the original time slot${fittingTimeInfo}, and notify the client.`
+      message: `Create project for ${userName}? This will create a new project${fittingTimeInfo} and notify the client.`
     };
   };
 
@@ -227,7 +241,28 @@ function ProjectModal({ onClose, appointment, onUpdate }) {
   const handleSave = (data) => {
     if (saving) return;
 
-    // Check all required fields - now checking dropdown value
+    // Check user selection
+    if (!data.user) {
+      toast.error(
+        <div style={{ padding: '8px' }}>
+          Please select a user.
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
+      return;
+    }
+
+    // Check attire type
     if (!data.attire_type) {
       toast.error(
         <div style={{ padding: '8px' }}>
@@ -399,6 +434,7 @@ function ProjectModal({ onClose, appointment, onUpdate }) {
 
     try {
       const formData = new FormData();
+      formData.append('user', data.user);
       formData.append('attire_type', data.attire_type || '');
       
       formData.append(
@@ -415,22 +451,16 @@ function ProjectModal({ onClose, appointment, onUpdate }) {
       formData.append('total_amount', data.total_amount || '');
       formData.append('payment_status', data.payment_status || 'no_payment');
       formData.append('amount_paid', data.amount_paid || '');
-      formData.append('user', appointment.user);
-      formData.append('appointment', appointment.id);
 
       if (referenceImage) {
         formData.append('reference_image', referenceImage);
       }
 
-      await AxiosInstance.post('design/designs/', formData, {
+      await AxiosInstance.post('/design/designs/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      await AxiosInstance.patch(`appointment/appointments/${appointment.id}/`, {
-        appointment_status: 'project',
-      });
-
-      sendDefaultNotification('project_created', appointment.user);
+      sendDefaultNotification('project_created', data.user);
 
       // HANDLE FITTING TIME UNAVAILABILITY
       if (fittingDate && selectedTimes.length > 0) {
@@ -463,46 +493,21 @@ function ProjectModal({ onClose, appointment, onUpdate }) {
         }
       }
 
-      // FREE UP ORIGINAL APPOINTMENT SLOT
-      try {
-        const appointmentDate = appointment.date;
-        const availabilityRes = await AxiosInstance.get(
-          `availability/display_unavailability/?date=${appointmentDate}`
-        );
-
-        const existing = availabilityRes.data?.[0];
-        if (existing) {
-          const matchedSlotKey = slotMap[appointment.time];
-
-          if (matchedSlotKey && existing[matchedSlotKey] === true) {
-            const updatedUnavailability = {
-              ...existing,
-              [matchedSlotKey]: false,
-              [`reason_${matchedSlotKey.split('_')[1]}`]: 'Available',
-            };
-
-            await AxiosInstance.post(
-              'availability/set_unavailability/',
-              updatedUnavailability
-            );
-          }
-        }
-      } catch (err) {
-        console.error('Error freeing appointment slots:', err);
-      }
-
-      // ✅ Success notification - show AFTER loading completes
-      if (onUpdate) {
-        onUpdate();
+      // ✅ Call onProjectCreated callback to refresh parent component
+      if (onProjectCreated) {
+        onProjectCreated();
       }
 
       // Hide loading spinner first
       setSaving(false);
 
+      const selectedUserData = users.find(u => u.value === data.user);
+      const userName = selectedUserData?.label || 'the user';
+
       // Then show success toast
       toast.success(
         <div style={{ padding: '8px' }}>
-          Project created successfully for {appointment.first_name} {appointment.last_name}!
+          Project created successfully for {userName}!
         </div>,
         {
           position: "top-center",
@@ -520,6 +525,10 @@ function ProjectModal({ onClose, appointment, onUpdate }) {
       // Close modal after success toast
       setTimeout(() => {
         reset();
+        setTargetDate(null);
+        setFittingDate(null);
+        setSelectedTimes([]);
+        setReferenceImage(null);
         onClose();
       }, 1000);
 
@@ -538,7 +547,7 @@ function ProjectModal({ onClose, appointment, onUpdate }) {
       } else if (error.response?.status === 403) {
         errorMessage = 'You do not have permission to create this project.';
       } else if (error.response?.status === 404) {
-        errorMessage = 'Appointment not found. Please try again.';
+        errorMessage = 'User not found. Please try again.';
       } else if (error.response?.status === 500) {
         errorMessage = 'Server error. Please try again later.';
       } else if (error.message === 'Network Error') {
@@ -573,6 +582,18 @@ function ProjectModal({ onClose, appointment, onUpdate }) {
     }
   };
 
+  // ✅ Reset form when closing
+  const handleClose = () => {
+    if (!saving) {
+      reset();
+      setTargetDate(null);
+      setFittingDate(null);
+      setSelectedTimes([]);
+      setReferenceImage(null);
+      onClose();
+    }
+  };
+
   return (
     <>
       <div className="projectOuterModal" style={{ position: 'relative' }}>
@@ -583,9 +604,8 @@ function ProjectModal({ onClose, appointment, onUpdate }) {
           </div>
         )}
 
-        <div className="createProjectModal">
           <Tooltip title="Close" arrow>
-            <button className="close-modal" onClick={onClose} disabled={saving}>
+            <button className="close-modal" onClick={handleClose} disabled={saving}>
               <CloseRoundedIcon
                 sx={{
                   color: '#f5f5f5',
@@ -600,12 +620,19 @@ function ProjectModal({ onClose, appointment, onUpdate }) {
             </button>
           </Tooltip>
 
+        <div className="createProjectModal">
+
+
           <div className="project-modal-body">
             <div className="project-title">Create Project</div>
 
-            <div className="project-user">
-              <span>Name: </span>
-              {appointment.first_name} {appointment.last_name}
+            <div className="user-selection-container project-container">
+              <DropdownComponentTime
+                items={users}
+                dropDownLabel="Select User"
+                name="user"
+                control={control}
+              />
             </div>
 
             <div className="attire-type-container project-container">
@@ -721,4 +748,4 @@ function ProjectModal({ onClose, appointment, onUpdate }) {
   );
 }
 
-export default ProjectModal;
+export default CreateProjectModal;

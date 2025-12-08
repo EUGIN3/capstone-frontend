@@ -19,12 +19,12 @@ import Dialog from '@mui/material/Dialog';
 import ModalDetails from '../manage-appointment/ModalDetails';
 import ProjectModal from './project-modal/ProjectModal';
 import dayjs from 'dayjs';
-
 import noImage from '../../../assets/no-image.jpg';
-
 import { Tooltip } from '@mui/material';
 import DatePickerComponent from '../../forms/date-picker/DatePicker';
 import ButtonElement from '../../forms/button/ButtonElement';
+import { ToastContainer, toast, Slide } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
 
 export default function ApprovedAppointmentTable() {
   const [loading, setLoading] = useState(false);
@@ -46,7 +46,6 @@ export default function ApprovedAppointmentTable() {
   const [rows, setRows] = useState([]);
   const [totalAppointments, setTotalAppointments] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
-
   const [open, setOpen] = useState(false);
   const [openCreate, setOpenCreate] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
@@ -73,6 +72,46 @@ export default function ApprovedAppointmentTable() {
       setSearchTerm('');
       setPage(0);
     });
+  };
+
+  const handleDownload = async () => {
+    try {
+      const response = await AxiosInstance.get("appointment/export/csv/", {
+        responseType: "blob",
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "approved_appointments.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      toast.success("Download successful!", {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "colored",
+        transition: Slide,
+      });
+
+    } catch (error) {
+      console.error("Download failed:", error);
+      toast.error("Failed to download approved appointments.", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "colored",
+        transition: Slide,
+      });
+    }
   };
 
   const columns = [
@@ -103,7 +142,6 @@ export default function ApprovedAppointmentTable() {
     });
   };
 
-  // ✅ Lightweight refresh — for onUpdate only (no loading UI)
   const refreshAppointments = async () => {
     try {
       const response = await AxiosInstance.get('appointment/appointments/');
@@ -151,12 +189,10 @@ export default function ApprovedAppointmentTable() {
     setOpen(true);
   };
 
-  // ✅ FIXED: No auto-refresh on close
   const handleClose = () => {
     setSelectedAppointment(null);
     setAttire(null);
     setOpen(false);
-    // ❌ Removed: fetchAppointments()
   };
 
   const handleOpenCreate = (appointment) => {
@@ -164,11 +200,9 @@ export default function ApprovedAppointmentTable() {
     setOpenCreate(true);
   };
 
-  // ✅ FIXED: No auto-refresh on close
   const handleCloseCreate = () => {
     setSelectedAppointment(null);
     setOpenCreate(false);
-    // ❌ Removed: fetchAppointments()
   };
 
   const handleSearchChange = async (event) => {
@@ -178,9 +212,7 @@ export default function ApprovedAppointmentTable() {
   };
 
   const handleChangePage = async (event, newPage) => {
-    await withLoading(async () => {
-      setPage(newPage);
-    });
+    await withLoading(async () => setPage(newPage));
   };
 
   const handleChangeRowsPerPage = async (event) => {
@@ -219,6 +251,7 @@ export default function ApprovedAppointmentTable() {
           <div className="loading-spinner"></div>
         </div>
       )}
+
       <div className="manage-appointment-header">
         <AppHeader headerTitle="Approved Appointments" />
 
@@ -235,6 +268,14 @@ export default function ApprovedAppointmentTable() {
               label='All'
               variant='outlined-black'
               onClick={handleShowAll}
+            />
+          </div>
+
+          <div className="approve-all-btn">
+            <ButtonElement
+              label='Download'
+              variant='outlined-black download'
+              onClick={handleDownload}
             />
           </div>
         </div>
@@ -442,6 +483,8 @@ export default function ApprovedAppointmentTable() {
           )}
         </Dialog>
       </Paper>
+
+      <ToastContainer />
     </>
   );
 }

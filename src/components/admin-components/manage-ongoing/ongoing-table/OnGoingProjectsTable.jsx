@@ -9,6 +9,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
+import { Dialog, DialogContent } from '@mui/material';
 import AxiosInstance from '../../../API/AxiosInstance'
 import SearchIcon from '@mui/icons-material/Search';
 import TextField from '@mui/material/TextField';
@@ -19,10 +20,19 @@ import { useNavigate } from 'react-router-dom';
 
 import DatePickerComponent from '../../../forms/date-picker/DatePicker';
 import ButtonElement from '../../../forms/button/ButtonElement';
+import { toast } from 'react-toastify';
+import CreateProjectModal from './CreateProjectModal';
 
 export default function OnGoingProjectsTable() {
   const [loading, setLoading] = useState(false);
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rows, setRows] = useState([]);
+  const [totalProjects, setTotalProjects] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedDate, setSelectedDate] = useState(null);
+  const navigate = useNavigate();
 
   const withLoading = async (cb) => {
     try {
@@ -33,14 +43,6 @@ export default function OnGoingProjectsTable() {
       setLoading(false);
     }
   };
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [rows, setRows] = useState([]);
-  const [totalProjects, setTotalProjects] = useState(0);
-  const [searchTerm, setSearchTerm] = useState('');
-  const navigate = useNavigate();
-  const [selectedDate, setSelectedDate] = useState(null);
-
 
   const columns = [
     { id: 'user', label: 'UserName', minWidth: 150, align: 'left' },
@@ -51,6 +53,16 @@ export default function OnGoingProjectsTable() {
     { id: 'balance', label: 'Balance', minWidth: 150, align: 'center' },
     { id: 'actions', label: 'Actions', minWidth: 100, align: 'center' },
   ];
+
+  const [isCreate, setIsCreate] = useState(false);
+
+  const handleOpenCreate = () => {
+    setIsCreate(true);
+  };
+
+  const handleCloseCreate = () => {
+    setIsCreate(false);
+  };
 
   const fetchDesigns = async () => {
     await withLoading(async () => {
@@ -66,13 +78,12 @@ export default function OnGoingProjectsTable() {
         const matchedUser = users.find((u) => u.id === design.user);
         return {
           ...design,
-          userInfo: matchedUser ? matchedUser : null,
+          userInfo: matchedUser || null,
         };
       });
 
       const ongoing = merged.filter(
-        (design) =>
-          design.process_status?.toLowerCase().trim() !== 'done'
+        (design) => design.process_status?.toLowerCase().trim() !== 'done'
       );
 
       setRows(ongoing);
@@ -80,23 +91,17 @@ export default function OnGoingProjectsTable() {
     });
   };
 
-  const formatDate = (date) => {
-    if (!date) return '—';
-    const formattedDate = new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-    return formattedDate;
-  };
-
   useEffect(() => {
     fetchDesigns();
   }, []);
 
-  const handleSearchChange = async (event) => {
-    const value = event.target.value.toLowerCase();
-    setSearchTerm(value);
+  const formatDate = (date) => {
+    if (!date) return '—';
+    return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  };
+
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value.toLowerCase());
     setPage(0);
   };
 
@@ -105,27 +110,25 @@ export default function OnGoingProjectsTable() {
   };
 
   const handleChangePage = async (event, newPage) => {
-    await withLoading(async () => {
-      setPage(newPage);
-    });
+    await withLoading(() => setPage(newPage));
   };
 
   const handleChangeRowsPerPage = async (event) => {
-    await withLoading(async () => {
+    await withLoading(() => {
       setRowsPerPage(+event.target.value);
       setPage(0);
     });
   };
 
   const handleDateChange = async (newValue) => {
-    await withLoading(async () => {
+    await withLoading(() => {
       setSelectedDate(newValue);
       setPage(0);
     });
   };
 
   const handleShowAll = async () => {
-    await withLoading(async () => {
+    await withLoading(() => {
       setSelectedDate(null);
       setSearchTerm('');
       setPage(0);
@@ -133,16 +136,26 @@ export default function OnGoingProjectsTable() {
   };
 
   const filteredRows = rows.filter((project) => {
-    const matchesSearch = Object.values(project)
-      .join(' ')
-      .toLowerCase()
-      .includes(searchTerm);
-
+    // Get full name from userInfo
+    const fullName = project.userInfo 
+      ? `${project.userInfo.first_name || ''} ${project.userInfo.last_name || ''}`.trim().toLowerCase()
+      : '';
+    
+    // Build searchable string including full name
+    const searchableFields = [
+      fullName,
+      project.attire_type,
+      project.process_status,
+      project.payment_status,
+      project.balance
+    ].filter(Boolean).join(' ').toLowerCase();
+    
+    const matchesSearch = searchableFields.includes(searchTerm);
+    
     const matchesDate = selectedDate
-      ? dayjs(project.targeted_date).format('YYYY-MM-DD') ===
-        dayjs(selectedDate).format('YYYY-MM-DD')
+      ? dayjs(project.targeted_date).format('YYYY-MM-DD') === dayjs(selectedDate).format('YYYY-MM-DD')
       : true;
-
+    
     return matchesSearch && matchesDate;
   });
 
@@ -150,52 +163,94 @@ export default function OnGoingProjectsTable() {
     setTotalProjects(filteredRows.length);
   }, [filteredRows]);
 
+  // ✅ CSV Export function
+  const handleDownloadCSV = async () => {
+    try {
+      const res = await AxiosInstance.get('design/export/csv/', { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'designs.csv');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast.success('CSV downloaded successfully!');
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to download CSV.');
+    }
+  };
 
   return (
     <div className='ongoing-projects'>
+      {/* Create Project Modal Dialog */}
+      <Dialog 
+        open={isCreate} 
+        onClose={handleCloseCreate}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          style: {
+            width: 'auto',
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            padding: '0px',
+            backgroundColor: 'transparent',
+            boxShadow: 'none',
+          },
+        }}
+      >
+        <DialogContent sx={{ padding: 0 }}>
+          <CreateProjectModal 
+            onClose={handleCloseCreate}
+            onProjectCreated={fetchDesigns}
+          />
+        </DialogContent>
+      </Dialog>
+
       {loading && (
         <div className="loading-overlay">
           <div className="loading-spinner"></div>
         </div>
       )}
+
       <div className="ongoing-projects-header">
         <AppHeader headerTitle="Ongoing Projects" />
-
         <div className="ongoing-filter-container">
           <div className="filter">
-            <DatePickerComponent
-              value={selectedDate}
-              onChange={handleDateChange}
-            />
+            <DatePickerComponent value={selectedDate} onChange={handleDateChange} />
           </div>
-
           <div className="ongoing-all-btn">
-            <ButtonElement
-              label="All"
-              variant="outlined-black"
-              onClick={handleShowAll}
-            />
+            <ButtonElement label="All" variant="outlined-black" onClick={handleShowAll} />
+          </div>
+          <div className="ongoing-download-btn">
+            <ButtonElement label="Download" variant="outlined-black" onClick={handleDownloadCSV} />
           </div>
         </div>
       </div>
 
       <div className="ongoing-projects-table-header">
-        <div className="search-ongoing-container">
-          <SearchIcon />
-          <TextField
-            variant="outlined"
-            placeholder="Search ongoing projects..."
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': { border: 'none' },
-                '&:hover fieldset': { border: 'none' },
-                '&.Mui-focused fieldset': { border: 'none' },
-              },
-            }}
-            onChange={handleSearchChange}
-            value={searchTerm}
-          />
+        <div className='create-search'>
+          <div className="create-project">
+            <ButtonElement
+              label='Create'
+              variant='filled-black'
+              onClick={handleOpenCreate}
+            />
+          </div>
+
+          <div className="search-ongoing-container">
+            <SearchIcon />
+            <TextField
+              variant="outlined"
+              placeholder="Name, attire type, status..."
+              sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { border: 'none' }, '&:hover fieldset': { border: 'none' }, '&.Mui-focused fieldset': { border: 'none' } } }}
+              onChange={handleSearchChange}
+              value={searchTerm}
+            />
+          </div>
         </div>
+
 
         <div className="total-ongoing">
           <span>Projects:</span>
@@ -204,27 +259,12 @@ export default function OnGoingProjectsTable() {
       </div>
 
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer
-          sx={{
-            maxHeight: '63vh',
-            overflowY: 'scroll',
-            scrollbarGutter: 'stable',
-            '&::-webkit-scrollbar': { width: '8px' },
-            '&::-webkit-scrollbar-thumb': {
-              backgroundColor: '#bdbdbd',
-              borderRadius: '10px',
-            },
-          }}
-        >
+        <TableContainer sx={{ maxHeight: '63vh', overflowY: 'scroll', scrollbarGutter: 'stable', '&::-webkit-scrollbar': { width: '8px' }, '&::-webkit-scrollbar-thumb': { backgroundColor: '#bdbdbd', borderRadius: '10px' } }}>
           <Table stickyHeader aria-label="ongoing projects table">
             <TableHead>
               <TableRow>
                 {columns.map((column) => (
-                  <TableCell
-                    key={column.id}
-                    align={column.align}
-                    style={{ minWidth: column.minWidth, fontWeight: 'bold' }}
-                  >
+                  <TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth, fontWeight: 'bold' }}>
                     {column.label}
                   </TableCell>
                 ))}
@@ -233,59 +273,28 @@ export default function OnGoingProjectsTable() {
 
             <TableBody>
               {filteredRows.length === 0 ? (
-                <TableRow sx={{height:'100px'}}>
-                  <TableCell colSpan={columns.length} align="center">
-                    No Ongoing Projects
-                  </TableCell>
+                <TableRow sx={{ height: '100px' }}>
+                  <TableCell colSpan={columns.length} align="center">No Ongoing Projects</TableCell>
                 </TableRow>
               ) : (
-                filteredRows
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((project) => (
-                    <TableRow hover key={project.id} className="ongoing-projects-row">
-                      <TableCell align="left" sx={{textTransform:'capitalize'}}>
-                        {project.userInfo
-                          ? `${project.userInfo.first_name || ''} ${project.userInfo.last_name || ''}`.trim()
-                          : '—'}
-                      </TableCell>
-                      <TableCell align="center" sx={{textTransform:'capitalize'}}>{project.attire_type || '—'}</TableCell>
-                      <TableCell align="center">{formatDate(project.targeted_date)}</TableCell>
-                      <TableCell align="center" sx={{textTransform:'capitalize'}}>{project.process_status || '—'}</TableCell>
-                      <TableCell align="center">
-                        {project.payment_status
-                          ? project.payment_status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
-                          : '—'}
-                      </TableCell>
-                      <TableCell align="center">{project.balance || '—'}</TableCell>
-                      <TableCell align="center">
-                        <button
-                          style={{
-                            background: 'transparent',
-                            border: 'none',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '100%',
-                          }}
-                          className="view-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleView(project);
-                          }}
-                        >
-                          <VisibilityTwoToneIcon
-                            sx={{
-                              color: 'rgba(56, 56, 56, 0.72)',
-                              fontSize: 26,
-                              cursor: 'pointer',
-                              '&:hover': { color: '#000000ff' },
-                              transition: 'all 0.3s ease',
-                            }}
-                          />
-                        </button>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((project) => (
+                  <TableRow hover key={project.id} className="ongoing-projects-row">
+                    <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
+                      {project.userInfo ? `${project.userInfo.first_name || ''} ${project.userInfo.last_name || ''}`.trim() : '—'}
+                    </TableCell>
+                    <TableCell align="center" sx={{ textTransform: 'capitalize' }}>{project.attire_type || '—'}</TableCell>
+                    <TableCell align="center">{formatDate(project.targeted_date)}</TableCell>
+                    <TableCell align="center">{project.process_status ? project.process_status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : '—'}</TableCell>
+                    <TableCell align="center">{project.payment_status ? project.payment_status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : '—'}</TableCell>
+                    <TableCell align="center">{project.balance || '—'}</TableCell>
+                    <TableCell align="center">
+                      <button style={{ background: 'transparent', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}
+                        className="view-btn" onClick={(e) => { e.stopPropagation(); handleView(project); }}>
+                        <VisibilityTwoToneIcon sx={{ color: 'rgba(56, 56, 56, 0.72)', fontSize: 26, cursor: 'pointer', '&:hover': { color: '#000000ff' }, transition: 'all 0.3s ease' }} />
+                      </button>
+                    </TableCell>
+                  </TableRow>
+                ))
               )}
             </TableBody>
           </Table>

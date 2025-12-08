@@ -89,8 +89,7 @@ function BigCalendar({ onCLickDate }) {
         }}
         headerToolbar={{
           right: "today prev,next",
-          center: "title",
-          left: "dayGridMonth,timeGridWeek,timeGridDay"
+          left: "title",
         }}
         datesSet={(arg) => {
           setCurrentStart(arg.startStr);

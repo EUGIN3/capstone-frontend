@@ -43,7 +43,19 @@ const ManageSchedule = () => {
   return (
     <div className='adminAppContainer manageSchedule'>
 
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog 
+        open={open} onClose={handleClose}
+        PaperProps={{
+          style: {
+            width: 'auto',
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            padding: '0px',
+            backgroundColor: 'transparent',
+            boxShadow: 'none',
+          },
+        }}
+      >
         <SetUnavailability
           selectedDate={selectedDate}
 

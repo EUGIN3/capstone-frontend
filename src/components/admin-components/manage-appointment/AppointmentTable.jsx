@@ -24,6 +24,9 @@ import ButtonElement from '../../forms/button/ButtonElement';
 
 import DatePickerComponent from '../../forms/date-picker/DatePicker';
 import dayjs from 'dayjs';
+import Confirmation from '../../forms/confirmation-modal/Confirmation';
+import { ToastContainer, toast, Slide } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
 
 
 export default function AppointmentTable() {
@@ -39,6 +42,10 @@ export default function AppointmentTable() {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [attire, setAttire] = useState([])
   const [selectedDate, setSelectedDate] = useState(null);
+  const [userCancels, setUserCancels] = useState({});
+
+  const [confirmData, setConfirmData] = useState(null);
+  const [archivingId, setArchivingId] = useState(null);
 
   const withLoading = async (callback) => {
     try {
@@ -61,25 +68,11 @@ export default function AppointmentTable() {
     { id: 'firstName', label: 'First Name', minWidth: 100, align: 'left'},
     { id: 'date', label: 'Date', minWidth: 100, align: 'left' },
     { id: 'time', label: 'Time', minWidth: 100, align: 'left' },
-    { id: 'appointment_status', label: 'Status', minWidth: 120, align: 'left' },
+    { id: 'appointment_status', label: 'Status', minWidth: 100, align: 'left' },
+    { id: 'cancels', label: 'Cancels', minWidth: 100, align: 'center' },
     { id: 'actions', label: 'Actions', minWidth: 100, align: 'center' },
   ];
 
-  // const fetchAppointments = async () => {
-  //   try {
-  //     setLoading(true);
-  //     const response = await AxiosInstance.get('appointment/appointments/');
-  //     const sortedAppointments = response.data.sort(
-  //       (a, b) => new Date(b.updated_at) - new Date(a.updated_at)
-  //     );
-  //     setRows(sortedAppointments);
-  //     setTotalAppointments(sortedAppointments.length);
-  //   } catch (error) {
-  //     console.error('Failed to fetch appointments:', error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
   const fetchAppointments = async () => {
     try {
       setLoading(true);
@@ -92,11 +85,41 @@ export default function AppointmentTable() {
 
       setRows(sortedAppointments);
       setTotalAppointments(sortedAppointments.length);
+
+      // ✅ Load user cancels here
+      loadUserCancels(sortedAppointments);
+
     } catch (error) {
       console.error('Failed to fetch appointments:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+
+  const fetchUser = async (userId) => {
+    try {
+      const response = await AxiosInstance.get(`/auth/users/${userId}/`);
+      return response.data.cancels || 0;
+    } catch (error) {
+      console.error('Failed to fetch user cancels:', error);
+      return 0;
+    }
+  };
+
+  const loadUserCancels = async (appointments) => {
+    const cancelsMap = {};
+
+    await Promise.all(
+      appointments.map(async (appointment) => {
+        if (appointment.user) {
+          const count = await fetchUser(appointment.user);
+          cancelsMap[appointment.user] = count;
+        }
+      })
+    );
+
+    setUserCancels(cancelsMap);
   };
 
 
@@ -150,16 +173,87 @@ export default function AppointmentTable() {
     setPage(0);
   };
 
-  const handleArchived = async (id) => {
+
+  const handleArchivedClick = (appointment) => {
+    setConfirmData({
+      id: appointment.id,
+      message: `Archive appointment for ${appointment.first_name}?`,
+      severity: 'warning'
+    });
+  };
+
+  const confirmArchive = async (confirmed) => {
+    if (!confirmed || !confirmData) {
+      setConfirmData(null);
+      return;
+    }
+
     try {
-      await AxiosInstance.patch(`appointment/appointments/${id}/`, {
+      setArchivingId(confirmData.id);
+
+      await AxiosInstance.patch(`appointment/appointments/${confirmData.id}/`, {
         appointment_status: "archived"
       });
 
-      // ✅ Automatically refresh the table after archiving
+      toast.success(
+        <div style={{ padding: '8px' }}>
+          Appointment archived successfully!
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
+
       fetchAppointments();
+
     } catch (error) {
-      console.error("❌ Failed to archive appointment:", error);
+      console.error('Failed to archive appointment:', error);
+
+      let errorMessage = 'Failed to archive appointment. Please try again.';
+
+      if (error.response?.status === 400) {
+        errorMessage = error.response?.data?.detail || 
+                      error.response?.data?.error ||
+                      'Invalid appointment data. Please check and try again.';
+      } else if (error.response?.status === 401) {
+        errorMessage = 'Your session has expired. Please log in again.';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'You do not have permission to archive this appointment.';
+      } else if (error.response?.status === 404) {
+        errorMessage = 'Appointment not found. Please refresh and try again.';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      } else if (error.message === 'Network Error') {
+        errorMessage = 'Network connection failed. Please check your internet connection.';
+      }
+
+      toast.error(
+        <div style={{ padding: '8px' }}>
+          {errorMessage}
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+          transition: Slide,
+          closeButton: false,
+        }
+      );
+    } finally {
+      setArchivingId(null);
+      setConfirmData(null);
     }
   };
 
@@ -221,6 +315,26 @@ export default function AppointmentTable() {
     return matchesSearch && matchesStatus && matchesDate;
   });
 
+  const handleDownload = async () => {
+    try {
+      const response = await AxiosInstance.get("appointment/export/csv/", {
+        responseType: "blob", // IMPORTANT for file download
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "appointments.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+    } catch (error) {
+      console.error("Download failed:", error);
+      toast.error("Failed to download CSV.");
+    }
+  };
+
   // Update total appointments count based on filter
   useEffect(() => {
     setTotalAppointments(filteredRows.length);
@@ -249,6 +363,14 @@ export default function AppointmentTable() {
               label="All"
               variant="outlined-black"
               onClick={handleShowAll}
+            />
+          </div>
+
+          <div className="approve-all-btn">
+            <ButtonElement
+              label="Download"
+              variant="outlined-black"
+              onClick={handleDownload}
             />
           </div>
         </div>
@@ -353,6 +475,16 @@ export default function AppointmentTable() {
                           {appointment.appointment_status || '—'}
                         </span>
                       </TableCell>
+                      <TableCell align="center">
+                        <span
+                          style={{
+                            fontWeight: 'bold',
+                            color: (userCancels[appointment.user] || 0) > 2 ? '#F04438' : '#383838',
+                          }}
+                        >
+                          {userCancels[appointment.user] ?? 0}
+                        </span>
+                      </TableCell>
                       <TableCell align="center" sx={{
                         display: 'flex',
                         justifyContent:'center',
@@ -404,7 +536,7 @@ export default function AppointmentTable() {
                               className="view-btn"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleArchived(appointment.id);
+                                handleArchivedClick(appointment);
                               }}
                             >
                               <DeleteTwoToneIcon 
@@ -468,6 +600,17 @@ export default function AppointmentTable() {
           )}
         </Dialog>
       </Paper>
+
+      {confirmData && (
+        <Confirmation
+          isOpen={true}
+          message={confirmData.message}
+          severity={confirmData.severity}
+          onConfirm={confirmArchive}
+        />
+      )}
+
+      <ToastContainer />
     </>
   );
 }

@@ -1,0 +1,190 @@
+/* Main modal container */
+.createProjectModal {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-sizing: border-box;
+    padding: 24px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    position: relative;
+}
+
+/* Outer wrapper for modal sizing */
+.projectOuterModal {
+    padding: 12px;
+    background-color: transparent;
+    width: 600px;
+}
+
+/* Container for full-width inputs */
+.projectOuterModal .total-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Close button styling */
+.close-modal {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    background-color: transparent;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+}
+
+.close-modal:hover {
+    transform: scale(1.05);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.close-modal:active {
+    transform: scale(0.98);
+}
+
+/* Modal title */
+.project-modal-body .project-title {
+    font-size: 24px;
+    font-weight: 600;
+    text-transform: uppercase;
+    text-align: center;
+    background-color: transparent;
+    border-radius: 4px;
+    padding: 8px;
+    margin-bottom: 4px;
+}
+
+/* User display section (for ProjectModal with appointment) */
+.project-user {
+    font-size: 18px;
+    text-transform: uppercase;
+    padding: 8px 12px;
+    background-color: rgba(255, 255, 255, 0.6);
+    border-radius: 4px;
+    margin-bottom: 4px;
+}
+
+.project-user span {
+    font-weight: bold;
+}
+
+/* Modal body container */
+.project-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* User selection container (for CreateProjectModal) */
+.user-selection-container {
+    width: 100%;
+}
+
+/* Attire type container */
+.attire-type-container {
+    width: 100%;
+}
+
+/* Two-column layouts */
+.date-status-container,
+.payment-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Individual form field containers */
+.targeted-date-container,
+.progress-status-container,
+.payment-status-container,
+.amount-paid-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Standard height for form containers */
+.project-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 54px;
+}
+
+/* Save button container */
+.save-container {
+    height: 50px;
+    margin-top: 4px;
+}
+
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .projectOuterModal {
+        width: 95vw;
+        padding: 8px;
+    }
+
+    .createProjectModal {
+        padding: 16px;
+    }
+
+    .project-modal-body .project-title {
+        font-size: 20px;
+    }
+
+    .project-user {
+        font-size: 16px;
+    }
+
+    .date-status-container,
+    .payment-container {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .targeted-date-container,
+    .progress-status-container,
+    .payment-status-container,
+    .amount-paid-container {
+        width: 100%;
+    }
+
+    .project-container {
+        height: auto;
+        min-height: 54px;
+    }
+}
+
+/* Additional styling for disabled state */
+.createProjectModal button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Form field focus states */
+.project-modal-body input:focus,
+.project-modal-body select:focus {
+    outline: 2px solid #0c0c0c;
+    outline-offset: 2px;
+}
+
+/* Error state styling (if needed) */
+.project-modal-body .error-message {
+    color: #d32f2f;
+    font-size: 12px;
+    margin-top: 4px;
+    padding-left: 4px;
+}
