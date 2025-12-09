@@ -18,6 +18,7 @@
     font-size: 220px;
     letter-spacing: 3px;
     font-weight: 700;
+
 }
 
 .animated-text span{
@@ -120,4 +121,11 @@
 
 .backdrop {
     opacity: 0.5;
+}
+
+/* added */
+.backdrop-container img {
+    max-width: 100%;
+    height: auto;
+    display: block;
 }

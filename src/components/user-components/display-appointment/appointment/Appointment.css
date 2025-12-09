@@ -217,3 +217,22 @@
 .confirmation-overlay {
   z-index: 1400 !important;
 }
+
+@media (max-width: 650px) {
+    .update-appointment-image {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        grid-template-columns: 1fr ;
+        flex-direction: column;
+    }
+
+    .outerUpdateAppointment {
+        width: 100%;
+    }
+
+    .update-dialog-time-date-container {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+}

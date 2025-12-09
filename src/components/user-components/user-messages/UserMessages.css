@@ -98,5 +98,67 @@
 }
 
 
+/* Tablet */
+@media (max-width: 1024px) {
+  #userMessages .messages-content-container {
+    grid-template-rows: auto 1fr auto;
+    height: auto;
+  }
+
+  #userMessages .admin-messages-contents {
+    height: 300px;
+    overflow-y: auto;
+  }
+
+  #userMessages .user-profile {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}
+
+/* Mobile Landscape / Small Tablets */
+@media (max-width: 768px) {
+  #userMessages .header {
+    font-size: 28px;
+  }
+
+  #userMessages .messages-content-container {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  #userMessages .filled-black {
+    width: 120px;
+    height: 48px;
+  }
+}
+
+/* Mobile Phones */
+@media (max-width: 425px) {
+  #userMessages {
+    padding: 10px;
+  }
+
+  #userMessages .header {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  #userMessages .admin-messages-contents {
+    height: 250px;
+    padding: 10px 0;
+  }
+
+  #userMessages .send-text-box-container .filled-black {
+    width: 100px;
+    height: 48px;
+  }
+
+  #userMessages .filled-black {
+    width: 100px;
+    height: 48px;
+  }
+}
 
 

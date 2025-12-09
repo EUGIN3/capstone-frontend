@@ -141,3 +141,44 @@
     transform: rotate(360deg);
   }
 }
+
+
+@media(max-width: 900px) {
+  .ProjectDetails .info-text {
+    font-size: 12px;
+  }
+}
+
+@media (400px <= width <= 768px) {
+  .ProjectDetails {
+    flex-direction: column;
+    padding: 20px;
+    gap: 16px;
+  }
+
+  .image-container {
+    width: 70%;
+    height: auto;
+  }
+
+  .project-info-container {
+    width: 100%;
+  }
+
+  .ProjectDetails .info {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
+
+@media(max-width: 425px) {
+   .ProjectDetails {
+    flex-direction: column;
+    padding: 20px;
+    gap: 16px;
+  }
+  .image-container {
+    width: 70%;
+    height: auto;
+  }
+}

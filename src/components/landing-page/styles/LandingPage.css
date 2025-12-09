@@ -74,6 +74,7 @@ html {
     --suit-name-font:42px;
 }
 
+
 body {
     color: var(--white);
     font-family: var(--normal-font);
@@ -106,4 +107,3 @@ body {
 .book-now:hover {
     transform: translateX(10px);
 }
-

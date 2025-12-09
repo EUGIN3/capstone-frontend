@@ -60,3 +60,36 @@ button.view-button {
   font-family: var(--fancy-font);
   font-size: 20px;
 }
+
+@media (max-width: 1024px) {
+  button.view-button {
+    width: 90px;
+    height: 36px;
+    font-size: 13px;
+  }
+  .user-gallery-attire-name {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  button.view-button {
+    width: 85px;
+    height: 34px;
+    font-size: 12px;
+  }
+  .user-gallery-attire-name {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  button.view-button {
+    width: 60px;
+    height: 20px;
+    font-size: 11px;
+  }
+  .user-gallery-attire-name {
+    font-size: 8px;
+  }
+}

@@ -11,7 +11,10 @@ import instagram from './assets/instagram.png'
 import messenger from './assets/messenger.png'
 import gps from './assets/gps.png'
 
+import { useNavigate, Link } from 'react-router-dom'
+
 const Contact = () => {
+  const navigate = useNavigate() 
   return (
     <section className="contacts-section">
 
@@ -47,7 +50,7 @@ const Contact = () => {
               className={"input"}/>
               
             <BasicTextFields 
-              label={"Email"}
+              label={"Email"} 
               className={"input"}/>
 
             <MultilineTextFields 

@@ -13,11 +13,11 @@ import Gallery from './Gallery'
 import { Link, Navigate } from 'react-router-dom'
 
 const LandingPage = () => {
-  return (    
+  return (     
     <div className='landingPage'>
       <Navbar />
       
-      <section id="home">
+      <section id="home"> 
         <Home />
       </section>
 

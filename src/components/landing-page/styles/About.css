@@ -1,6 +1,6 @@
 #about .about-section {
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
     background-color: var(--black);
     padding-top: 150px;
     position: relative;
@@ -58,22 +58,34 @@
     opacity: 0.5;
 } 
 
-.services-container{
+/* .services-container{
     margin-top: 70px;
-    height: 100%;
-    /* background-color: rebeccapurple; */
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 40px;
+} */
+
+.services-container {
+    margin-top: 70px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 40px;
+    width: 100%;
+    padding: 20px 20px 0 20px;
 }
+
 
 .service-container {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    width: 300px;
+    width: 100%;
     height: 360px;
     padding: 40px;
     gap: 20px;
@@ -95,10 +107,18 @@
 .service-container p{
     font-size: 16px;
 }
-
+ 
 .about-hr {
     width: 1px;
     height: 280px;
     background-color: var(--white);
     opacity: 0.1;
+}
+
+/* added */
+.circle-about-container img,
+.about-backdrop-container img {
+    max-width: 100%;
+    height: auto;
+    display: block;
 }

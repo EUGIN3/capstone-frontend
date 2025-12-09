@@ -94,3 +94,23 @@
 .save-container {
   height: 50px;
 }
+
+@media (max-width: 640px) {
+  .projectOuterModal {
+    width: 100%;
+  }
+
+}
+
+@media (max-width: 480px) {
+  
+  .date-status-container,
+  .payment-container {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .loading-overlay {
+    background-color: red;
+  }
+}

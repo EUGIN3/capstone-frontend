@@ -343,7 +343,6 @@
     100% { transform: rotate(360deg); }
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
     .modalDetails {
         padding: 20px;
@@ -376,5 +375,25 @@
     .modalDetails-status {
         flex-direction: column;
         align-items: flex-start;
+    }
+}
+
+@media (max-width: 425px) {
+    .modalDetails {
+        padding: 16px;
+        gap: 12px;
+    }
+
+    .title {
+        font-size: 18px;
+        margin: 0 0 4px 0;
+    }
+
+    .image-section {
+        height: 180px;
+    }
+
+    .modalDetails-description p {
+        height: 60px;
     }
 }

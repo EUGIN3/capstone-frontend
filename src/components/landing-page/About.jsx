@@ -15,25 +15,38 @@ const About = () => {
 
             <div className="services-container">
                 <div className="service-container">
-                    <h2 className='services-title'>Custom Design</h2>
+                    <h2 className='services-title'>Custom Dress Design</h2>
 
-                    <p className="service-info">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. </p>
+                    <p className="service-info">Made-to-measure dresses tailored to your style, body shape, and event. Each piece is designed with personal details that reflect your personality.</p>
                 </div>
 
-                <hr className="about-hr" />
-
                 <div className="service-container">
-                    <h2 className='services-title'>Custom Design</h2>
+                    <h2 className='services-title'>Outfit Consultation</h2>
 
-                    <p className="service-info">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. </p>
+                    <p className="service-info">One-on-one guidance to help you choose the right look for any occasion. Includes color matching, fabric suggestions, and styling tips.</p>
                 </div>
 
-                <hr className="about-hr" />
+                <div className="service-container">
+                    <h2 className='services-title'>Bridal & Formal Wear</h2>
+
+                    <p className="service-info">Elegant custom gowns for weddings, debuts, and formal events. Designed from scratch with fittings included.</p>
+                </div>
+                <div className="service-container">
+                    <h2 className='services-title'>Wardrobe Makeover</h2>
+
+                    <p className="service-info">A full review and refresh of your clothing collection. We help you decide what to keep, what to update, and what styles suit you best.</p>
+                </div>
 
                 <div className="service-container">
-                    <h2 className='services-title'>Custom Design</h2>
+                    <h2 className='services-title'>Made-to-Order Couples or Group Outfits</h2>
 
-                    <p className="service-info">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. </p>
+                    <p className="service-info">Coordinated designs for couples, families, barkada themes, or event crews.</p>
+                </div>
+
+                <div className="service-container">
+                    <h2 className='services-title'>Fabric & Material Sourcing</h2>
+
+                    <p className="service-info">Assistance in choosing the best fabrics and materials based on your budget and the look you want.</p>
                 </div>
             </div>
 

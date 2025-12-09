@@ -123,3 +123,76 @@
   from { transform: scale(0.9999); }
   to { transform: scale(1); }
 }
+
+
+/* Tablets – Reduce layout sizes */
+@media (max-width: 1024px) {
+    .UserViewModalItem {
+        width: 95%;
+        height: auto;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+    }
+
+    .userview-main-image-container {
+        height: 380px;
+    }
+}
+
+/* Large Phones / Small Tablets */
+@media (max-width: 768px) {
+    .UserViewModalItem {
+        padding: 15px;
+        width: 95%;
+    }
+
+    .userview-main-image-container {
+        height: 300px;
+    }
+
+    .userview-sub-image-container {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+    }
+
+    .userview-item-name {
+        font-size: 26px;
+    }
+}
+
+/* Mobile Phones */
+@media (max-width: 600px) {
+    .UserViewModalItem {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        height: auto;
+    }
+
+    .userview-main-image-container {
+        height: 250px;
+    }
+
+    .userview-sub-image-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .userview-item-name {
+        font-size: 22px;
+        letter-spacing: 1px;
+    }
+
+    .userview-item-description {
+        font-size: 14px;
+    }
+}
+
+/* Very Small Phones */
+@media (max-width: 400px) {
+    .userview-main-image-container {
+        height: 200px;
+    }
+
+    .userview-sub-image-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

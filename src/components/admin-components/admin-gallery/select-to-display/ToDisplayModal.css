@@ -132,3 +132,35 @@
 .to-display-text:hover {
   opacity: 0.8;
 }
+
+@media (max-width: 700px) {
+  .ToDisplayModal {
+    min-width: 100%;
+    padding: 20px;
+  }
+}
+
+@media (max-height: 600px) {
+  .to-display-items-container {
+    max-height: 300px;
+    min-height: 300px;
+  }
+}
+
+@media (max-width: 400px) {
+  .to-display-item {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .to-display-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .to-display-img-container {
+    width: 100%;
+    height: auto;
+  }
+
+}

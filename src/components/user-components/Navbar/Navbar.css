@@ -6,3 +6,8 @@ svg[data-testid="ArrowBackIosNewTwoToneIcon"] {
 svg[data-testid="ArrowBackIosNewTwoToneIcon"]:hover {
     color: #0c0c0c !important;
 }
+@media (max-width: 600px) {
+  .navbar-logo {
+    display: none !important;
+  }
+}

@@ -81,3 +81,12 @@
   font-size: 28px;
   font-weight: 600;
 }
+
+
+
+@media (max-width:570px) {
+  .AddUpdateModal {
+    width: 100%;
+    padding: 13px;
+  }
+}

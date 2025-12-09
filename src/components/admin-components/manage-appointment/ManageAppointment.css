@@ -133,3 +133,23 @@
     transform: rotate(360deg);
   }
 }
+
+
+@media (max-width: 768px) {
+    .search-appointment-container .MuiInputBase-input .MuiOutlinedInput-input {
+        width: 150px;
+    }
+    
+    .filter-appointment .main-dropdown {
+        width: 100px;
+    }
+}
+
+@media (max-width: 480px) {
+    .manage-appointment .manage-appointment-header {
+        display: grid;
+        grid-template-columns: 1fr ;
+        gap: 10px;
+    }
+
+}

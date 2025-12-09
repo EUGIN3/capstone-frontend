@@ -175,3 +175,16 @@
 .ongoing-projects .ongoing-download-btn .outlined-black {
   padding: 0px 20px;
 }
+
+
+@media (max-width: 425px) {
+  .ongoing-projects-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .search-ongoing-container .MuiInputBase-input .MuiOutlinedInput-input {
+    width: 100%;
+  }
+}
